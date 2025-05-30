@@ -1,4 +1,7 @@
 #!/usr/bin/env bash
-echo 'Na kaka ti huq'
+source ./secret.sh
 
+echo "root directory is: $ROOT_DIRECTORY "
+echo "Na kaka ti huq"
+# Check if this is root dir
 dir
