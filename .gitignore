@@ -1,51 +1,20 @@
-# Dependencies
+# Dependencies (covers both frontend and server)
 node_modules/
 */node_modules/
 
-# Environment files
-.env
-.env.local
-.env.*.local
-
-# IDE files
-.vscode/
-.idea/
-*.swp
-*.swo
-
-# OS files
-.DS_Store
-Thumbs.db
+# Server-specific
+server/uploads/
+server/*.db*
 
 # Build outputs
 dist/
 build/
 
-# Logs
-*.log
-npm-debug.log*
-
-# Server-specific ignores
-server/public/uploads/
-server/watchmaker-database.db*
-server/*.db-shm
-server/*.db-wal
-
-node_modules/
-server/node_modules/
-server/uploads/
-server/*.db*
-# Dependencies
-node_modules/
-server/node_modules/
-
-# Server uploads and database
-server/uploads/
-server/*.db
-server/*.db-shm
-server/*.db-wal
-
-# Environment files
+# Environment
 .env
-server/.env
+.env.*
+!.env.example
 
+# IDE & OS
+.vscode/
+.DS_Store
