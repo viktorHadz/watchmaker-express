@@ -3,10 +3,7 @@ node_modules/
 */node_modules/
 **/node_modules/** 
 # Server-specific
-server/public/uploads
-server/public/uploads/*
-server/*.db*
-
+/server/public/** 
 # Build outputs
 dist/
 build/
