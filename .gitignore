@@ -1,9 +1,10 @@
 # Dependencies (covers both frontend and server)
 node_modules/
 */node_modules/
-
+**/node_modules/** 
 # Server-specific
-server/uploads/
+server/public/uploads
+server/public/uploads/*
 server/*.db*
 
 # Build outputs
@@ -18,3 +19,6 @@ build/
 # IDE & OS
 .vscode/
 .DS_Store
+
+# BASH 
+secret.sh
