@@ -1,5 +1,5 @@
 <script setup>
-import NewGalleryElement from '@/components/NewGalleryPost.vue'
+import NewGalleryElement from '@/components/AdminNewPost.vue'
 </script>
 <template>
   <div class="">

@@ -3,11 +3,15 @@ import helmet from 'helmet'
 import cors from 'cors'
 import { db, initializeDatabase } from './database.js'
 import process from 'process'
+import path from 'node:path'
+import { fileURLToPath } from 'url'
 import insertPostRouter from './routes/insertPostRouter.js'
 import formRouter from './routes/formRouter.js'
 import getPostRouter from './routes/getPostRouter.js'
 
 const app = express()
+const __filename = fileURLToPath(import.meta.url) // get the resolved path to the file
+const __dirname = path.dirname(__filename) // get the name of the directory
 // Trust the proxy if behind one (important for correct IP detection)
 app.set('trust proxy', 1 /*this needs to be the proxy's ip here not 1 when i implement nginx */)
 // Security headers
@@ -20,11 +24,12 @@ app.use(
 )
 app.use(cors())
 app.use(express.json())
-app.use('/', express.static('public/uploads'))
 // Registering routes
 app.use('/api/form/', formRouter)
 app.use('/api/posts/', insertPostRouter)
 app.use('/api/posts/', getPostRouter)
+
+app.use('/public/uploads', express.static(path.join(__dirname, 'public', 'uploads')))
 
 // GET homepage
 app.get('/home-baby', (req, res) => {

@@ -8,8 +8,7 @@ import pocketWatch from './icons/pocketWatch.vue'
 import { useDateFormat, useNow } from '@vueuse/core'
 import { usePostType } from '@/composables/utils'
 import GalleryEl from './Gallery/GalleryEl.vue'
-// Historic posts filled from DB
-const posts = ref([])
+import { CloudArrowUpIcon, PaperAirplaneIcon, PlusIcon, TrashIcon } from '@heroicons/vue/24/outline'
 
 // Empty object to use when creating new post (for preview only now)
 const newPost = ref({
@@ -343,12 +342,11 @@ function removeExtraImage(index) {
     <div class="relative z-10 px-4 py-12 sm:px-6 lg:px-8">
       <!-- Header -->
       <div class="mb-12 text-center">
-        <h1 class="font-sec text-fg mb-4 text-4xl font-semibold lg:text-5xl">Gallery Management</h1>
+        <h1 class="font-sec text-fg mb-4 text-4xl font-semibold lg:text-5xl">Post Management</h1>
         <p class="text-fg/70 mx-auto max-w-3xl text-xl">
           Share your latest watch restorations and horological achievements
         </p>
       </div>
-      <GalleryEl></GalleryEl>
       <!-- CREATE NEW POST SECTION -->
       <div class="mx-auto mb-16 max-w-6xl">
         <div
@@ -360,14 +358,7 @@ function removeExtraImage(index) {
           >
             <div class="flex items-center space-x-4">
               <div class="bg-acc/20 flex h-12 w-12 items-center justify-center rounded-xl">
-                <svg class="text-acc h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                    stroke-width="2"
-                    d="M12 6v6m0 0v6m0-6h6m-6 0H6"
-                  ></path>
-                </svg>
+                <PlusIcon class="text-acc size-6"></PlusIcon>
               </div>
               <div>
                 <h2 class="font-sec text-fg text-2xl font-semibold">Create New Post</h2>
@@ -412,21 +403,9 @@ function removeExtraImage(index) {
 
                   <!-- Upload Icon -->
                   <div
-                    class="absolute top-4 right-4 flex h-8 w-8 items-center justify-center rounded-lg bg-white/80 opacity-0 transition-opacity group-hover:opacity-100 dark:bg-slate-700/80"
+                    class="absolute top-4 right-4 flex h-10 w-10 items-center justify-center rounded-lg bg-white/80 opacity-0 transition-opacity group-hover:opacity-100 dark:bg-slate-700/80"
                   >
-                    <svg
-                      class="text-acc h-4 w-4"
-                      fill="none"
-                      stroke="currentColor"
-                      viewBox="0 0 24 24"
-                    >
-                      <path
-                        stroke-linecap="round"
-                        stroke-linejoin="round"
-                        stroke-width="2"
-                        d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"
-                      ></path>
-                    </svg>
+                    <CloudArrowUpIcon class="size-5 text-acc"></CloudArrowUpIcon>
                   </div>
                 </div>
 
@@ -452,19 +431,7 @@ function removeExtraImage(index) {
                           @click="removeTitleImage"
                           class="flex h-8 w-8 items-center justify-center rounded-full bg-red-500 text-white transition-colors hover:bg-red-600"
                         >
-                          <svg
-                            class="h-4 w-4"
-                            fill="none"
-                            stroke="currentColor"
-                            viewBox="0 0 24 24"
-                          >
-                            <path
-                              stroke-linecap="round"
-                              stroke-linejoin="round"
-                              stroke-width="2"
-                              d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
-                            ></path>
-                          </svg>
+                          <TrashIcon class="size-4"></TrashIcon>
                         </button>
                       </div>
                     </div>
@@ -494,7 +461,7 @@ function removeExtraImage(index) {
                 <div
                   ref="extraImageDropZoneRef"
                   :class="[
-                    'group relative min-h-[280px] cursor-pointer rounded-xl border-2 border-dashed transition-all duration-300',
+                    'group relative min-h-[280px] cursor-pointer rounded-xl border-2 border-dashed transition-all duration-300 flex items-center justify-center',
                     isOverExtraDropZone
                       ? 'border-acc bg-acc/10 scale-[1.02]'
                       : 'hover:border-acc/50 border-slate-300 dark:border-slate-600',
@@ -536,19 +503,7 @@ function removeExtraImage(index) {
                               @click.stop="removeExtraImage(index)"
                               class="h-8 w-8 rounded-full bg-red-500 text-white opacity-0 transition-opacity group-hover:opacity-100 hover:bg-red-600"
                             >
-                              <svg
-                                class="mx-auto h-4 w-4"
-                                fill="none"
-                                stroke="currentColor"
-                                viewBox="0 0 24 24"
-                              >
-                                <path
-                                  stroke-linecap="round"
-                                  stroke-linejoin="round"
-                                  stroke-width="2"
-                                  d="M6 18L18 6M6 6l12 12"
-                                ></path>
-                              </svg>
+                              <TrashIcon class="size-4 mx-auto"></TrashIcon>
                             </button>
                           </div>
                         </div>
@@ -558,19 +513,7 @@ function removeExtraImage(index) {
                       <div
                         class="border-acc/30 hover:bg-acc/5 flex aspect-square items-center justify-center rounded-lg border-2 border-dashed transition-colors"
                       >
-                        <svg
-                          class="text-acc/60 h-8 w-8"
-                          fill="none"
-                          stroke="currentColor"
-                          viewBox="0 0 24 24"
-                        >
-                          <path
-                            stroke-linecap="round"
-                            stroke-linejoin="round"
-                            stroke-width="2"
-                            d="M12 6v6m0 0v6m0-6h6m-6 0H6"
-                          ></path>
-                        </svg>
+                        <PlusIcon class="text-acc/60 size-8"></PlusIcon>
                       </div>
                     </div>
                   </div>
@@ -639,201 +582,15 @@ function removeExtraImage(index) {
                 class="from-acc to-acc/80 hover:from-acc/90 hover:to-acc/70 focus:ring-acc/50 inline-flex transform items-center rounded-xl bg-gradient-to-r px-8 py-3 font-semibold text-white shadow-lg transition-all duration-200 hover:scale-[1.02] focus:ring-2 focus:outline-none"
                 :class="{ 'cursor-not-allowed opacity-50': isUploading }"
               >
-                <svg class="mr-2 h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                    stroke-width="2"
-                    d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"
-                  ></path>
-                </svg>
+                <PaperAirplaneIcon class="mr-2 size-5 transform -rotate-90"></PaperAirplaneIcon>
+
                 {{ isUploading ? 'Creating Post...' : 'Publish Post' }}
               </button>
             </div>
           </div>
         </div>
       </div>
-
-      <!-- GALLERY SECTION -->
-      <section class="mx-auto max-w-7xl">
-        <!-- Gallery Header -->
-        <div class="mb-12 text-center">
-          <div
-            class="inline-flex items-center space-x-3 rounded-2xl border border-white/20 bg-white/80 px-6 py-3 backdrop-blur-sm dark:border-slate-700/50 dark:bg-slate-800/80"
-          >
-            <svg class="text-acc h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                stroke-width="2"
-                d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012 2v2M7 7h10"
-              ></path>
-            </svg>
-            <h2 class="font-sec text-fg text-2xl font-semibold">Workshop Gallery</h2>
-          </div>
-          <p class="text-fg/70 mx-auto mt-4 max-w-2xl">
-            A showcase of precision craftsmanship and horological excellence
-          </p>
-        </div>
-
-        <!-- Gallery Grid -->
-        <div v-if="posts.length === 0" class="py-16 text-center">
-          <div
-            class="bg-acc/10 mx-auto mb-6 flex h-24 w-24 items-center justify-center rounded-2xl"
-          >
-            <svg
-              class="text-acc/60 h-12 w-12"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                stroke-width="2"
-                d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 2h12a2 2 0 012 2v12a2 2 0 01-2 2H6a2 2 0 01-2-2V4a2 2 0 012-2z"
-              ></path>
-            </svg>
-          </div>
-          <h3 class="font-sec text-fg mb-2 text-xl font-semibold">No posts yet</h3>
-          <p class="text-fg/60">Create your first post to showcase your work</p>
-        </div>
-
-        <div v-else class="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-          <article
-            v-for="(post, i) in posts"
-            :key="i"
-            class="group cursor-pointer overflow-hidden rounded-2xl border border-white/20 bg-white/90 shadow-lg backdrop-blur-sm transition-all duration-300 hover:scale-[1.02] hover:shadow-2xl dark:border-slate-700/50 dark:bg-slate-800/90"
-          >
-            <!-- Image -->
-            <div class="relative aspect-[4/3] overflow-hidden">
-              <img
-                :src="post.titleImage || '/src/assets/pictures/placeholder.png'"
-                :alt="post.title"
-                class="h-full w-full object-cover transition-transform duration-500 group-hover:scale-110"
-              />
-              <div
-                class="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent opacity-0 transition-opacity duration-300 group-hover:opacity-100"
-              ></div>
-
-              <!-- Post Type Badge -->
-              <div class="absolute top-3 left-3">
-                <span
-                  class="text-fg inline-flex items-center rounded-full border border-white/20 bg-white/90 px-2 py-1 text-xs font-medium dark:bg-slate-800/90"
-                >
-                  {{ post.type }}
-                </span>
-              </div>
-
-              <!-- Date Badge -->
-              <div class="absolute top-3 right-3">
-                <span
-                  class="text-fg inline-flex items-center rounded-full border border-white/20 bg-white/90 px-2 py-1 text-xs font-medium dark:bg-slate-800/90"
-                >
-                  {{ post.date }}
-                </span>
-              </div>
-            </div>
-
-            <!-- Content -->
-            <div class="p-6">
-              <div v-if="post.type === 'blog' || post.type === 'mixed'" class="space-y-3">
-                <h3
-                  class="font-sec text-fg group-hover:text-acc line-clamp-2 text-lg font-semibold transition-colors"
-                >
-                  {{ post.title }}
-                </h3>
-                <p class="text-fg/70 line-clamp-3 text-sm leading-relaxed">
-                  {{ post.bodyText }}
-                </p>
-              </div>
-              <div v-else class="flex items-center justify-center py-4">
-                <div class="bg-acc/10 flex h-12 w-12 items-center justify-center rounded-xl">
-                  <svg
-                    class="text-acc h-6 w-6"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                  >
-                    <path
-                      stroke-linecap="round"
-                      stroke-linejoin="round"
-                      stroke-width="2"
-                      d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 2h12a2 2 0 012 2v12a2 2 0 01-2 2H6a2 2 0 01-2-2V4a2 2 0 012-2z"
-                    ></path>
-                  </svg>
-                </div>
-              </div>
-
-              <!-- Additional Images Indicator -->
-              <div
-                v-if="post.extraImages && post.extraImages.length > 0"
-                class="mt-4 border-t border-slate-200 pt-4 dark:border-slate-700"
-              >
-                <div class="flex items-center justify-between">
-                  <span class="text-fg/60 text-xs">Additional photos</span>
-                  <div class="flex -space-x-2">
-                    <div
-                      v-for="(img, idx) in post.extraImages.slice(0, 3)"
-                      :key="idx"
-                      class="h-6 w-6 overflow-hidden rounded-full border-2 border-white dark:border-slate-800"
-                    >
-                      <img :src="img" class="h-full w-full object-cover" />
-                    </div>
-                    <div
-                      v-if="post.extraImages.length > 3"
-                      class="bg-acc/20 flex h-6 w-6 items-center justify-center rounded-full border-2 border-white dark:border-slate-800"
-                    >
-                      <span class="text-acc text-xs font-medium"
-                        >+{{ post.extraImages.length - 3 }}</span
-                      >
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            <!-- Hover Action Buttons -->
-            <div
-              class="absolute inset-0 flex items-end justify-center bg-gradient-to-t from-black/80 via-transparent to-transparent pb-6 opacity-0 transition-opacity duration-300 group-hover:opacity-100"
-            >
-              <div class="flex space-x-3">
-                <button
-                  type="button"
-                  class="rounded-lg bg-white/20 px-4 py-2 text-white backdrop-blur-sm transition-colors hover:bg-white/30"
-                >
-                  <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path
-                      stroke-linecap="round"
-                      stroke-linejoin="round"
-                      stroke-width="2"
-                      d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"
-                    ></path>
-                    <path
-                      stroke-linecap="round"
-                      stroke-linejoin="round"
-                      stroke-width="2"
-                      d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"
-                    ></path>
-                  </svg>
-                </button>
-                <button
-                  class="rounded-lg bg-white/20 px-4 py-2 text-white backdrop-blur-sm transition-colors hover:bg-white/30"
-                >
-                  <svg class="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path
-                      stroke-linecap="round"
-                      stroke-linejoin="round"
-                      stroke-width="2"
-                      d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.367 2.684 3 3 0 00-5.367-2.684z"
-                    ></path>
-                  </svg>
-                </button>
-              </div>
-            </div>
-          </article>
-        </div>
-      </section>
     </div>
+    <GalleryEl></GalleryEl>
   </div>
 </template>
