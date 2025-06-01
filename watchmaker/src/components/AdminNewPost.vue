@@ -16,11 +16,13 @@ const newPost = ref({
   bodyText: '',
   titleImage: [],
   extraImages: [],
+  thumbnails: [],
 })
 
 // Store actual files separately for FormData
 const titleFile = ref(null)
 const extraFiles = ref([])
+const thumbnailFiles = ref([])
 
 // Loading state to prevent multiple submissions
 const isUploading = ref(false)
@@ -33,7 +35,7 @@ const titleFileInputRef = ref(null)
 const extraFileInputRef = ref(null)
 
 // Image compression function with better quality
-function compressImage(file, maxWidth = 1200, quality = 0.85) {
+function compressImage(file, maxWidth = 1200, quality = 0.7) {
   return new Promise((resolve) => {
     const canvas = document.createElement('canvas')
     const ctx = canvas.getContext('2d')
@@ -74,6 +76,11 @@ function compressImage(file, maxWidth = 1200, quality = 0.85) {
   })
 }
 
+// Generate thumbnail with lower quality and smaller size
+function generateThumbnail(file) {
+  return compressImage(file, 150, 0.5)
+}
+
 // Validation function
 function validatePost() {
   const errors = []
@@ -88,6 +95,11 @@ function validatePost() {
 
   if (extraFiles.value.length > 5) {
     errors.push('Maximum 5 extra images allowed')
+  }
+
+  // Validate thumbnails match extra images
+  if (extraFiles.value.length !== thumbnailFiles.value.length) {
+    errors.push('Thumbnail generation error')
   }
 
   return errors
@@ -125,21 +137,21 @@ async function saveNewPost(e) {
       formData.append('titleImage', titleFile.value)
     }
 
+    // Add extra images and their thumbnails
     extraFiles.value.forEach((file) => {
       formData.append('extraImages', file)
+    })
+
+    thumbnailFiles.value.forEach((file) => {
+      formData.append('thumbnails', file)
     })
 
     const success = await sendNewPost(formData)
     console.log('2. sendNewPost completed, success:', success)
     // Only reset form if upload was successful
     if (success) {
-      console.log('3. About to reset form')
       resetForm()
-      console.log('4. Form reset complete')
-
-      console.log('5. About to show toast')
       toast.showToast('Post created successfully!', 'success')
-      console.log('6. Toast shown')
     }
   } catch (error) {
     console.error('Error saving post:', error)
@@ -178,9 +190,11 @@ function resetForm() {
     bodyText: '',
     titleImage: [],
     extraImages: [],
+    thumbnails: [],
   }
   titleFile.value = null
   extraFiles.value = []
+  thumbnailFiles.value = []
 
   // Reset file inputs
   if (titleFileInputRef.value) titleFileInputRef.value.value = null
@@ -239,16 +253,26 @@ const { isOverDropZone: isOverExtraDropZone } = useDropZone(extraImageDropZoneRe
         continue
       }
 
-      // Compress each file
+      // Compress main image and generate thumbnail
       const compressedFile = await compressImage(file)
-      extraFiles.value.push(compressedFile)
+      const thumbnailFile = await generateThumbnail(file)
 
-      // Create preview
+      extraFiles.value.push(compressedFile)
+      thumbnailFiles.value.push(thumbnailFile)
+
+      // Create preview for extra image
       const reader = new FileReader()
       reader.onload = (e) => {
         newPost.value.extraImages.push(e.target.result)
       }
       reader.readAsDataURL(compressedFile)
+
+      // Create preview for thumbnail
+      const thumbReader = new FileReader()
+      thumbReader.onload = (e) => {
+        newPost.value.thumbnails.push(e.target.result)
+      }
+      thumbReader.readAsDataURL(thumbnailFile)
     }
   },
   dataTypes: ['image/jpeg', 'image/png', 'image/webp'],
@@ -309,16 +333,26 @@ async function handleFileChange(event) {
       continue
     }
 
-    // Compress each file
+    // Compress main image and generate thumbnail
     const compressedFile = await compressImage(file)
-    extraFiles.value.push(compressedFile)
+    const thumbnailFile = await generateThumbnail(file)
 
-    // Create preview
+    extraFiles.value.push(compressedFile)
+    thumbnailFiles.value.push(thumbnailFile)
+
+    // Create preview for extra image
     const reader = new FileReader()
     reader.onload = (e) => {
       newPost.value.extraImages.push(e.target.result)
     }
     reader.readAsDataURL(compressedFile)
+
+    // Create preview for thumbnail (optional - remove if not needed)
+    const thumbReader = new FileReader()
+    thumbReader.onload = (e) => {
+      newPost.value.thumbnails.push(e.target.result)
+    }
+    thumbReader.readAsDataURL(thumbnailFile)
   }
 
   // Clear input for next selection
@@ -332,8 +366,11 @@ function removeTitleImage() {
 }
 
 function removeExtraImage(index) {
+  // Remove from all arrays at the same index
   newPost.value.extraImages.splice(index, 1)
+  newPost.value.thumbnails.splice(index, 1)
   extraFiles.value.splice(index, 1)
+  thumbnailFiles.value.splice(index, 1)
 }
 </script>
 
@@ -405,7 +442,7 @@ function removeExtraImage(index) {
                   <div
                     class="absolute top-4 right-4 flex h-10 w-10 items-center justify-center rounded-lg bg-white/80 opacity-0 transition-opacity group-hover:opacity-100 dark:bg-slate-700/80"
                   >
-                    <CloudArrowUpIcon class="size-5 text-acc"></CloudArrowUpIcon>
+                    <CloudArrowUpIcon class="text-acc size-5"></CloudArrowUpIcon>
                   </div>
                 </div>
 
@@ -461,7 +498,7 @@ function removeExtraImage(index) {
                 <div
                   ref="extraImageDropZoneRef"
                   :class="[
-                    'group relative min-h-[280px] cursor-pointer rounded-xl border-2 border-dashed transition-all duration-300 flex items-center justify-center',
+                    'group relative flex min-h-[280px] cursor-pointer items-center justify-center rounded-xl border-2 border-dashed transition-all duration-300',
                     isOverExtraDropZone
                       ? 'border-acc bg-acc/10 scale-[1.02]'
                       : 'hover:border-acc/50 border-slate-300 dark:border-slate-600',
@@ -503,7 +540,7 @@ function removeExtraImage(index) {
                               @click.stop="removeExtraImage(index)"
                               class="h-8 w-8 rounded-full bg-red-500 text-white opacity-0 transition-opacity group-hover:opacity-100 hover:bg-red-600"
                             >
-                              <TrashIcon class="size-4 mx-auto"></TrashIcon>
+                              <TrashIcon class="mx-auto size-4"></TrashIcon>
                             </button>
                           </div>
                         </div>
@@ -582,7 +619,7 @@ function removeExtraImage(index) {
                 class="from-acc to-acc/80 hover:from-acc/90 hover:to-acc/70 focus:ring-acc/50 inline-flex transform items-center rounded-xl bg-gradient-to-r px-8 py-3 font-semibold text-white shadow-lg transition-all duration-200 hover:scale-[1.02] focus:ring-2 focus:outline-none"
                 :class="{ 'cursor-not-allowed opacity-50': isUploading }"
               >
-                <PaperAirplaneIcon class="mr-2 size-5 transform -rotate-90"></PaperAirplaneIcon>
+                <PaperAirplaneIcon class="mr-2 size-5 -rotate-90 transform"></PaperAirplaneIcon>
 
                 {{ isUploading ? 'Creating Post...' : 'Publish Post' }}
               </button>
