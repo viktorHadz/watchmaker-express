@@ -13,7 +13,7 @@ defineProps({
 <template>
   <div
     v-if="toast.visible"
-    class="fixed right-12 bottom-5 z-[999] rounded px-4 py-2 text-2xl font-bold text-white shadow-md"
+    class="fixed right-12 bottom-5 z-[101] rounded px-4 py-2 text-2xl font-bold text-white shadow-md"
     :class="{
       'bg-green-600': type === 'success',
       'bg-red-500': type === 'error',

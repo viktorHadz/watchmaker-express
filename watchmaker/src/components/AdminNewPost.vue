@@ -376,7 +376,7 @@ function removeExtraImage(index) {
 
 <template>
   <div class="min-h-screen">
-    <div class="relative z-10 px-4 py-12 sm:px-6 lg:px-8">
+    <div class="relative z-[98] px-4 py-12 sm:px-6 lg:px-8">
       <!-- Header -->
       <div class="mb-12 text-center">
         <h1 class="font-sec text-fg mb-4 text-4xl font-semibold lg:text-5xl">Post Management</h1>
@@ -387,7 +387,7 @@ function removeExtraImage(index) {
       <!-- CREATE NEW POST SECTION -->
       <div class="mx-auto mb-16 max-w-6xl">
         <div
-          class="overflow-hidden rounded-2xl border border-white/20 bg-white/90 shadow-2xl backdrop-blur-sm dark:border-slate-700/50 dark:bg-slate-800/90"
+          class="bg-primary/90 dark:border-sec-mute/50 dark:bg-sec/90 overflow-hidden rounded-2xl border border-white/20 shadow-2xl backdrop-blur-sm"
         >
           <!-- Form Header -->
           <div
@@ -399,7 +399,7 @@ function removeExtraImage(index) {
               </div>
               <div>
                 <h2 class="font-sec text-fg text-2xl font-semibold">Create New Post</h2>
-                <p class="text-fg/70">Share your latest work with the community</p>
+                <p class="text-acc-mute">Share your latest work</p>
               </div>
             </div>
           </div>
@@ -410,8 +410,8 @@ function removeExtraImage(index) {
               <!-- Title Image Section -->
               <div class="space-y-4">
                 <div class="flex items-center justify-between">
-                  <h3 class="font-sec text-fg text-lg font-semibold">Featured Image</h3>
-                  <span class="text-fg/60 bg-acc/10 rounded-full px-2 py-1 text-sm">Required</span>
+                  <h3 class="input-lbl">Featured Image</h3>
+                  <span class="text-acc bg-acc/10 rounded-full px-2 py-1 text-sm">Required</span>
                 </div>
 
                 <div
@@ -421,7 +421,7 @@ function removeExtraImage(index) {
                     'group relative flex min-h-[280px] cursor-pointer flex-col items-center justify-center rounded-xl border-2 border-dashed transition-all duration-300',
                     isOverDropZone
                       ? 'border-acc bg-acc/10 scale-[1.02]'
-                      : 'hover:border-acc/50 hover:bg-acc/5 border-slate-300 dark:border-slate-600',
+                      : 'hover:border-acc/50 hover:bg-acc/5 border-brdr dark:border-sec-light',
                   ]"
                   @click="triggerTitleUpload"
                 >
@@ -440,7 +440,7 @@ function removeExtraImage(index) {
 
                   <!-- Upload Icon -->
                   <div
-                    class="absolute top-4 right-4 flex h-10 w-10 items-center justify-center rounded-lg bg-white/80 opacity-0 transition-opacity group-hover:opacity-100 dark:bg-slate-700/80"
+                    class="dark:bg-sec/80 absolute top-4 right-4 flex h-10 w-10 items-center justify-center rounded-lg bg-white/80 opacity-0 transition-opacity group-hover:opacity-100"
                   >
                     <CloudArrowUpIcon class="text-acc size-5"></CloudArrowUpIcon>
                   </div>
@@ -488,9 +488,8 @@ function removeExtraImage(index) {
               <!-- Extra Images Section -->
               <div class="space-y-4">
                 <div class="flex items-center justify-between">
-                  <h3 class="font-sec text-fg text-lg font-semibold">Additional Images</h3>
-                  <span
-                    class="text-fg/60 rounded-full bg-slate-100 px-2 py-1 text-sm dark:bg-slate-700"
+                  <h3 class="input-lbl">Additional Images</h3>
+                  <span class="text-fg bg-sec-light dark:bg-sec-mute rounded-full px-2 py-1 text-sm"
                     >Optional</span
                   >
                 </div>
@@ -501,7 +500,7 @@ function removeExtraImage(index) {
                     'group relative flex min-h-[280px] cursor-pointer items-center justify-center rounded-xl border-2 border-dashed transition-all duration-300',
                     isOverExtraDropZone
                       ? 'border-acc bg-acc/10 scale-[1.02]'
-                      : 'hover:border-acc/50 border-slate-300 dark:border-slate-600',
+                      : 'hover:border-acc/50 border-brdr dark:border-sec-light',
                   ]"
                   @click="triggerExtraUpload"
                 >
@@ -570,42 +569,36 @@ function removeExtraImage(index) {
 
             <!-- Text Content Section -->
             <div class="space-y-6">
-              <div class="grid grid-cols-1 gap-6 lg:grid-cols-2">
+              <div class="grid grid-cols-1">
                 <div class="space-y-2">
-                  <label class="font-sec text-fg text-lg font-semibold">Post Title</label>
+                  <div class="flex justify-between">
+                    <label for="new-title-input" class="input-lbl">Post Title</label>
+                    <span class="text-acc bg-acc/10 rounded-full px-2 py-1 text-sm">Required</span>
+                  </div>
+
                   <input
                     v-model="newPost.title"
                     type="text"
-                    class="text-fg placeholder-fg/50 focus:ring-acc/50 focus:border-acc w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 transition-all duration-200 focus:ring-2 focus:outline-none dark:border-slate-600 dark:bg-slate-700"
+                    id="new-title-input"
+                    class="input"
                     placeholder="Give your post a compelling title..."
                   />
-                </div>
-
-                <div class="flex items-end">
-                  <div class="w-full">
-                    <div class="mb-2 flex items-center justify-between">
-                      <span class="font-sec text-fg text-sm font-medium">Post Type</span>
-                      <span class="bg-acc/10 text-acc rounded-full px-2 py-1 text-xs">{{
-                        postType || 'Auto-detected'
-                      }}</span>
-                    </div>
-                    <div
-                      class="flex h-12 items-center rounded-xl border border-slate-200 bg-slate-50 px-4 dark:border-slate-600 dark:bg-slate-700"
-                    >
-                      <span class="text-fg/70 capitalize">{{
-                        postType || 'Will be detected automatically'
-                      }}</span>
-                    </div>
-                  </div>
                 </div>
               </div>
 
               <div class="space-y-2">
-                <label class="font-sec text-fg text-lg font-semibold">Description</label>
+                <div class="flex justify-between">
+                  <label for="new-post-body" class="input-lbl">Description</label>
+                  <span class="text-fg bg-sec-light dark:bg-sec-mute rounded-full px-2 text-sm"
+                    >Optional</span
+                  >
+                </div>
+
                 <textarea
                   v-model="newPost.bodyText"
                   rows="4"
-                  class="text-fg placeholder-fg/50 focus:ring-acc/50 focus:border-acc w-full resize-none rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 transition-all duration-200 focus:ring-2 focus:outline-none dark:border-slate-600 dark:bg-slate-700"
+                  id="new-post-body"
+                  class="text-fg placeholder-fg/50 focus:ring-acc/50 focus:border-acc input w-full resize-none rounded-xl"
                   placeholder="Describe the work done, techniques used, or story behind this piece..."
                 ></textarea>
               </div>

@@ -91,7 +91,7 @@ watch(
 
   <!-- Mobile bottom nav -->
   <nav
-    class="dark:text-fg text-fg2 border-brdr from-sec to-sec-mute fixed right-0 bottom-0 left-0 z-[699] flex items-center justify-around border-t bg-gradient-to-l py-2 sm:hidden"
+    class="dark:text-fg text-fg2 border-brdr from-sec to-sec-mute fixed right-0 bottom-0 left-0 z-[99] flex items-center justify-around border-t bg-gradient-to-l py-2 sm:hidden"
   >
     <RouterLink
       to="/"

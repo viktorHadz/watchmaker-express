@@ -14,56 +14,85 @@
     }
   }
 }
-
 @custom-variant dark (&:where([data-theme=dark], [data-theme=dark] *));
 @custom-variant light (&:where([data-theme=light], [data-theme=light] *));
+
 [data-theme='light'] {
-  --color-primary: oklch(98.7% 0.022 95.277);
-  --color-sec: oklch(0.3325 0.0321 233.09);
-  --color-sec-mute: oklch(0.4763 0.0291 229.74);
-  /* --color-sec-mute: oklch(0.6971 0.0752 222.35); */
-  --color-acc: oklch(0.7407 0.1367 42.71);
+  /* Backgrounds - Refined warm grays and creams */
+  --color-primary: oklch(96.5% 0.002 40); /* Warm ivory - like vintage watch dial */
+  --color-sec: oklch(93% 0.004 35); /* Soft parchment - cards/sections */
+  --color-sec-mute: oklch(89% 0.006 32); /* Warm gray - hover states */
+  --color-sec-light: oklch(95% 0.003 38); /* Light cream */
 
-  --color-bordr: oklch(0.708 0 0);
-  --color-font: oklch(0.28 0.0055 286.03);
-  --color-font2: oklch(100% 0 0);
+  /* Accents - Rich brass and gold tones */
+  --color-acc: oklch(68% 0.14 65); /* Rich brass - primary accent */
+  --color-acc-mute: oklch(58% 0.11 60); /* Aged brass - secondary */
 
-  --color-danger: oklch(0.737 0.237 25.331);
-  --color-warning: oklch(75.22% 0.1235 62.47);
-  --color-success: oklch(68.1% 0.1708 151.16);
+  /* Borders & Dividers */
+  --color-brdr: oklch(84% 0.007 35); /* Warm silver borders */
+  --color-brdr-mute: oklch(76% 0.01 32); /* Darker warm borders */
+
+  /* Text */
+  --color-fg: oklch(18% 0.01 30); /* Deep charcoal with warmth */
+  --color-fg2: oklch(98% 0.001 40); /* Cream white */
+  --color-fg-mute: oklch(42% 0.008 30); /* Warm medium gray */
+  --color-fg-subtle: oklch(58% 0.006 32); /* Warm light gray */
+
+  /* Status colors - Muted and sophisticated */
+  --color-danger: oklch(0.64 0.23 29); /* Deep burgundy */
+  --color-warning: oklch(62% 0.1 50); /* Amber bronze */
+  --color-success: oklch(48% 0.07 145); /* Forest green */
 }
+
 [data-theme='dark'] {
-  --color-primary: oklch(25.93% 0 0);
-  --color-sec: oklch(0.205 0 0);
-  --color-sec-mute: oklch(0.23 0 0);
-  --color-acc: oklch(0.74 0.1373 42.52);
+  /* Backgrounds - Deep midnight blues with subtle warmth */
+  --color-primary: oklch(12% 0.015 250); /* Deep midnight blue */
+  --color-sec: oklch(16% 0.018 245); /* Rich navy - cards/sections */
+  --color-sec-mute: oklch(21% 0.015 240); /* Lighter navy - hover states */
+  --color-sec-light: oklch(26% 0.012 235); /* Light midnight */
 
-  --color-bordr: oklch(0.3 0 0);
-  --color-font: oklch(0.808 0 0);
-  --color-font2: oklch(0.95 0 0);
+  /* Accents - Warm brass and copper */
+  --color-acc: oklch(72% 0.13 55); /* Warm brass/copper */
+  --color-acc-mute: oklch(62% 0.11 52); /* Muted copper */
 
-  --color-danger: oklch(0.637 0.237 25.331);
-  --color-warning: oklch(75.22% 0.1235 62.47);
-  --color-success: oklch(68.1% 0.1708 151.16);
+  /* Borders & Dividers */
+  --color-brdr: oklch(28% 0.01 240); /* Subtle blue borders */
+  --color-brdr-mute: oklch(38% 0.015 235); /* Stronger borders */
+
+  /* Text */
+  --color-fg: oklch(88% 0.006 230); /* Warm silver text */
+  --color-fg2: oklch(95% 0.004 225); /* Bright silver (for dark backgrounds) */
+  --color-fg-mute: oklch(68% 0.01 235); /* Muted blue-gray */
+  --color-fg-subtle: oklch(48% 0.012 240); /* Subtle blue-gray */
+
+  /* Status colors */
+  --color-danger: oklch(58% 0.18 25); /* Warm red */
+  --color-warning: oklch(72% 0.12 62); /* Golden amber */
+  --color-success: oklch(65% 0.15 151); /* Jade green */
 }
 
+/* Keep the existing theme configuration */
 @theme {
-  /* --font-sans: 'Manrope Variable', sans-serif; */
   --font-*: initial;
   --default-font-family: 'EB Garamond Variable', serif;
   --font-sec: 'Cinzel Variable', serif;
   --text-mini: 0.725rem;
   --text-tiny: 0.625rem;
 
+  /* Map to Tailwind utilities */
   --color-primary: var(--color-primary);
   --color-sec: var(--color-sec);
   --color-sec-mute: var(--color-sec-mute);
+  --color-sec-light: var(--color-sec-light);
   --color-acc: var(--color-acc);
-  --color-ter: var(--color-ter);
+  --color-acc-mute: var(--color-acc-mute);
 
-  --color-brdr: var(--color-bordr);
-  --color-fg: var(--color-font);
-  --color-fg2: var(--color-font2);
+  --color-brdr: var(--color-brdr);
+  --color-brdr-mute: var(--color-brdr-mute);
+  --color-fg: var(--color-fg);
+  --color-fg2: var(--color-fg2);
+  --color-fg-mute: var(--color-fg-mute);
+  --color-fg-subtle: var(--color-fg-subtle);
 
   --color-success: var(--color-success);
   --color-danger: var(--color-danger);
@@ -93,6 +122,7 @@
     transform: rotate(-360deg);
   }
 }
+
 #bottom-wheel {
   animation: rotate-cw 2s linear infinite;
   transform-origin: center;
@@ -103,7 +133,6 @@
   transform-origin: center;
   transform-box: fill-box;
 }
-
 #top-wheel {
   animation: rotate-cw 2s linear infinite;
   transform-origin: center;
@@ -112,15 +141,20 @@
 
 @layer components {
   .input {
-    @apply bg-primary dark:bg-sec-mute outline-brdr placeholder:text-fg/70 text-fg focus:outline-acc block w-full rounded-md px-2 py-1 text-sm outline-1 -outline-offset-1 placeholder:text-sm hover:placeholder:brightness-110 focus:outline-2 focus:-outline-offset-2;
+    @apply dark:border-sec-light dark:bg-sec text-fg placeholder-fg/50 bg-sec-light border-brdr focus:ring-acc/80 focus:border-acc/90 flex min-h-12 w-full items-center rounded-xl border p-2 px-3 ring-0 transition duration-200 focus:ring-2 focus:outline-none;
   }
-}
-@layer components {
+  .input-lbl {
+    @apply font-sec text-fg font-medium;
+  }
+
   .btn {
-    @apply bg-acc hover:bg-acc/90 focus-visible:outline-acc cursor-pointer rounded-md px-3.5 py-2.5 text-center text-sm font-semibold text-white shadow-xs focus-visible:outline-2 focus-visible:outline-offset-2;
+    @apply bg-acc hover:bg-acc-mute focus-visible:ring-acc/50 text-fg2 cursor-pointer rounded-md px-3.5 py-2.5 text-sm font-semibold shadow-sm transition-all duration-200 hover:shadow-md focus-visible:ring-2 focus-visible:ring-offset-2;
   }
-}
-@layer components {
+
+  .card {
+    @apply bg-primary dark:bg-sec/80 border-brdr/20 dark:border-sec-mute/50 rounded-xl border shadow-lg backdrop-blur-sm transition-all duration-300;
+  }
+
   .grad-container {
     @apply border-brdr/50 via-primary w-full bg-radial-[at_50%_75%] from-amber-50 to-amber-100 drop-shadow-xl;
   }

@@ -8,7 +8,7 @@ defineProps({
   <Transition name="modal">
     <div
       v-if="show"
-      class="fixed top-0 left-0 z-[1000] flex h-full w-full items-center justify-center bg-black/50 transition-all duration-initial sm:items-center"
+      class="fixed top-0 left-0 z-[100] flex h-full w-full items-center justify-center bg-black/50 transition-all duration-initial sm:items-center"
     >
       <div
         class="bg-primary max-h-[90dvh] w-full overflow-y-auto rounded-t-2xl shadow-xl sm:max-w-lg sm:rounded-xl"

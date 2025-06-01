@@ -37,7 +37,7 @@ const handlePostShare = (post) => {
     <!-- Gallery Header -->
     <div class="mb-12 text-center">
       <div
-        class="inline-flex items-center space-x-3 rounded-2xl border border-white/20 bg-white/80 px-6 py-3 backdrop-blur-sm dark:border-slate-700/50 dark:bg-slate-800/80"
+        class="bg-primary/80 dark:border-sec-mute/50 dark:bg-sec/80 inline-flex items-center space-x-3 rounded-2xl border border-white/20 px-6 py-3 backdrop-blur-sm"
       >
         <FolderOpenIcon class="text-acc size-6"></FolderOpenIcon>
         <h2 class="font-sec text-fg text-2xl font-semibold">Workshop Gallery</h2>
@@ -60,7 +60,7 @@ const handlePostShare = (post) => {
       <article
         v-for="(post, i) in allPosts.posts"
         :key="i"
-        class="group dark:bg-sec/80 bg-primary border-acc/20 hover:border-acc/40 dark:hover:border-acc/40 cursor-pointer overflow-hidden rounded-2xl border shadow-lg backdrop-blur-sm transition-all duration-300 hover:scale-[1.02] hover:shadow-2xl dark:border-slate-700/50"
+        class="group dark:bg-sec/80 bg-primary border-acc/20 hover:border-acc/40 dark:hover:border-acc/40 dark:border-sec-mute/50 cursor-pointer overflow-hidden rounded-2xl border shadow-lg backdrop-blur-sm transition-all duration-300 hover:scale-[1.02] hover:shadow-2xl"
         @click="openPost(post)"
       >
         <!-- Image -->
@@ -112,7 +112,7 @@ const handlePostShare = (post) => {
           <!-- Additional Images Indicator -->
           <div
             v-if="post.thumbImages && post.thumbImages.length > 0"
-            class="mt-4 border-t border-slate-200 pt-4 dark:border-slate-700"
+            class="border-brdr dark:border-sec-mute mt-4 border-t pt-4"
           >
             <div class="flex items-center justify-between">
               <span class="text-fg/60 text-xs">Additional photos</span>
@@ -120,13 +120,13 @@ const handlePostShare = (post) => {
                 <div
                   v-for="(img, idx) in post.thumbImages.slice(0, 3)"
                   :key="idx"
-                  class="h-6 w-6 overflow-hidden rounded-full border-2 border-white dark:border-slate-800"
+                  class="border-brdr dark:border-sec h-6 w-6 overflow-hidden rounded-full border-2"
                 >
                   <img :src="`/public${img.path}`" class="h-full w-full object-cover" />
                 </div>
                 <div
                   v-if="post.extraImages.length > 3"
-                  class="bg-acc/20 flex h-6 w-6 items-center justify-center rounded-full border-2 border-white dark:border-slate-800"
+                  class="bg-acc/20 border-brdr dark:border-sec flex h-6 w-6 items-center justify-center rounded-full border-2"
                 >
                   <span class="text-acc text-xs font-medium"
                     >+{{ post.extraImages.length - 3 }}</span

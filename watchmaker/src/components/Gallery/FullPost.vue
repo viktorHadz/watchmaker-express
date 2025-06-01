@@ -109,7 +109,7 @@ watch(
     <Transition name="backdrop" appear>
       <div
         v-if="show"
-        class="fixed inset-0 z-[800] bg-black/60 backdrop-blur-sm"
+        class="fixed inset-0 z-[98] bg-black/60 backdrop-blur-sm"
         @click="closeModal"
       ></div>
     </Transition>
@@ -118,14 +118,14 @@ watch(
     <Transition name="modal" appear>
       <div
         v-if="show"
-        class="pointer-events-none fixed inset-0 z-[800] flex items-center justify-center sm:p-4"
+        class="pointer-events-none fixed inset-0 z-[98] flex items-center justify-center sm:p-4"
       >
         <div
-          class="dark:bg-sec/80 dark:border-sec-mute pointer-events-auto relative flex h-full w-full max-w-4xl flex-col overflow-hidden border border-white/20 bg-white shadow-2xl backdrop-blur-md sm:max-h-[90vh] sm:rounded-2xl"
+          class="dark:bg-sec/80 dark:border-sec-mute bg-primary pointer-events-auto relative flex h-full w-full max-w-4xl flex-col overflow-hidden border border-white/20 shadow-2xl backdrop-blur-md sm:max-h-[90vh] sm:rounded-2xl"
         >
           <!-- Header -->
           <div
-            class="dark:border-sec-mute dark:bg-sec/80 from-acc/10 via-acc/5 sticky top-0 flex flex-col space-y-4 border-b border-white/10 bg-white bg-gradient-to-r to-transparent p-4 backdrop-blur-md sm:p-6"
+            class="dark:border-sec-mute dark:bg-sec/80 from-acc/10 via-acc/5 bg-primary sticky top-0 flex flex-col space-y-4 border-b border-white/10 bg-gradient-to-r to-transparent p-4 backdrop-blur-md sm:p-6"
           >
             <!-- Title and buttons row -->
             <div class="flex items-start justify-between gap-3">
@@ -157,7 +157,7 @@ watch(
             <!-- Image Gallery Section -->
             <div v-if="allImages.length > 0" class="relative">
               <!-- Main Image Display -->
-              <div class="dark:bg-sec relative bg-white">
+              <div class="dark:bg-sec bg-primary relative">
                 <img
                   v-if="allImages[currentImageIndex]"
                   :src="allImages[currentImageIndex]"
@@ -218,7 +218,7 @@ watch(
                       'relative size-16 flex-shrink-0 rounded-lg border-2 transition-all',
                       currentImageIndex === index
                         ? 'border-acc scale-110 shadow-lg'
-                        : 'hover:border-acc/50 border-white/20 dark:border-slate-600',
+                        : 'hover:border-acc/50 dark:border-sec-light border-white/20',
                     ]"
                   >
                     <img
@@ -256,7 +256,7 @@ watch(
           <!-- Footer -->
           <div
             v-if="allImages.length > 0"
-            class="dark:border-sec-mute dark:bg-sec/80 from-acc/10 via-acc/5 sticky bottom-0 z-10 border-t border-white/10 bg-white bg-gradient-to-r to-transparent backdrop-blur-md"
+            class="dark:border-sec-mute dark:bg-sec/80 from-acc/10 via-acc/5 bg-primary sticky bottom-0 border-t border-white/10 bg-gradient-to-r to-transparent backdrop-blur-md"
           >
             <div class="text-fg flex items-center justify-between px-6 py-2 text-sm">
               <span class="flex items-center gap-2">

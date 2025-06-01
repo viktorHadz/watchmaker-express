@@ -1,168 +1,125 @@
+<!-- Top Section - Hero -->
 <script setup>
 import TheLogo from '../logo/TheLogo.vue'
-import OmegaLogo from '@/components/brands/OmegaLogo.vue'
-import CasioLogo from '@/components/brands/CasioLogo.vue'
-import LonginesLogo from '@/components/brands/LonginesLogo.vue'
-import RolexLogo from '@/components/brands/RolexLogo.vue'
-import SeikoLogo from '@/components/brands/SeikoLogo.vue'
-import VostokLogo from '@/components/brands/VostokLogo.vue'
 </script>
+
 <template>
-  <section class="relative flex min-h-[85vh] items-center justify-center px-6 py-12">
-    <!-- Glass morphism container -->
-    <div class="relative w-full max-w-6xl">
-      <!-- Main hero card -->
+  <section class="relative min-h-[85vh] w-full">
+    <!-- Background with subtle texture -->
+    <div class="from-primary via-sec-light to-sec absolute inset-0 bg-gradient-to-b">
+      <!-- Watch dial texture overlay -->
       <div
-        class="bg-primary/60 border-brdr/20 relative overflow-hidden rounded-3xl border shadow-2xl backdrop-blur-xl"
+        class="absolute inset-0 opacity-20"
+        style="
+          background-image: radial-gradient(
+            circle at center,
+            transparent 40%,
+            rgba(0, 0, 0, 0.1) 100%
+          );
+          background-size: 100% 100%;
+        "
+      ></div>
+    </div>
+
+    <!-- Main content -->
+    <div class="relative mx-auto max-w-7xl px-6 py-6 sm:py-20">
+      <h1
+        class="font-sec text-fg mb-4 text-center text-4xl font-normal tracking-wide md:text-6xl lg:text-6xl"
       >
-        <!-- Subtle inner glow -->
-        <div
-          class="from-acc/5 to-sec/5 absolute inset-0 rounded-3xl bg-gradient-to-br via-transparent"
-        ></div>
-
-        <!-- Content grid -->
-        <div class="relative z-10 grid grid-cols-1 items-center gap-8 p-8 lg:grid-cols-5 lg:p-12">
-          <!-- Left brand column - enhanced -->
-          <div class="hidden lg:col-span-1 lg:block">
-            <div class="flex flex-col items-center space-y-8">
-              <div class="group">
-                <OmegaLogo
-                  class="text-fg/60 hover:text-acc size-12 cursor-pointer transition-all duration-300 hover:scale-110"
-                />
-                <div
-                  class="via-brdr/30 mt-4 h-px w-full bg-gradient-to-r from-transparent to-transparent"
-                ></div>
-              </div>
-              <div class="group">
-                <CasioLogo
-                  class="text-fg/60 hover:text-acc size-12 cursor-pointer transition-all duration-300 hover:scale-110"
-                />
-                <div
-                  class="via-brdr/30 mt-4 h-px w-full bg-gradient-to-r from-transparent to-transparent"
-                ></div>
-              </div>
-              <div class="group">
-                <LonginesLogo
-                  class="text-fg/60 hover:text-acc size-14 cursor-pointer transition-all duration-300 hover:scale-110"
-                />
-              </div>
-            </div>
-          </div>
-
-          <!-- Center content -->
-          <div class="space-y-8 text-center lg:col-span-3">
-            <!-- Main title -->
-            <div class="space-y-4">
-              <h1
-                class="font-sec text-fg dark:text-fg2/90 text-4xl font-semibold tracking-tight md:text-5xl lg:text-6xl"
-              >
-                Veselin Hadzhiyski
-              </h1>
-              <div class="flex items-center justify-center space-x-4">
-                <div class="to-acc h-px w-12 bg-gradient-to-r from-transparent"></div>
-                <div class="bg-acc h-2 w-2 animate-pulse rounded-full"></div>
-                <div class="to-acc h-px w-12 bg-gradient-to-l from-transparent"></div>
-              </div>
-            </div>
-
-            <!-- Logo with elegant frame -->
-            <div class="flex justify-center">
-              <div class="group relative">
-                <div
-                  class="from-acc/20 to-sec/20 absolute inset-0 rounded-full bg-gradient-to-br opacity-0 blur-xl transition-opacity duration-500 group-hover:opacity-100"
-                ></div>
-                <div
-                  class="bg-primary/80 border-brdr/30 relative rounded-full border p-6 shadow-lg backdrop-blur-sm"
-                >
-                  <TheLogo class="transition-transform duration-300 group-hover:scale-105" />
-                </div>
-              </div>
-            </div>
-
-            <!-- Subtitle with refined typography -->
-            <div class="space-y-2 pb-4">
-              <h2
-                class="font-sec text-fg dark:text-fg2/90 text-4xl font-semibold tracking-tight md:text-5xl lg:text-6xl"
-              >
-                Watchmaker & Repairs
-              </h2>
-              <p class="text-fg/70 mx-auto max-w-2xl text-lg leading-relaxed">
-                Precision craftsmanship meets timeless tradition in the art of horological
-                restoration
-              </p>
-            </div>
-
-            <!-- Call to action -->
-            <RouterLink to="/repairs">
-              <button
-                class="group bg-acc hover:bg-acc/90 text-fg2 relative overflow-hidden rounded-xl px-8 py-4 font-medium transition-all duration-300 hover:scale-105 hover:shadow-lg dark:hover:text-white"
-              >
-                <span class="relative z-10">Start Your Restoration</span>
-                <div
-                  class="absolute inset-0 -translate-x-full bg-gradient-to-r from-transparent via-white/20 to-transparent transition-transform duration-700 group-hover:translate-x-full"
-                ></div>
-              </button>
-            </RouterLink>
-          </div>
-
-          <!-- Right brand column - enhanced -->
-          <div class="hidden lg:col-span-1 lg:block">
-            <div class="flex flex-col items-center space-y-8">
-              <div class="group">
-                <RolexLogo
-                  class="text-fg/60 hover:text-acc size-12 cursor-pointer transition-all duration-300 hover:scale-110"
-                />
-                <div
-                  class="via-brdr/30 mt-4 h-px w-full bg-gradient-to-r from-transparent to-transparent"
-                ></div>
-              </div>
-              <div class="group">
-                <SeikoLogo
-                  class="text-fg/60 hover:text-acc size-12 cursor-pointer transition-all duration-300 hover:scale-110"
-                />
-                <div
-                  class="via-brdr/30 mt-4 h-px w-full bg-gradient-to-r from-transparent to-transparent"
-                ></div>
-              </div>
-              <div class="group">
-                <VostokLogo
-                  class="text-fg/60 hover:text-acc size-12 cursor-pointer transition-all duration-300 hover:scale-110"
-                />
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <!-- Mobile brand showcase -->
-        <div class="border-brdr/20 border-t p-6 lg:hidden">
-          <div class="flex items-center justify-center space-x-8 opacity-60">
-            <OmegaLogo class="hover:text-acc size-8 transition-colors duration-300" />
-            <CasioLogo class="hover:text-acc size-8 transition-colors duration-300" />
-            <LonginesLogo class="hover:text-acc size-9 transition-colors duration-300" />
-            <RolexLogo class="hover:text-acc size-8 transition-colors duration-300" />
-            <SeikoLogo class="hover:text-acc size-8 transition-colors duration-300" />
-            <VostokLogo class="hover:text-acc size-8 transition-colors duration-300" />
-          </div>
+        Veselin Hadzhiyski
+      </h1>
+      <!-- Brand showcase bar -->
+      <div class="mb-12 flex items-center justify-center">
+        <div class="flex items-center space-x-2">
+          <div class="to-brdr h-px w-20 bg-gradient-to-r from-transparent"></div>
+          <span class="text-fg-subtle w-28 text-sm tracking-widest uppercase"></span>
+          <div class="to-brdr h-px w-20 bg-gradient-to-l from-transparent"></div>
         </div>
       </div>
 
-      <!-- Floating quote card -->
-      <div class="relative mx-auto mt-12 max-w-2xl">
-        <div class="bg-primary/40 border-brdr/20 rounded-2xl border p-8 shadow-xl backdrop-blur-lg">
-          <blockquote class="text-center">
-            <div class="relative">
-              <span class="text-acc/60 absolute -top-4 -left-2 font-serif text-6xl">"</span>
-              <p class="text-fg px-6 text-xl leading-relaxed font-light italic md:text-2xl">
-                Time is the wisest counselor of all.
-              </p>
-              <span class="text-acc/60 absolute -right-2 -bottom-8 rotate-180 font-serif text-6xl"
-                >"</span
-              >
+      <!-- Main hero content -->
+      <div class="text-center">
+        <!-- Logo -->
+        <div class="mb-12 flex justify-center">
+          <div class="group relative">
+            <!-- Glow effect -->
+            <div
+              class="bg-acc/10 group-hover:bg-acc/20 absolute inset-0 rounded-full blur-3xl transition-all duration-700"
+            ></div>
+
+            <TheLogo class="transition-transform duration-500 group-hover:scale-110" />
+          </div>
+        </div>
+
+        <!-- Title and subtitle -->
+        <div class="space-y-6">
+          <!-- Decorative divider -->
+          <div class="flex items-center justify-center space-x-4">
+            <div class="to-acc h-px w-16 bg-gradient-to-r from-transparent"></div>
+            <div class="flex space-x-2">
+              <div class="bg-acc h-1.5 w-1.5 rounded-full"></div>
+              <div class="bg-acc/60 h-1.5 w-1.5 rounded-full"></div>
+              <div class="bg-acc/30 h-1.5 w-1.5 rounded-full"></div>
             </div>
-            <footer class="border-brdr/20 mt-6 border-t pt-4">
-              <cite class="text-fg/70 text-lg font-medium not-italic">— Pericles</cite>
+            <div class="to-acc h-px w-16 bg-gradient-to-l from-transparent"></div>
+          </div>
+
+          <h2
+            class="font-sec text-fg-mute text-2xl font-light tracking-[0.3em] uppercase md:text-3xl"
+          >
+            Watchmaker & Repairs
+          </h2>
+
+          <p class="text-fg/70 mx-auto max-w-2xl text-lg leading-relaxed">
+            Specializing in the restoration and repair of fine mechanical timepieces since 1985
+          </p>
+        </div>
+
+        <!-- Call to action buttons -->
+        <div
+          class="mt-12 flex flex-col items-center justify-center space-y-4 sm:flex-row sm:space-y-0 sm:space-x-6"
+        >
+          <RouterLink to="/repairs">
+            <button
+              class="group border-acc bg-acc text-fg2 relative overflow-hidden border-2 px-8 py-4 transition-all duration-300 hover:shadow-xl"
+            >
+              <span class="relative font-medium tracking-wide">Schedule Consultation</span>
+              <div
+                class="absolute inset-0 -translate-x-full bg-gradient-to-r from-transparent via-white/20 to-transparent transition-transform duration-700 group-hover:translate-x-full"
+              ></div>
+            </button>
+          </RouterLink>
+
+          <RouterLink to="/my-work">
+            <button
+              class="group border-brdr text-fg hover:border-acc border-2 bg-transparent px-8 py-4 transition-all duration-300 hover:shadow-lg"
+            >
+              <span class="font-medium tracking-wide">View Portfolio</span>
+            </button>
+          </RouterLink>
+        </div>
+      </div>
+
+      <!-- Bottom quote section -->
+      <div class="mt-24 flex justify-center">
+        <div class="max-w-3xl text-center">
+          <div
+            class="via-brdr/50 mb-4 h-px w-full bg-gradient-to-r from-transparent to-transparent"
+          ></div>
+          <blockquote class="relative">
+            <p class="text-fg/60 text-xl leading-relaxed italic">
+              "A thing of beauty is a joy forever. In horology, we preserve that joy through
+              generations."
+            </p>
+            <footer class="mt-4">
+              <cite class="text-fg-subtle text-sm font-normal not-italic">
+                — The Philosophy of Fine Watchmaking
+              </cite>
             </footer>
           </blockquote>
+          <div
+            class="via-brdr/50 mt-4 h-px w-full bg-gradient-to-r from-transparent to-transparent"
+          ></div>
         </div>
       </div>
     </div>

@@ -3,7 +3,7 @@ import NewGalleryElement from '@/components/AdminNewPost.vue'
 </script>
 <template>
   <div class="">
-    <div class="relative z-10 mx-auto">
+    <div class="relative mx-auto">
       <NewGalleryElement></NewGalleryElement>
     </div>
   </div>

@@ -6,7 +6,7 @@ import LowerSection from '@/components/home/LowerSection.vue'
 </script>
 
 <template>
-  <main class="flex flex-col items-center">
+  <main class="flex flex-col items-center sm:py-12">
     <!-- TOP SECTION -->
     <TopSection></TopSection>
 

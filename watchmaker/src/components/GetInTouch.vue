@@ -8,7 +8,7 @@ const showModal = ref(false)
 
 <template>
   <div
-    class="sticky top-8 h-fit rounded-2xl border border-white/20 bg-white/80 p-8 shadow-xl backdrop-blur-sm dark:border-slate-700/50 dark:bg-slate-800/80"
+    class="bg-primary/80 dark:border-sec-mute/50 dark:bg-sec/80 sticky top-8 h-fit rounded-2xl border border-white/20 p-8 shadow-xl backdrop-blur-sm"
   >
     <!-- Header -->
     <div class="mb-8">

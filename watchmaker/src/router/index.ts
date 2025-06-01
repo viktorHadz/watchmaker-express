@@ -2,9 +2,10 @@ import { createRouter, createWebHistory } from 'vue-router'
 import HomeView from '../views/HomeView.vue'
 import RepairsView from '@/views/RepairsView.vue'
 import MyWorkView from '@/views/MyWorkView.vue'
+import LoginPanel from '@/views/Admin/LoginPanel.vue'
 
 const router = createRouter({
-  history: createWebHistory(import.meta.env.BASE_URL),
+  history: createWebHistory(),
   routes: [
     {
       path: '/',
@@ -21,7 +22,15 @@ const router = createRouter({
       name: 'myWork',
       component: MyWorkView,
     },
+    {
+      path: '/admin',
+      name: 'admin',
+      component: LoginPanel,
+    },
   ],
+  scrollBehavior(to, from, savedPosition) {
+    return { top: 0 }
+  },
 })
 
 export default router

@@ -59,77 +59,61 @@ onUnmounted(() => {
   <!-- Desktop Navigation -->
   <nav
     :class="[
-      'border-brdr/20 bg-primary/80 fixed top-5 left-1/2 z-[500] hidden w-lg -translate-x-1/2 items-center justify-between rounded-xl border p-3 shadow-lg backdrop-blur-md transition-all duration-300 ease-in-out sm:flex',
+      'border-brdr/20 bg-primary/80 fixed top-5 left-1/2 z-[99] hidden w-lg -translate-x-1/2 items-center justify-between rounded-xl border p-3 shadow-lg backdrop-blur-md transition-all duration-300 ease-in-out sm:flex',
       isVisible ? 'translate-y-0 opacity-95' : '-translate-y-20 opacity-0',
     ]"
   >
     <div class="flex gap-8">
       <RouterLink to="/" class="group relative">
         <button
-          class="group hover:bg-sec/10 dark:hover:bg-sec/50 cursor-pointer rounded-lg p-2 transition-colors duration-200"
+          class="group group-hover:text-acc text-fg hover:bg-sec/60 dark:hover:bg-sec cursor-pointer rounded-lg transition-colors duration-200"
         >
           <!-- Active Indicator -->
           <div
-            v-if="$route.path === '/'"
-            class="bg-acc absolute top-0 -right-0.5 h-2 w-2 animate-pulse rounded-full"
-          ></div>
-          <HomeIcon class="text-fg group-hover:text-acc size-5 transition-colors duration-200" />
-        </button>
-        <!-- Tooltip -->
-        <div
-          class="pointer-events-none absolute -bottom-10 left-1/2 z-10 -translate-x-1/2 opacity-0 transition-opacity duration-200 group-hover:opacity-100"
-        >
-          <div class="bg-sec text-fg2 rounded-md px-2 py-1 text-xs whitespace-nowrap shadow-lg">
-            Home
-            <div class="bg-sec absolute -top-1 left-1/2 h-2 w-2 -translate-x-1/2 rotate-45"></div>
+            class="relative flex flex-col items-center rounded-md px-2 py-1 text-xs whitespace-nowrap"
+          >
+            <div
+              v-if="$route.path === '/'"
+              class="bg-acc absolute top-0 -right-0.5 h-2 w-2 animate-pulse rounded-full"
+            ></div>
+            <HomeIcon class="size-5" />
+            <p>Home</p>
           </div>
-        </div>
+        </button>
       </RouterLink>
-
       <RouterLink to="/repairs" class="group relative">
         <button
-          class="group hover:bg-sec/10 dark:hover:bg-sec/50 cursor-pointer rounded-lg p-2 transition-colors duration-200"
+          class="group group-hover:text-acc text-fg hover:bg-sec/60 dark:hover:bg-sec cursor-pointer rounded-lg transition-colors duration-200"
         >
           <!-- Active Indicator -->
           <div
-            v-if="$route.path === '/repairs'"
-            class="bg-acc absolute top-0 -right-0.5 h-2 w-2 animate-pulse rounded-full"
-          ></div>
-          <ChatBubbleBottomCenterTextIcon
-            class="text-fg group-hover:text-acc size-5 transition-colors duration-200"
-          />
-        </button>
-        <!-- Tooltip -->
-        <div
-          class="pointer-events-none absolute -bottom-10 left-1/2 z-10 -translate-x-1/2 opacity-0 transition-opacity duration-200 group-hover:opacity-100"
-        >
-          <div class="bg-sec text-fg2 rounded-md px-2 py-1 text-xs whitespace-nowrap shadow-lg">
-            Repairs
-            <div class="bg-sec absolute -top-1 left-1/2 h-2 w-2 -translate-x-1/2 rotate-45"></div>
+            class="relative flex flex-col items-center rounded-md px-2 py-1 text-xs whitespace-nowrap"
+          >
+            <div
+              v-if="$route.path === '/repairs'"
+              class="bg-acc absolute top-0 -right-0.5 h-2 w-2 animate-pulse rounded-full"
+            ></div>
+            <ChatBubbleBottomCenterTextIcon class="size-5" />
+            Contact
           </div>
-        </div>
+        </button>
       </RouterLink>
-
       <RouterLink to="/my-work" class="group relative">
         <button
-          class="group hover:bg-sec/10 dark:hover:bg-sec/50 cursor-pointer rounded-lg p-2 transition-colors duration-200"
+          class="group group-hover:text-acc text-fg hover:bg-sec/60 dark:hover:bg-sec cursor-pointer rounded-lg transition-colors duration-200"
         >
           <!-- Active Indicator -->
           <div
-            v-if="$route.path === '/my-work'"
-            class="bg-acc absolute top-0 -right-0.5 h-2 w-2 animate-pulse rounded-full"
-          ></div>
-          <PhotoIcon class="text-fg group-hover:text-acc size-5 transition-colors duration-200" />
-        </button>
-        <!-- Tooltip -->
-        <div
-          class="pointer-events-none absolute -bottom-10 left-1/2 z-10 -translate-x-1/2 opacity-0 transition-opacity duration-200 group-hover:opacity-100"
-        >
-          <div class="bg-sec text-fg2 rounded-md px-2 py-1 text-xs whitespace-nowrap shadow-lg">
+            class="relative flex flex-col items-center rounded-md px-2 py-1 text-xs whitespace-nowrap"
+          >
+            <div
+              v-if="$route.path === '/my-work'"
+              class="bg-acc absolute top-0 -right-0.5 h-2 w-2 animate-pulse rounded-full"
+            ></div>
+            <PhotoIcon class="size-5" />
             My Work
-            <div class="bg-sec absolute -top-1 left-1/2 h-2 w-2 -translate-x-1/2 rotate-45"></div>
           </div>
-        </div>
+        </button>
       </RouterLink>
     </div>
 
@@ -137,7 +121,7 @@ onUnmounted(() => {
       <DarkMode class="hover:text-acc transition duration-200" />
       <!-- Tooltip for Dark Mode -->
       <div
-        class="pointer-events-none absolute -bottom-10 left-1/2 z-10 -translate-x-1/2 opacity-0 transition-opacity duration-200 group-hover:opacity-100"
+        class="pointer-events-none absolute -bottom-10 left-1/2 -translate-x-1/2 opacity-0 transition-opacity duration-200 group-hover:opacity-100"
       >
         <div class="bg-sec text-fg2 rounded-md px-2 py-1 text-xs whitespace-nowrap shadow-lg">
           Toggle Theme
@@ -148,7 +132,7 @@ onUnmounted(() => {
   </nav>
 
   <!-- Mobile Navigation -->
-  <nav class="fixed right-0 bottom-0 left-0 z-[699] sm:hidden">
+  <nav class="fixed right-0 bottom-0 left-0 z-[99] sm:hidden">
     <!-- Glassmorphism backdrop -->
     <div class="bg-primary/90 border-brdr/30 absolute inset-0 border-t backdrop-blur-lg"></div>
 

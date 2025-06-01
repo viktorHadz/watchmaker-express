@@ -201,7 +201,7 @@ const handleFileChange = (event) => {
               id="first-name"
               maxlength="50"
               autocomplete="given-name"
-              class="text-fg placeholder-fg/50 focus:ring-acc/50 focus:border-acc w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 transition-all duration-200 focus:ring-2 focus:outline-none dark:border-slate-600 dark:bg-slate-700"
+              class="input"
               placeholder="Enter your first name"
               v-model="form.firstName"
               @focus="handleFocus('firstName')"
@@ -230,7 +230,7 @@ const handleFileChange = (event) => {
               id="last-name"
               maxlength="50"
               autocomplete="family-name"
-              class="text-fg placeholder-fg/50 focus:ring-acc/50 focus:border-acc w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 transition-all duration-200 focus:ring-2 focus:outline-none dark:border-slate-600 dark:bg-slate-700"
+              class="input"
               placeholder="Enter your last name"
               v-model="form.lastName"
               @focus="handleFocus('lastName')"
@@ -261,7 +261,7 @@ const handleFileChange = (event) => {
             id="email"
             maxlength="254"
             autocomplete="email"
-            class="text-fg placeholder-fg/50 focus:ring-acc/50 focus:border-acc w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 transition-all duration-200 focus:ring-2 focus:outline-none dark:border-slate-600 dark:bg-slate-700"
+            class="input"
             placeholder="your.email@example.com"
             v-model="form.email"
             @focus="handleFocus('email')"
@@ -290,7 +290,7 @@ const handleFileChange = (event) => {
             id="phone-number"
             maxlength="25"
             autocomplete="tel"
-            class="text-fg placeholder-fg/50 focus:ring-acc/50 focus:border-acc w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 transition-all duration-200 focus:ring-2 focus:outline-none dark:border-slate-600 dark:bg-slate-700"
+            class="input"
             placeholder="+44 123 456 7890"
             v-model="form.phone"
             @focus="handleFocus('phone')"
@@ -310,7 +310,9 @@ const handleFileChange = (event) => {
       <!-- File Upload -->
       <div class="group">
         <div class="mb-4 flex items-center justify-between">
-          <label class="font-sec text-fg font-medium">Watch Images (Optional)</label>
+          <label for="file-upload" class="font-sec text-fg font-medium"
+            >Watch Images (Optional)</label
+          >
           <label
             for="file-upload"
             class="bg-acc/10 text-acc hover:bg-acc/20 inline-flex cursor-pointer items-center rounded-lg px-4 py-2 font-medium transition-colors"
@@ -375,7 +377,7 @@ const handleFileChange = (event) => {
             id="message"
             maxlength="1000"
             rows="6"
-            class="text-fg placeholder-fg/50 focus:ring-acc/50 focus:border-acc w-full resize-none rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 transition-all duration-200 focus:ring-2 focus:outline-none dark:border-slate-600 dark:bg-slate-700"
+            class="text-fg placeholder-fg/50 focus:ring-acc/50 focus:border-acc input w-full resize-none rounded-xl"
             placeholder="Tell me about your watch, what issues you're experiencing, or any specific requirements..."
             v-model="form.message"
             @focus="handleFocus('message')"

@@ -1,7 +1,7 @@
 <!-- MAIN ENTRY FILE TEMPLATE -->
 <template>
   <div class="relative min-h-screen w-full">
-    <div class="relative z-10 mx-auto max-w-7xl px-4 py-12 sm:px-6 lg:px-8">
+    <div class="relative mx-auto max-w-7xl px-4 py-12 sm:px-6 lg:px-8">
       <!-- Header Section -->
       <div class="mb-16 text-center">
         <h1 class="font-sec text-fg mb-4 text-4xl font-semibold lg:text-5xl">Get in Touch</h1>
@@ -20,7 +20,7 @@
         <!-- Right Column - Contact Form -->
         <div class="lg:col-span-3">
           <div
-            class="overflow-hidden rounded-2xl border border-white/20 bg-white/90 shadow-2xl backdrop-blur-sm dark:border-slate-700/50 dark:bg-slate-800/90"
+            class="bg-primary/90 dark:bg-sec/90 dark:border-sec-mute/50 overflow-hidden rounded-2xl border border-white/20 shadow-2xl backdrop-blur-sm"
           >
             <!-- Form Header -->
             <div

@@ -1,95 +1,118 @@
 <script setup>
-import { StarIcon } from '@heroicons/vue/24/outline'
+import { StarIcon } from '@heroicons/vue/24/solid'
 </script>
+
 <template>
-  <section class="bg-sec/5 mt-20 w-full py-16">
-    <div class="mx-auto max-w-7xl px-6">
-      <div class="mb-12 text-center">
-        <h2 class="font-sec text-fg mb-4 text-4xl font-semibold">What Clients Say</h2>
-        <p class="text-fg/70 text-lg">Trusted by watch enthusiasts and collectors worldwide</p>
+  <section class="mt-20 w-full py-16">
+    <div class="relative mx-auto max-w-7xl px-6">
+      <!-- Section Header -->
+      <div class="mb-16 text-center">
+        <h2 class="font-sec text-fg mb-2 text-4xl font-normal tracking-wide">
+          Client Testimonials
+        </h2>
+        <div class="mb-6 flex items-center justify-center space-x-4">
+          <div class="to-acc/50 h-px w-20 bg-gradient-to-r from-transparent"></div>
+          <div class="flex space-x-1">
+            <div class="bg-acc h-1.5 w-1.5 rounded-full"></div>
+            <div class="bg-acc/60 h-1.5 w-1.5 rounded-full"></div>
+            <div class="bg-acc/30 h-1.5 w-1.5 rounded-full"></div>
+          </div>
+          <div class="to-acc/50 h-px w-20 bg-gradient-to-l from-transparent"></div>
+        </div>
+        <p class="text-fg/70 text-lg">Trusted by collectors and enthusiasts for three decades</p>
       </div>
 
+      <!-- Testimonials Grid -->
       <div class="grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-3">
         <!-- Testimonial 1 -->
-        <div
-          class="bg-primary border-brdr/20 rounded-xl border p-6 shadow-sm transition-shadow duration-300 hover:shadow-md"
-        >
-          <div class="mb-4 flex items-center">
-            <div class="text-acc flex">
-              <StarIcon class="fill-acc size-5"></StarIcon>
-              <StarIcon class="fill-acc size-5"></StarIcon>
-              <StarIcon class="fill-acc size-5"></StarIcon>
-              <StarIcon class="fill-acc size-5"></StarIcon>
-              <StarIcon class="fill-acc size-5"></StarIcon>
+        <div class="group">
+          <div
+            class="bg-primary/80 border-brdr/30 hover:border-acc/20 relative h-full rounded-lg border p-8 transition-all duration-500 hover:shadow-xl"
+          >
+            <!-- Decorative quote mark -->
+            <div class="text-acc/10 absolute -top-2 -left-2 font-serif text-6xl leading-none">
+              "
             </div>
-          </div>
-          <p class="text-fg/80 mb-4 leading-relaxed italic">
-            "Veselin brought my grandfather's Omega back to life. The attention to detail and
-            craftsmanship is absolutely incredible. It runs better than when it was new!"
-          </p>
-          <div class="flex items-center">
-            <div class="bg-acc/20 flex h-10 w-10 items-center justify-center rounded-full">
-              <span class="text-acc text-sm font-semibold">MR</span>
+
+            <!-- Stars -->
+            <div class="mb-4 flex space-x-0.5">
+              <StarIcon class="text-acc size-4" />
+              <StarIcon class="text-acc size-4" />
+              <StarIcon class="text-acc size-4" />
+              <StarIcon class="text-acc size-4" />
+              <StarIcon class="text-acc size-4" />
             </div>
-            <div class="ml-3">
+
+            <!-- Testimonial text -->
+            <p class="text-fg/80 mb-6 leading-relaxed italic">
+              "Veselin restored my grandfather's 1954 Omega Seamaster to perfection. His attention
+              to detail and respect for the watch's heritage is unmatched. It now keeps better time
+              than when new."
+            </p>
+
+            <!-- Author -->
+            <div class="border-brdr/20 border-t pt-4">
               <p class="text-fg font-medium">Michael Rodriguez</p>
-              <p class="text-fg/60 text-sm">Watch Collector</p>
+              <p class="text-fg-subtle text-sm">Vintage Watch Collector</p>
             </div>
           </div>
         </div>
 
         <!-- Testimonial 2 -->
-        <div
-          class="bg-primary border-brdr/20 rounded-xl border p-6 shadow-sm transition-shadow duration-300 hover:shadow-md"
-        >
-          <div class="mb-4 flex items-center">
-            <div class="text-acc flex">
-              <StarIcon class="fill-acc size-5"></StarIcon>
-              <StarIcon class="fill-acc size-5"></StarIcon>
-              <StarIcon class="fill-acc size-5"></StarIcon>
-              <StarIcon class="fill-acc size-5"></StarIcon>
-              <StarIcon class="fill-acc size-5"></StarIcon>
+        <div class="group">
+          <div
+            class="bg-primary/80 border-brdr/30 hover:border-acc/20 relative h-full rounded-lg border p-8 transition-all duration-500 hover:shadow-xl"
+          >
+            <div class="text-acc/10 absolute -top-2 -left-2 font-serif text-6xl leading-none">
+              "
             </div>
-          </div>
-          <p class="text-fg/80 mb-4 leading-relaxed italic">
-            "Professional service and fair pricing. My vintage Seiko looks and performs like new.
-            Veselin's expertise with mechanical movements is truly exceptional."
-          </p>
-          <div class="flex items-center">
-            <div class="bg-acc/20 flex h-10 w-10 items-center justify-center rounded-full">
-              <span class="text-acc text-sm font-semibold">SL</span>
+
+            <div class="mb-4 flex space-x-0.5">
+              <StarIcon class="text-acc size-4" />
+              <StarIcon class="text-acc size-4" />
+              <StarIcon class="text-acc size-4" />
+              <StarIcon class="text-acc size-4" />
+              <StarIcon class="text-acc size-4" />
             </div>
-            <div class="ml-3">
+
+            <p class="text-fg/80 mb-6 leading-relaxed italic">
+              "Professional expertise combined with fair pricing. My vintage Seiko required
+              extensive work, and Veselin explained every step. The results exceeded my
+              expectations."
+            </p>
+
+            <div class="border-brdr/20 border-t pt-4">
               <p class="text-fg font-medium">Sarah Liu</p>
-              <p class="text-fg/60 text-sm">Antique Dealer</p>
+              <p class="text-fg-subtle text-sm">Estate Jewelry Specialist</p>
             </div>
           </div>
         </div>
 
         <!-- Testimonial 3 -->
-        <div
-          class="bg-primary border-brdr/20 rounded-xl border p-6 shadow-sm transition-shadow duration-300 hover:shadow-md"
-        >
-          <div class="mb-4 flex items-center">
-            <div class="text-acc flex">
-              <StarIcon class="fill-acc size-5"></StarIcon>
-              <StarIcon class="fill-acc size-5"></StarIcon>
-              <StarIcon class="fill-acc size-5"></StarIcon>
-              <StarIcon class="fill-acc size-5"></StarIcon>
-              <StarIcon class="fill-acc size-5"></StarIcon>
+        <div class="group">
+          <div
+            class="bg-primary/80 border-brdr/30 hover:border-acc/20 relative h-full rounded-lg border p-8 transition-all duration-500 hover:shadow-xl"
+          >
+            <div class="text-acc/10 absolute -top-2 -left-2 font-serif text-6xl leading-none">
+              "
             </div>
-          </div>
-          <p class="text-fg/80 mb-4 leading-relaxed italic">
-            "Outstanding work on my Rolex restoration. Veselin's knowledge of vintage movements is
-            remarkable, and the turnaround time was excellent."
-          </p>
-          <div class="flex items-center">
-            <div class="bg-acc/20 flex h-10 w-10 items-center justify-center rounded-full">
-              <span class="text-acc text-sm font-semibold">DJ</span>
+
+            <div class="mb-4 flex space-x-0.5">
+              <StarIcon class="text-acc size-4" />
+              <StarIcon class="text-acc size-4" />
+              <StarIcon class="text-acc size-4" />
+              <StarIcon class="text-acc size-4" />
+              <StarIcon class="text-acc size-4" />
             </div>
-            <div class="ml-3">
+
+            <p class="text-fg/80 mb-6 leading-relaxed italic">
+              "Outstanding restoration of my 1960s Rolex Datejust. Veselin's knowledge of vintage
+              movements is encyclopedic, and his craftsmanship is truly masterful."
+            </p>
+
+            <div class="border-brdr/20 border-t pt-4">
               <p class="text-fg font-medium">David Johnson</p>
-              <p class="text-fg/60 text-sm">Estate Attorney</p>
+              <p class="text-fg-subtle text-sm">Private Collector</p>
             </div>
           </div>
         </div>

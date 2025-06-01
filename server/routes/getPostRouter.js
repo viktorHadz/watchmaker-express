@@ -36,41 +36,60 @@ router.get('/get-all', (req, res) => {
           `
         SELECT * FROM images 
         WHERE post_id IN (${placeholders})
-        ORDER BY post_id, id
+        ORDER BY post_id, order_index, id
       `,
         )
         .all(...postIds)
     }
 
-    // Group images by post
+    // Group images by post and type
     const imgsByPost = {}
     images.forEach((image) => {
       if (!imgsByPost[image.post_id]) {
-        imgsByPost[image.post_id] = []
+        imgsByPost[image.post_id] = {
+          title: null,
+          extras: [],
+          thumbnails: [],
+        }
       }
-      imgsByPost[image.post_id].push(image)
+
+      if (image.image_type === 'title') {
+        imgsByPost[image.post_id].title = image
+      } else if (image.image_type === 'extra') {
+        imgsByPost[image.post_id].extras.push(image)
+      } else if (image.image_type === 'thumbnail') {
+        imgsByPost[image.post_id].thumbnails.push(image)
+      }
     })
 
     // Build the result
     const result = posts.map((post) => {
-      const postImages = imgsByPost[post.id] || []
+      const postImages = imgsByPost[post.id] || { title: null, extras: [], thumbnails: [] }
       return {
         postId: post.id,
         postTitle: post.post_title,
         postBody: post.post_body,
         date: post.date,
-        postFolder: postImages[0]?.folder_url || null,
-        titleImage: postImages[0]
+        postType: post.post_type,
+        postFolder: postImages.title?.folder_url || null,
+        titleImage: postImages.title
           ? {
-              id: postImages[0].id,
-              titlePath: postImages[0].image_path,
-              type: postImages[0].image_type,
+              id: postImages.title.id,
+              titlePath: postImages.title.image_path,
+              type: postImages.title.image_type,
             }
           : null,
-        extraImages: postImages.slice(1).map((img) => ({
+        extraImages: postImages.extras.map((img) => ({
           id: img.id,
           path: img.image_path,
           type: img.image_type,
+          order: img.order_index,
+        })),
+        thumbImages: postImages.thumbnails.map((img) => ({
+          id: img.id,
+          path: img.image_path,
+          type: img.image_type,
+          order: img.order_index,
         })),
       }
     })
@@ -96,36 +115,56 @@ router.get('/get-all', (req, res) => {
 // Alternative: Keep a simpler endpoint without pagination for backward compatibility
 router.get('/get-all-simple', (req, res) => {
   try {
-    const posts = db.prepare(`SELECT * FROM posts`).all()
-    const images = db.prepare('SELECT * FROM images ORDER BY post_id, id').all()
+    const posts = db.prepare(`SELECT * FROM posts ORDER BY id DESC`).all()
+    const images = db.prepare('SELECT * FROM images ORDER BY post_id, order_index, id').all()
 
+    // Group images by post and type
     const imgsByPost = {}
     images.forEach((image) => {
       if (!imgsByPost[image.post_id]) {
-        imgsByPost[image.post_id] = []
+        imgsByPost[image.post_id] = {
+          title: null,
+          extras: [],
+          thumbnails: [],
+        }
       }
-      imgsByPost[image.post_id].push(image)
+
+      if (image.image_type === 'title') {
+        imgsByPost[image.post_id].title = image
+      } else if (image.image_type === 'extra') {
+        imgsByPost[image.post_id].extras.push(image)
+      } else if (image.image_type === 'thumbnail') {
+        imgsByPost[image.post_id].thumbnails.push(image)
+      }
     })
 
     const result = posts.map((post) => {
-      const postImages = imgsByPost[post.id] || []
+      const postImages = imgsByPost[post.id] || { title: null, extras: [], thumbnails: [] }
       return {
         postId: post.id,
         postTitle: post.post_title,
         postBody: post.post_body,
         date: post.date,
-        postFolder: postImages[0]?.folder_url || null,
-        titleImage: postImages[0]
+        postType: post.post_type,
+        postFolder: postImages.title?.folder_url || null,
+        titleImage: postImages.title
           ? {
-              id: postImages[0].id,
-              titlePath: postImages[0].image_path,
-              type: postImages[0].image_type,
+              id: postImages.title.id,
+              titlePath: postImages.title.image_path,
+              type: postImages.title.image_type,
             }
           : null,
-        extraImages: postImages.slice(1).map((img) => ({
+        extraImages: postImages.extras.map((img) => ({
           id: img.id,
           path: img.image_path,
           type: img.image_type,
+          order: img.order_index,
+        })),
+        thumbImages: postImages.thumbnails.map((img) => ({
+          id: img.id,
+          path: img.image_path,
+          type: img.image_type,
+          order: img.order_index,
         })),
       }
     })
@@ -166,7 +205,7 @@ router.get('/search', (req, res) => {
       )
       .all(`%${searchTerm}%`, `%${searchTerm}%`, limit, offset)
 
-    // Rest is the same as the paginated get-all...
+    // Get all post IDs from this page
     const postIds = posts.map((post) => post.id)
 
     let images = []
@@ -177,38 +216,59 @@ router.get('/search', (req, res) => {
           `
         SELECT * FROM images 
         WHERE post_id IN (${placeholders})
-        ORDER BY post_id, id
+        ORDER BY post_id, order_index, id
       `,
         )
         .all(...postIds)
     }
 
+    // Group images by post and type
     const imgsByPost = {}
     images.forEach((image) => {
       if (!imgsByPost[image.post_id]) {
-        imgsByPost[image.post_id] = []
+        imgsByPost[image.post_id] = {
+          title: null,
+          extras: [],
+          thumbnails: [],
+        }
       }
-      imgsByPost[image.post_id].push(image)
+
+      if (image.image_type === 'title') {
+        imgsByPost[image.post_id].title = image
+      } else if (image.image_type === 'extra') {
+        imgsByPost[image.post_id].extras.push(image)
+      } else if (image.image_type === 'thumbnail') {
+        imgsByPost[image.post_id].thumbnails.push(image)
+      }
     })
 
     const result = posts.map((post) => {
-      const postImages = imgsByPost[post.id] || []
+      const postImages = imgsByPost[post.id] || { title: null, extras: [], thumbnails: [] }
       return {
         postId: post.id,
-        postTitle: post.post_body,
+        postTitle: post.post_title,
+        postBody: post.post_body,
         date: post.date,
-        postFolder: postImages[0]?.folder_url || null,
-        titleImage: postImages[0]
+        postType: post.post_type,
+        postFolder: postImages.title?.folder_url || null,
+        titleImage: postImages.title
           ? {
-              id: postImages[0].id,
-              titlePath: postImages[0].image_path,
-              type: postImages[0].image_type,
+              id: postImages.title.id,
+              titlePath: postImages.title.image_path,
+              type: postImages.title.image_type,
             }
           : null,
-        extra_images: postImages.slice(1).map((img) => ({
+        extraImages: postImages.extras.map((img) => ({
           id: img.id,
           path: img.image_path,
           type: img.image_type,
+          order: img.order_index,
+        })),
+        thumbImages: postImages.thumbnails.map((img) => ({
+          id: img.id,
+          path: img.image_path,
+          type: img.image_type,
+          order: img.order_index,
         })),
       }
     })
@@ -231,9 +291,80 @@ router.get('/search', (req, res) => {
   }
 })
 
+// Get single post by ID
+router.get('/get/:id', (req, res) => {
+  try {
+    const postId = req.params.id
+
+    // Get the post
+    const post = db.prepare('SELECT * FROM posts WHERE id = ?').get(postId)
+
+    if (!post) {
+      return res.status(404).json({ error: 'Post not found' })
+    }
+
+    // Get all images for this post
+    const images = db
+      .prepare('SELECT * FROM images WHERE post_id = ? ORDER BY order_index, id')
+      .all(postId)
+
+    // Separate images by type
+    const imagesByType = {
+      title: null,
+      extras: [],
+      thumbnails: [],
+    }
+
+    images.forEach((image) => {
+      if (image.image_type === 'title') {
+        imagesByType.title = image
+      } else if (image.image_type === 'extra') {
+        imagesByType.extras.push(image)
+      } else if (image.image_type === 'thumbnail') {
+        imagesByType.thumbnails.push(image)
+      }
+    })
+
+    // Build response
+    const result = {
+      postId: post.id,
+      postTitle: post.post_title,
+      postBody: post.post_body,
+      date: post.date,
+      postType: post.post_type,
+      postFolder: imagesByType.title?.folder_url || null,
+      titleImage: imagesByType.title
+        ? {
+            id: imagesByType.title.id,
+            titlePath: imagesByType.title.image_path,
+            type: imagesByType.title.image_type,
+          }
+        : null,
+      extraImages: imagesByType.extras.map((img) => ({
+        id: img.id,
+        path: img.image_path,
+        type: img.image_type,
+        order: img.order_index,
+      })),
+      thumbImages: imagesByType.thumbnails.map((img) => ({
+        id: img.id,
+        path: img.image_path,
+        type: img.image_type,
+        order: img.order_index,
+      })),
+    }
+
+    return res.json(result)
+  } catch (error) {
+    console.log(`V-Error: ${error}`)
+    return res.status(500).json({ error: 'Database error' })
+  }
+})
+
 export default router
 
 // Usage examples:
 // GET /posts/get-all?page=1&limit=10
 // GET /posts/get-all?page=2&limit=20
 // GET /posts/search?q=javascript&page=1&limit=10
+// GET /posts/get/123

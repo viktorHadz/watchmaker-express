@@ -1,64 +1,133 @@
 <script setup>
 import { WrenchIcon, Cog6ToothIcon, SparklesIcon } from '@heroicons/vue/24/outline'
 </script>
+
 <template>
   <section class="mt-16 w-full max-w-7xl px-6">
-    <div class="mb-12 text-center">
-      <h2 class="font-sec text-fg mb-4 text-4xl font-semibold">Expert Services</h2>
-      <p class="text-fg/70 mx-auto max-w-2xl text-lg">
-        Comprehensive watch repair and restoration services with decades of experience in precision
-        timekeeping
+    <!-- Section Header -->
+    <div class="mb-16 text-center">
+      <h2 class="font-sec text-fg mb-2 text-4xl font-normal tracking-wide">Horological Services</h2>
+      <div class="mb-6 flex items-center justify-center space-x-4">
+        <div class="to-acc/50 h-px w-20 bg-gradient-to-r from-transparent"></div>
+        <div class="flex space-x-1">
+          <div class="bg-acc h-1.5 w-1.5 rounded-full"></div>
+          <div class="bg-acc/60 h-1.5 w-1.5 rounded-full"></div>
+          <div class="bg-acc/30 h-1.5 w-1.5 rounded-full"></div>
+        </div>
+        <div class="to-acc/50 h-px w-20 bg-gradient-to-l from-transparent"></div>
+      </div>
+      <p class="text-fg/70 mx-auto max-w-2xl text-lg leading-relaxed">
+        Preserving the art of mechanical timekeeping through meticulous restoration and expert
+        servicing
       </p>
     </div>
 
+    <!-- Services Grid -->
     <div class="grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-3">
       <!-- Service 1: Movement Restoration -->
-      <div
-        class="group bg-primary border-brdr/30 hover:border-acc/50 rounded-xl border p-6 transition-all duration-300 hover:shadow-lg"
-      >
+      <div class="group relative">
+        <!-- Card background with subtle gradient -->
         <div
-          class="bg-acc/10 group-hover:bg-acc/20 mb-4 flex h-12 w-12 items-center justify-center rounded-lg transition-colors duration-300"
+          class="from-primary to-sec-light absolute inset-0 rounded-lg bg-gradient-to-br opacity-50"
+        ></div>
+
+        <div
+          class="bg-primary/90 border-brdr/50 hover:border-acc/30 relative h-full rounded-lg border p-8 transition-all duration-500 hover:shadow-xl"
         >
-          <Cog6ToothIcon class="text-acc size-6"></Cog6ToothIcon>
+          <!-- Icon with brass accent -->
+          <div class="mb-6 inline-flex">
+            <div class="relative">
+              <div
+                class="bg-acc/20 group-hover:bg-acc/30 absolute inset-0 rounded-full blur-xl transition-colors duration-500"
+              ></div>
+              <div
+                class="bg-acc/10 border-acc/20 group-hover:border-acc/40 relative rounded-full border p-4 transition-all duration-300"
+              >
+                <Cog6ToothIcon class="text-acc size-6" />
+              </div>
+            </div>
+          </div>
+
+          <h3 class="font-sec text-fg mb-4 text-xl font-normal tracking-wide">
+            Movement Restoration
+          </h3>
+          <p class="text-fg/70 leading-relaxed">
+            Complete overhaul of mechanical movements including disassembly, ultrasonic cleaning,
+            lubrication, and precision timing adjustment to restore factory specifications.
+          </p>
         </div>
-        <h3 class="font-sec text-fg mb-3 text-xl font-semibold">Movement Restoration</h3>
-        <p class="text-fg/70 leading-relaxed">
-          Complete mechanical movement servicing, cleaning, and calibration to restore your
-          timepiece to factory precision.
-        </p>
       </div>
 
-      <!-- Service 2: Dial Refinishing -->
-      <div
-        class="group bg-primary border-brdr/30 hover:border-acc/50 rounded-xl border p-6 transition-all duration-300 hover:shadow-lg"
-      >
+      <!-- Service 2: Dial & Hand Refinishing -->
+      <div class="group relative">
         <div
-          class="bg-acc/10 group-hover:bg-acc/20 mb-4 flex h-12 w-12 items-center justify-center rounded-lg transition-colors duration-300"
+          class="from-primary to-sec-light absolute inset-0 rounded-lg bg-gradient-to-br opacity-50"
+        ></div>
+
+        <div
+          class="bg-primary/90 border-brdr/50 hover:border-acc/30 relative h-full rounded-lg border p-8 transition-all duration-500 hover:shadow-xl"
         >
-          <WrenchIcon class="text-acc size-6"></WrenchIcon>
+          <div class="mb-6 inline-flex">
+            <div class="relative">
+              <div
+                class="bg-acc/20 group-hover:bg-acc/30 absolute inset-0 rounded-full blur-xl transition-colors duration-500"
+              ></div>
+              <div
+                class="bg-acc/10 border-acc/20 group-hover:border-acc/40 relative rounded-full border p-4 transition-all duration-300"
+              >
+                <WrenchIcon class="text-acc size-6" />
+              </div>
+            </div>
+          </div>
+
+          <h3 class="font-sec text-fg mb-4 text-xl font-normal tracking-wide">
+            Dial & Hand Refinishing
+          </h3>
+          <p class="text-fg/70 leading-relaxed">
+            Expert restoration of vintage dials, careful hand relumeing, and index marker
+            refinishing while preserving the original character and patina of your timepiece.
+          </p>
         </div>
-        <h3 class="font-sec text-fg mb-3 text-xl font-semibold">Dial Refinishing</h3>
-        <p class="text-fg/70 leading-relaxed">
-          Expert restoration of watch dials, hands, and indices to bring back the original beauty
-          and legibility.
-        </p>
       </div>
 
-      <!-- Service 3: Case Polishing -->
-      <div
-        class="group bg-primary border-brdr/30 hover:border-acc/50 rounded-xl border p-6 transition-all duration-300 hover:shadow-lg"
-      >
+      <!-- Service 3: Case & Bracelet Restoration -->
+      <div class="group relative">
         <div
-          class="bg-acc/10 group-hover:bg-acc/20 mb-4 flex h-12 w-12 items-center justify-center rounded-lg transition-colors duration-300"
+          class="from-primary to-sec-light absolute inset-0 rounded-lg bg-gradient-to-br opacity-50"
+        ></div>
+
+        <div
+          class="bg-primary/90 border-brdr/50 hover:border-acc/30 relative rounded-lg border p-8 transition-all duration-500 hover:shadow-xl"
         >
-          <SparklesIcon class="text-acc size-6"></SparklesIcon>
+          <div class="mb-6 inline-flex">
+            <div class="relative">
+              <div
+                class="bg-acc/20 group-hover:bg-acc/30 absolute inset-0 rounded-full blur-xl transition-colors duration-500"
+              ></div>
+              <div
+                class="bg-acc/10 border-acc/20 group-hover:border-acc/40 relative rounded-full border p-4 transition-all duration-300"
+              >
+                <SparklesIcon class="text-acc size-6" />
+              </div>
+            </div>
+          </div>
+
+          <h3 class="font-sec text-fg mb-4 text-xl font-normal tracking-wide">
+            Case & Bracelet Restoration
+          </h3>
+          <p class="text-fg/70 leading-relaxed">
+            Professional refinishing of watch cases and bracelets using traditional techniques to
+            restore original finishing while maintaining crisp edges and factory specifications.
+          </p>
         </div>
-        <h3 class="font-sec text-fg mb-3 text-xl font-semibold">Case Polishing</h3>
-        <p class="text-fg/70 leading-relaxed">
-          Professional case refinishing and bracelet restoration to eliminate scratches and restore
-          original luster.
-        </p>
       </div>
+    </div>
+
+    <!-- Additional Service Note -->
+    <div class="mt-12 text-center">
+      <p class="text-fg-subtle text-sm">
+        All services include a comprehensive 24-month warranty · Free estimates available
+      </p>
     </div>
   </section>
 </template>
