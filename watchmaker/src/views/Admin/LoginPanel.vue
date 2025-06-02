@@ -74,22 +74,26 @@ async function validate() {
 
 async function login() {
   const validationResult = await validate()
-
   if (!validationResult) {
     return
   }
-
   isLoading.value = true
-
   try {
-    // Your actual login logic here
+    // Login logic here
     console.log('Login data:', validationResult)
+    // Sends to server
+    const response = await fetch('/api/admin/login', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(validationResult),
+    })
 
-    // Simulate API call
-    await new Promise((resolve) => setTimeout(resolve, 1000))
-    const response = await fetch('/api/admin/login')
     if (!response.ok) throw new Error(`Bad fetch: ${response.statusText}`)
-    // now what?
+    const token = await response.json()
+    console.log(token)
+
     // Have to wait for server to validate once server validates then i create a session
     clearInputs()
     toast('Login successful!', 'success')

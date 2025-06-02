@@ -8,6 +8,7 @@ import { fileURLToPath } from 'url'
 import insertPostRouter from './routes/insertPostRouter.js'
 import formRouter from './routes/formRouter.js'
 import getPostRouter from './routes/getPostRouter.js'
+import { loginRouter } from './routes/adminRouter.js'
 
 const app = express()
 const __filename = fileURLToPath(import.meta.url) // get the resolved path to the file
@@ -28,6 +29,7 @@ app.use(express.json())
 app.use('/api/form/', formRouter)
 app.use('/api/posts/', insertPostRouter)
 app.use('/api/posts/', getPostRouter)
+app.use('/api/admin/', loginRouter)
 
 app.use('/public/uploads', express.static(path.join(__dirname, 'public', 'uploads')))
 
