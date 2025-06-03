@@ -32,6 +32,7 @@ export function authenticateToken(req, res, next) {
 function generateAccessToken(username) {
   return jwt.sign(username, process.env.TOKEN_SECRET)
 }
+
 // /api/admin/login =>
 loginRouter.post('/login', (req, res) => {
   console.log(req.body)

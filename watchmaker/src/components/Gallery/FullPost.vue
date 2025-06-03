@@ -109,7 +109,7 @@ watch(
     <Transition name="backdrop" appear>
       <div
         v-if="show"
-        class="fixed inset-0 z-[98] bg-black/60 backdrop-blur-sm"
+        class="fixed inset-0 z-[100] bg-black/60 backdrop-blur-sm"
         @click="closeModal"
       ></div>
     </Transition>
@@ -118,7 +118,7 @@ watch(
     <Transition name="modal" appear>
       <div
         v-if="show"
-        class="pointer-events-none fixed inset-0 z-[98] flex items-center justify-center sm:p-4"
+        class="pointer-events-none fixed inset-0 z-[101] flex items-center justify-center sm:p-4"
       >
         <div
           class="dark:bg-sec/80 dark:border-sec-mute bg-primary pointer-events-auto relative flex h-full w-full max-w-4xl flex-col overflow-hidden border border-white/20 shadow-2xl backdrop-blur-md sm:max-h-[90vh] sm:rounded-2xl"

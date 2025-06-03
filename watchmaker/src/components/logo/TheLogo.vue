@@ -9,17 +9,13 @@ const mode = useLocalStorage('vueuse-color-scheme')
       <img
         v-if="mode === 'dark'"
         src="./dark-mode-central.png"
-        alt="central-watch-mechanism"
-        loading="eager"
-        decoding="async"
+        alt="central-watch-mechanism-dark"
         class="absolute size-52 sm:size-64"
       />
       <img
         v-if="mode === 'light'"
         src="./light-mode-central.png"
-        alt="central-watch-mechanism"
-        loading="eager"
-        decoding="async"
+        alt="central-watch-mechanism-light"
         class="absolute size-52 sm:size-64"
       />
       <!-- top-piece -->
