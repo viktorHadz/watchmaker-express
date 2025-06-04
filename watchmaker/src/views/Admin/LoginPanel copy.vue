@@ -1,22 +1,60 @@
 <script setup>
 import TheLogo from '@/components/logo/TheLogo.vue'
 import { ArrowRightEndOnRectangleIcon } from '@heroicons/vue/24/outline'
-import { loginSchema } from './loginSchema'
-import { ref, computed, onMounted } from 'vue'
+import * as z from 'zod'
+import { ref, computed } from 'vue'
 import { useToastStore } from '@/stores/toast'
-import { supabase } from '@/supabase'
+
 const toast = (message, type) => useToastStore().showToast(message, type)
 
-const loading = ref(false)
-const email = ref('')
-const password = ref('')
+const allowedCharsOnly = /^[a-zA-Z0-9!@#._-]+$/
+const loginSchema = z.object({
+  email: z
+    .string()
+    .trim()
+    .max(32, { message: 'Email cannot exceed 32 characters' })
+    .nonempty({ message: 'Email field cannot be empty' })
+    .email({ message: 'Must be a valid email address' }),
+  password: z
+    .string()
+    .trim()
+    .max(32, { message: 'Password cannot exceed 32 characters' })
+    .min(1, { message: 'Password field cannot be empty' })
+    .min(6, { message: 'Password must be at least 6 characters long' })
+    .refine((val) => allowedCharsOnly.test(val), {
+      message: 'Password can only contain letters, numbers, and safe symbols (!@#._-)',
+    }),
+})
+
+const errors = ref([])
+const isLoading = ref(false)
+const loginForm = ref({
+  email: '',
+  password: '',
+})
+
+const emailError = computed(() => errors.value.find((err) => err.field === 'email')?.message || '')
+const passwordError = computed(
+  () => errors.value.find((err) => err.field === 'password')?.message || '',
+)
+
+const clearErrors = () => {
+  errors.value = []
+}
+const clearFieldError = (fieldName) => {
+  errors.value = errors.value.filter((err) => err.field !== fieldName)
+}
+const clearInputs = () => {
+  loginForm.value.email = ''
+  loginForm.value.password = ''
+}
 
 async function validate() {
   clearErrors()
 
   const results = loginSchema.safeParse({
-    email: email.value,
-    password: password.value,
+    email: loginForm.value.email,
+    password: loginForm.value.password,
   })
 
   if (!results.success) {
@@ -33,74 +71,39 @@ async function validate() {
 
   return results.data
 }
-const errors = ref([])
-const emailError = computed(() => errors.value.find((err) => err.field === 'email')?.message || '')
-const passwordError = computed(
-  () => errors.value.find((err) => err.field === 'password')?.message || '',
-)
-const clearErrors = () => {
-  errors.value = []
-}
-const clearFieldError = (fieldName) => {
-  errors.value = errors.value.filter((err) => err.field !== fieldName)
-}
-const clearInputs = () => {
-  email.value = ''
-  password.value = ''
-}
-const session = ref()
-const username = ref()
-const avatar = ref()
-async function getProfile() {
-  try {
-    loading.value = true
-    const { user } = session.value
-    const { data, error, status } = await supabase
-      .from('profiles')
-      .select(`username, avatar_url`)
-      .eq('id', user.id)
-      .single()
-    if (error && status !== 406) throw error
-    if (data) {
-      username.value = data.username
-      avatar.value = data.avatar_url
-    }
-  } catch (error) {
-    toast(error.message, 'error')
-  } finally {
-    loading.value = false
-  }
-}
-const handleLogin = async () => {
-  try {
-    loading.value = true
-    const loginDetails = await validate()
 
-    const { error } = await supabase.auth.signInWithPassword({
-      email: loginDetails.email,
-      password: loginDetails.password,
+async function login() {
+  const validationResult = await validate()
+  if (!validationResult) {
+    return
+  }
+  isLoading.value = true
+  try {
+    // Login logic here
+    console.log('Login data:', validationResult)
+    // Sends to server
+    const response = await fetch('/api/admin/login', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(validationResult),
     })
 
-    await getProfile()
-    if (error) throw error
+    if (!response.ok) throw new Error(`Bad fetch: ${response.statusText}`)
+    const token = await response.json()
+    console.log(token)
+
+    // Have to wait for server to validate once server validates then i create a session
     clearInputs()
-    toast(`Welcome! ${username.value}`, 'success')
+    toast('Login successful!', 'success')
   } catch (error) {
-    if (error instanceof Error) {
-      toast(error.message, 'error')
-    }
+    console.error('Login failed:', error)
+    toast('Login failed. Please try again.', 'error')
   } finally {
-    loading.value = false
+    isLoading.value = false
   }
 }
-onMounted(() => {
-  supabase.auth.getSession().then(({ data }) => {
-    session.value = data.session
-  })
-  supabase.auth.onAuthStateChange((_, _session) => {
-    session.value = _session
-  })
-})
 </script>
 
 <template>
@@ -127,14 +130,14 @@ onMounted(() => {
     >
       <form
         class="from-sec to-sec-mute dark:from-sec-mute dark:to-sec space-y-6 rounded-lg bg-gradient-to-br p-4 sm:p-6"
-        @submit.prevent="handleLogin"
+        @submit.prevent="login"
       >
         <div class="pt-4">
           <div>
             <label for="email" class="input-lbl">Email address</label>
             <div class="mt-2">
               <input
-                v-model="email"
+                v-model="loginForm.email"
                 type="email"
                 name="email"
                 id="email"
@@ -157,7 +160,7 @@ onMounted(() => {
             </div>
             <div class="mt-2">
               <input
-                v-model="password"
+                v-model="loginForm.password"
                 type="password"
                 name="password"
                 id="password"
@@ -174,9 +177,9 @@ onMounted(() => {
         </div>
 
         <div class="flex w-full items-center justify-center pb-4">
-          <button type="submit" :disabled="loading" class="btn flex items-center gap-x-2 text-lg">
+          <button type="submit" :disabled="isLoading" class="btn flex items-center gap-x-2 text-lg">
             <div
-              v-if="loading"
+              v-if="isLoading"
               class="h-5 w-5 animate-spin rounded-full border-b-2 border-current"
             ></div>
             <template v-else>
