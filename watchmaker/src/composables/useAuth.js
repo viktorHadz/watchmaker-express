@@ -1,159 +1,110 @@
-// composables/useAuth.js
-import { ref, computed } from 'vue'
-import { supabase } from '@/supabase'
+// useAuth.js or useAuth.ts
+import { ref, computed, watch } from 'vue'
 import { useToastStore } from '@/stores/toast'
-import { loginSchema } from '@/schemas/loginSchema'
+import { supabase } from '@/supabase'
 
-export const useAuth = () => {
-  const toast = (message, type) => useToastStore().showToast(message, type)
+const toast = (message, type) => useToastStore().showToast(message, type)
 
-  // Reactive state
-  const loading = ref(false)
-  const session = ref(null)
-  const user = ref(null)
-  const profile = ref({
-    username: null,
-    avatar_url: null,
+// Singleton state — shared across all components
+const session = ref(null)
+const user = ref(null)
+const loading = ref(false)
+
+let initialized = false
+
+async function getUserProfile(userSession) {
+  try {
+    loading.value = true
+    const {
+      data,
+      error: dbErr,
+      status,
+    } = await supabase
+      .from('profiles')
+      .select('username, avatar_url')
+      .eq('id', userSession.user.id)
+      .single()
+
+    if (dbErr && status !== 406) throw dbErr
+
+    if (data) {
+      return {
+        id: userSession.user.id,
+        email: userSession.user.email,
+        username: data.username,
+        avatar: data.avatar_url,
+      }
+    }
+  } catch (err) {
+    toast('Error getting profile. Please try again later', 'error')
+    console.error(err)
+    return null
+  } finally {
+    loading.value = false
+  }
+}
+
+function initAuth() {
+  if (initialized) return
+  initialized = true
+
+  // Initial session load
+  supabase.auth.getSession().then(({ data }) => {
+    session.value = data.session
   })
 
-  // Computed properties
+  // Subscribe to auth state changes
+  supabase.auth.onAuthStateChange((event, _session) => {
+    session.value = _session
+  })
+
+  // Watch session changes
+  watch(session, async (newSession, oldSession) => {
+    if (newSession) {
+      user.value = await getUserProfile(newSession)
+    } else if (oldSession) {
+      user.value = null
+    }
+  })
+}
+
+export function useAuth() {
+  initAuth()
+
   const isAuthenticated = computed(() => !!session.value)
-  const userId = computed(() => user.value?.id || null)
-  const username = computed(() => profile.value.username)
-  const avatarUrl = computed(() => profile.value.avatar_url)
+  const currentUser = computed(() => session.value?.user)
 
-  // Initialize auth state
-  const initAuth = async () => {
-    try {
-      loading.value = true
-
-      // Get initial session
-      const {
-        data: { session: currentSession },
-      } = await supabase.auth.getSession()
-
-      if (currentSession) {
-        session.value = currentSession
-        user.value = currentSession.user
-        await getProfile(currentSession.user.id)
-      }
-
-      // Listen for auth changes
-      supabase.auth.onAuthStateChange(async (_event, newSession) => {
-        session.value = newSession
-        user.value = newSession?.user || null
-
-        if (newSession?.user) {
-          await getProfile(newSession.user.id)
-        } else {
-          // Clear profile on logout
-          profile.value = {
-            username: null,
-            avatar_url: null,
-          }
-        }
-      })
-    } catch (error) {
-      console.error('Error initializing auth:', error)
-      toast('Failed to initialize authentication', 'error')
-    } finally {
-      loading.value = false
+  const refreshUser = async () => {
+    if (session.value) {
+      user.value = await getUserProfile(session.value)
     }
   }
 
-  // Get user profile
-  const getProfile = async (userId) => {
-    try {
-      const { data, error, status } = await supabase
-        .from('profiles')
-        .select('username, avatar_url')
-        .eq('id', userId)
-        .single()
-
-      if (error && status !== 406) throw error
-
-      if (data) {
-        profile.value = {
-          username: data.username,
-          avatar_url: data.avatar_url,
-        }
-      }
-    } catch (error) {
-      console.error('Error fetching profile:', error)
-      toast('Failed to load user profile', 'error')
-    }
+  const logIn = async (email, password) => {
+    const { error } = await supabase.auth.signInWithPassword({ email, password })
+    if (error) throw error
+    return { success: true }
   }
 
-  // Login with email and password
-  const login = async (email, password) => {
+  const signOut = async () => {
     try {
-      loading.value = true
-
-      // Validate inputs
-      const validation = loginSchema.safeParse({ email, password })
-      if (!validation.success) {
-        const errors = validation.error.issues.map((issue) => ({
-          field: issue.path[0],
-          message: issue.message,
-        }))
-        return { success: false, errors }
-      }
-
-      // Attempt login
-      const { data, error } = await supabase.auth.signInWithPassword({
-        email,
-        password,
-      })
-
-      if (error) throw error
-
-      // Profile will be loaded automatically via onAuthStateChange
-      toast(`Welcome back, ${profile.value.username || 'User'}!`, 'success')
-
-      return { success: true, data }
-    } catch (error) {
-      toast(error.message || 'Login failed', 'error')
-      return { success: false, error: error.message }
-    } finally {
-      loading.value = false
-    }
-  }
-
-  // Logout
-  const logout = async () => {
-    try {
-      loading.value = true
       const { error } = await supabase.auth.signOut()
-
       if (error) throw error
-
-      toast('Logged out successfully', 'success')
-      return { success: true }
+      toast('Signed out successfully', 'success')
     } catch (error) {
-      toast(error.message || 'Logout failed', 'error')
-      return { success: false, error: error.message }
-    } finally {
-      loading.value = false
+      toast('Error signing out', 'error')
+      console.error('Sign out error:', error)
     }
   }
 
   return {
-    // State
-    loading,
     session,
     user,
-    profile,
-
-    // Computed
+    loading,
     isAuthenticated,
-    userId,
-    username,
-    avatarUrl,
-
-    // Methods
-    initAuth,
-    login,
-    logout,
-    getProfile,
+    currentUser,
+    refreshUser,
+    logIn,
+    signOut,
   }
 }

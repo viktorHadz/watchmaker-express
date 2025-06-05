@@ -20,7 +20,7 @@
 [data-theme='light'] {
   /* Backgrounds - Refined warm grays and creams */
   --color-primary: oklch(96.5% 0.002 40); /* Warm ivory - like vintage watch dial */
-  --color-sec: oklch(93% 0.004 35); /* Soft parchment - cards/sections */
+  --color-sec: oklch(90% 0.004 35); /* Soft parchment - cards/sections */
   --color-sec-mute: oklch(89% 0.006 32); /* Warm gray - hover states */
   --color-sec-light: oklch(95% 0.003 38); /* Light cream */
 

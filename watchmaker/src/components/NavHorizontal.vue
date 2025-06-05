@@ -1,5 +1,5 @@
 <script setup>
-import { ref, onMounted, onUnmounted } from 'vue'
+import { ref, onMounted, onUnmounted, computed } from 'vue'
 import {
   HomeIcon,
   ChatBubbleBottomCenterTextIcon,
@@ -7,12 +7,14 @@ import {
   WrenchIcon,
 } from '@heroicons/vue/24/outline'
 import DarkMode from './DarkMode.vue'
+import { useAuth } from '@/composables/useAuth'
 
+const { user, isAuthenticated } = useAuth()
 const isVisible = ref(true)
 const lastScrollY = ref(0)
 const scrollThreshold = 10
 let scrollElement = null
-
+const avatarUrl = computed(() => `${user.value?.avatar}` || '/default-avatar.png')
 const handleScroll = () => {
   if (!scrollElement) return
 
@@ -116,13 +118,20 @@ onUnmounted(() => {
         </button>
       </RouterLink>
     </div>
-
-    <div class="border-brdr/20 dark:border-fg/20 group relative ml-4 border-l pl-4">
-      <DarkMode class="hover:text-acc transition duration-200" />
+    <div class="border-brdr/20 dark:border-fg/20 group relative ml-4 border-l pl-3">
+      <div v-if="isAuthenticated" class="flex items-center gap-4">
+        <div class="border-acc overflow-hidden rounded-full border">
+          <img :src="avatarUrl" alt="avatar" class="max-h-16 w-full object-cover" />
+        </div>
+        <DarkMode size="8" class="hover:text-acc mr-4 transition duration-200" />
+      </div>
+      <div v-else class="flex gap-4">
+        <DarkMode size="8" class="hover:text-acc mr-4 transition duration-200" />
+      </div>
     </div>
   </nav>
 
-  <!-- Mobile Navigation -->
+  <!-- MOBILE NAVIGATION HERE -->
   <nav class="fixed right-0 bottom-0 left-0 z-[99] sm:hidden">
     <!-- Glassmorphism backdrop -->
     <div class="bg-primary/90 border-brdr/30 absolute inset-0 border-t backdrop-blur-lg"></div>
@@ -131,11 +140,11 @@ onUnmounted(() => {
     <div class="relative flex items-center justify-around px-2 py-3">
       <RouterLink
         to="/"
-        class="group flex flex-col items-center gap-1.5 text-xs transition-all duration-200 hover:scale-105"
+        class="group flex flex-col items-center gap-1.5 text-xs transition-all duration-200"
         :class="$route.path === '/' ? 'text-acc' : 'text-fg hover:text-acc'"
       >
         <div class="relative">
-          <HomeIcon class="size-6 transition-transform duration-200 group-hover:scale-110" />
+          <HomeIcon class="size-6 transition-transform duration-200" />
           <!-- Active indicator -->
           <div
             v-if="$route.path === '/'"
@@ -147,11 +156,11 @@ onUnmounted(() => {
 
       <RouterLink
         to="/repairs"
-        class="group flex flex-col items-center gap-1.5 text-xs transition-all duration-200 hover:scale-105"
+        class="group flex flex-col items-center gap-1.5 text-xs transition-all duration-200"
         :class="$route.path === '/repairs' ? 'text-acc' : 'text-fg hover:text-acc'"
       >
         <div class="relative">
-          <WrenchIcon class="size-6 transition-transform duration-200 group-hover:scale-110" />
+          <WrenchIcon class="size-6 transition-transform duration-200" />
           <!-- Active indicator -->
           <div
             v-if="$route.path === '/repairs'"
@@ -163,11 +172,11 @@ onUnmounted(() => {
 
       <RouterLink
         to="/my-work"
-        class="group flex flex-col items-center gap-1.5 text-xs transition-all duration-200 hover:scale-105"
+        class="group flex flex-col items-center gap-1.5 text-xs transition-all duration-200"
         :class="$route.path === '/my-work' ? 'text-acc' : 'text-fg hover:text-acc'"
       >
         <div class="relative">
-          <PhotoIcon class="size-6 transition-transform duration-200 group-hover:scale-110" />
+          <PhotoIcon class="size-6 transition-transform duration-200" />
           <!-- Active indicator -->
           <div
             v-if="$route.path === '/my-work'"
@@ -178,9 +187,9 @@ onUnmounted(() => {
       </RouterLink>
 
       <div
-        class="group text-fg hover:text-acc flex flex-col items-center gap-1.5 text-xs transition-all duration-200 hover:scale-105"
+        class="group text-fg hover:text-acc flex flex-col items-center gap-1.5 text-xs transition-all duration-200"
       >
-        <div class="transition-transform duration-200 group-hover:scale-110">
+        <div class="transition-transform duration-200">
           <DarkMode />
         </div>
         <span class="font-medium tracking-wide">Theme</span>

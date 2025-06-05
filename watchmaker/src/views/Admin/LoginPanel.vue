@@ -2,23 +2,26 @@
 import TheLogo from '@/components/logo/TheLogo.vue'
 import { ArrowRightEndOnRectangleIcon } from '@heroicons/vue/24/outline'
 import { loginSchema } from './loginSchema'
-import { ref, computed, onMounted } from 'vue'
+import { ref, computed } from 'vue'
 import { useToastStore } from '@/stores/toast'
-import { supabase } from '@/supabase'
+import { useAuth } from '@/composables/useAuth'
 const toast = (message, type) => useToastStore().showToast(message, type)
+const { user, loading, isAuthenticated, logIn } = useAuth()
 
-const loading = ref(false)
 const email = ref('')
 const password = ref('')
+const errors = ref([])
+const emailError = computed(() => errors.value.find((err) => err.field === 'email')?.message || '')
+const passwordError = computed(
+  () => errors.value.find((err) => err.field === 'password')?.message || '',
+)
 
 async function validate() {
   clearErrors()
-
   const results = loginSchema.safeParse({
     email: email.value,
     password: password.value,
   })
-
   if (!results.success) {
     const issues = results.error.issues
     issues.forEach((issue) => {
@@ -33,11 +36,7 @@ async function validate() {
 
   return results.data
 }
-const errors = ref([])
-const emailError = computed(() => errors.value.find((err) => err.field === 'email')?.message || '')
-const passwordError = computed(
-  () => errors.value.find((err) => err.field === 'password')?.message || '',
-)
+
 const clearErrors = () => {
   errors.value = []
 }
@@ -48,59 +47,25 @@ const clearInputs = () => {
   email.value = ''
   password.value = ''
 }
-const session = ref()
-const username = ref()
-const avatar = ref()
-async function getProfile() {
-  try {
-    loading.value = true
-    const { user } = session.value
-    const { data, error, status } = await supabase
-      .from('profiles')
-      .select(`username, avatar_url`)
-      .eq('id', user.id)
-      .single()
-    if (error && status !== 406) throw error
-    if (data) {
-      username.value = data.username
-      avatar.value = data.avatar_url
-    }
-  } catch (error) {
-    toast(error.message, 'error')
-  } finally {
-    loading.value = false
-  }
-}
-const handleLogin = async () => {
+
+async function handleLogin() {
   try {
     loading.value = true
     const loginDetails = await validate()
-
-    const { error } = await supabase.auth.signInWithPassword({
-      email: loginDetails.email,
-      password: loginDetails.password,
-    })
-
-    await getProfile()
-    if (error) throw error
-    clearInputs()
-    toast(`Welcome! ${username.value}`, 'success')
-  } catch (error) {
-    if (error instanceof Error) {
-      toast(error.message, 'error')
+    if (!loginDetails) {
+      return
     }
+    await logIn(loginDetails.email, loginDetails.password)
+
+    toast(`Logged in successfully. Welcome ${user.value?.username || 'back'}!`, 'success')
+    clearInputs()
+  } catch (error) {
+    console.error('Login error:', error)
+    toast(error.message || 'Login failed. Please try again.', 'error')
   } finally {
     loading.value = false
   }
 }
-onMounted(() => {
-  supabase.auth.getSession().then(({ data }) => {
-    session.value = data.session
-  })
-  supabase.auth.onAuthStateChange((_, _session) => {
-    session.value = _session
-  })
-})
 </script>
 
 <template>
