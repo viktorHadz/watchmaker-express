@@ -8,6 +8,7 @@ import {
 } from '@heroicons/vue/24/outline'
 import DarkMode from './DarkMode.vue'
 import { useAuth } from '@/composables/useAuth'
+import ToolTip from './ToolTip.vue'
 
 const { user, isAuthenticated } = useAuth()
 const isVisible = ref(true)
@@ -55,6 +56,10 @@ onUnmounted(() => {
     scrollElement.removeEventListener('scroll', handleScroll)
   }
 })
+const toolVisible = ref(false)
+function showTool() {
+  toolVisible.value = !toolVisible.value
+}
 </script>
 
 <template>
@@ -120,8 +125,13 @@ onUnmounted(() => {
     </div>
     <div class="border-brdr/20 dark:border-fg/20 group relative ml-4 border-l pl-3">
       <div v-if="isAuthenticated" class="flex items-center gap-4">
-        <div class="border-acc overflow-hidden rounded-full border">
+        <div class="border-acc relative overflow-hidden rounded-full border" @click="showTool()">
           <img :src="avatarUrl" alt="avatar" class="max-h-16 w-full object-cover" />
+          <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2">
+            <ToolTip>
+              <button class="text-danger">sign out</button>
+            </ToolTip>
+          </div>
         </div>
         <DarkMode size="8" class="hover:text-acc mr-4 transition duration-200" />
       </div>
