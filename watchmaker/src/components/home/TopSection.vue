@@ -47,7 +47,7 @@ import TheLogo from '../logo/TheLogo.vue'
               class="bg-acc/10 group-hover:bg-acc/20 absolute inset-0 rounded-full blur-3xl transition-all duration-700"
             ></div>
 
-            <TheLogo class="transition-transform duration-500 group-hover:scale-110" />
+            <TheLogo class="transition-transform duration-500 group-hover:scale-105" />
           </div>
         </div>
 

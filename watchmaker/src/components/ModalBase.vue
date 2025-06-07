@@ -1,6 +1,13 @@
 <script setup>
+import { useTemplateRef } from 'vue'
+import { onClickOutside } from '@vueuse/core'
 defineProps({
   show: Boolean,
+})
+const emit = defineEmits(['close'])
+const modalRef = useTemplateRef('pricing-modal')
+onClickOutside(modalRef, () => {
+  emit('close')
 })
 </script>
 
@@ -13,8 +20,8 @@ defineProps({
       <div
         class="bg-primary max-h-[90dvh] w-full overflow-y-auto rounded-t-2xl shadow-xl sm:max-w-lg sm:rounded-xl"
       >
-        <div class="p-4 sm:p-6">
-          <header v-if="$slots.header" class="">
+        <div class="p-4 sm:p-6" ref="pricing-modal">
+          <header v-if="$slots.header">
             <slot name="header" />
           </header>
 
@@ -27,7 +34,7 @@ defineProps({
             class="bg-primary border-fg/10 sticky bottom-0 mt-6 border-t py-3"
           >
             <slot name="footer">
-              <button class="modal-default-button" @click="$emit('close')">OK</button>
+              <button class="modal-default-button" @click="emit('close')">OK</button>
             </slot>
           </footer>
         </div>
@@ -48,15 +55,6 @@ defineProps({
   display: flex;
   transition: opacity 0.3s ease;
 }
-
-/*
- * The following styles are auto-applied to elements with
- * transition="modal" when their visibility is toggled
- * by Vue.js.
- *
- * You can easily play with the modal transition by editing
- * these styles.
- */
 
 .modal-enter-from {
   opacity: 0;

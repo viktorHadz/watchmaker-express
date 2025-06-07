@@ -1,5 +1,7 @@
 <script setup>
-import { ref, onMounted, onUnmounted, computed } from 'vue'
+import { ref, onMounted, onUnmounted, computed, useTemplateRef } from 'vue'
+import { useRouter } from 'vue-router'
+import { useAuth } from '@/composables/useAuth'
 import {
   HomeIcon,
   ChatBubbleBottomCenterTextIcon,
@@ -7,15 +9,14 @@ import {
   WrenchIcon,
 } from '@heroicons/vue/24/outline'
 import DarkMode from './DarkMode.vue'
-import { useAuth } from '@/composables/useAuth'
+import { onClickOutside } from '@vueuse/core'
+
 import ToolTip from './ToolTip.vue'
 
-const { user, isAuthenticated } = useAuth()
-const isVisible = ref(true)
+const isVisible = ref(true) // menu
 const lastScrollY = ref(0)
 const scrollThreshold = 10
 let scrollElement = null
-const avatarUrl = computed(() => `${user.value?.avatar}` || '/default-avatar.png')
 const handleScroll = () => {
   if (!scrollElement) return
 
@@ -43,6 +44,9 @@ const handleScroll = () => {
   lastScrollY.value = currentScrollY
 }
 
+const router = useRouter()
+const { user, isAuthenticated } = useAuth()
+const avatarUrl = computed(() => `${user.value?.avatar}` || '/default-avatar.png')
 onMounted(() => {
   // Find the actual scrolling container (the div with overflow-y-auto)
   scrollElement = document.querySelector('.overflow-y-auto')
@@ -56,9 +60,19 @@ onUnmounted(() => {
     scrollElement.removeEventListener('scroll', handleScroll)
   }
 })
+
+const toolRef = useTemplateRef('tooltip-ref')
 const toolVisible = ref(false)
+onClickOutside(toolRef, () => {
+  toolVisible.value = false
+})
 function showTool() {
   toolVisible.value = !toolVisible.value
+  console.log('showTool: ', toolVisible.value)
+}
+function toolNewPostNav() {
+  router.push('/my-work')
+  showTool()
 }
 </script>
 
@@ -66,7 +80,7 @@ function showTool() {
   <!-- Desktop Navigation -->
   <nav
     :class="[
-      'border-brdr/20 bg-primary/80 fixed top-5 left-1/2 z-[99] hidden w-lg -translate-x-1/2 items-center justify-between rounded-xl border p-3 shadow-lg backdrop-blur-md transition-all duration-300 ease-in-out sm:flex',
+      'border-brdr/20 bg-primary/80 fixed top-5 left-1/2 z-[99] hidden w-lg -translate-x-1/2 items-center justify-between rounded-xl border p-2 shadow-lg backdrop-blur-md transition-all duration-300 ease-in-out sm:flex',
       isVisible ? 'translate-y-0 opacity-95' : '-translate-y-20 opacity-0',
     ]"
   >
@@ -90,7 +104,7 @@ function showTool() {
       </RouterLink>
       <RouterLink to="/repairs" class="group relative">
         <button
-          class="group group-hover:text-acc text-fg hover:bg-sec/60 dark:hover:bg-sec cursor-pointer rounded-lg transition-colors duration-200"
+          class="group group-hover:text-acc text-fg hover:bg-sec/60 dark:hover:bg-sec transi6 tion-colors cursor-pointer rounded-lg duration-200"
         >
           <!-- Active Indicator -->
           <div
@@ -123,17 +137,38 @@ function showTool() {
         </button>
       </RouterLink>
     </div>
-    <div class="border-brdr/20 dark:border-fg/20 group relative ml-4 border-l pl-3">
+    <!-- Main nav & Dark mode border (pl-5 to control) -->
+    <div class="border-brdr dark:border-brdr group relative ml-4 border-l pl-5">
       <div v-if="isAuthenticated" class="flex items-center gap-4">
-        <div class="border-acc relative overflow-hidden rounded-full border" @click="showTool()">
-          <img :src="avatarUrl" alt="avatar" class="max-h-16 w-full object-cover" />
-          <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2">
-            <ToolTip>
-              <button class="text-danger">sign out</button>
-            </ToolTip>
+        <div>
+          <div
+            class="hover:bg-acc cursor-pointer overflow-hidden rounded-full"
+            :class="[toolVisible ? 'bg-acc' : '']"
+            @click="showTool()"
+          >
+            <img :src="avatarUrl" alt="avatar" class="max-h-9 w-full object-cover" />
+          </div>
+          <div ref="tooltip-ref">
+            <Transition>
+              <ToolTip wrapper-class="absolute right-3 top-12" v-if="toolVisible">
+                <div class="text-fg font-sec flex flex-col items-start gap-2">
+                  <button
+                    class="hover:text-acc cursor-pointer truncate transition duration-200"
+                    @click="toolNewPostNav()"
+                  >
+                    New post
+                  </button>
+                  <button class="hover:text-danger cursor-pointer transition duration-200">
+                    Sign out
+                  </button>
+                </div>
+              </ToolTip>
+            </Transition>
           </div>
         </div>
-        <DarkMode size="8" class="hover:text-acc mr-4 transition duration-200" />
+        <div class="relative">
+          <DarkMode size="8" class="hover:text-acc transition duration-200" />
+        </div>
       </div>
       <div v-else class="flex gap-4">
         <DarkMode size="8" class="hover:text-acc mr-4 transition duration-200" />
@@ -207,3 +242,14 @@ function showTool() {
     </div>
   </nav>
 </template>
+<style scoped>
+.v-enter-active,
+.v-leave-active {
+  transition: opacity 0.2s ease;
+}
+
+.v-enter-from,
+.v-leave-to {
+  opacity: 0;
+}
+</style>
