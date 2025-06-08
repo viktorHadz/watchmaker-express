@@ -49,14 +49,13 @@ const handleScroll = () => {
 }
 
 const router = useRouter()
-const { user, isAuthenticated } = useAuth()
+const { user, isAuthenticated, signOut } = useAuth()
 const avatarUrl = computed(() => `${user.value?.avatar}` || '/default-avatar.png')
 
 const DropdownRef = useTemplateRef('tooltip-ref')
+const tooltipButtonRef = useTemplateRef('tooltip-button-ref')
 const showDropdown = ref(false)
-onClickOutside(DropdownRef, () => {
-  showDropdown.value = false
-})
+
 function toggleDropdown() {
   showDropdown.value = !showDropdown.value
 }
@@ -66,15 +65,29 @@ function toolNewPostNav() {
 }
 
 // Mobile nav slider
-const isOpen = ref(false)
+const isOpenMobile = ref(false)
+const isOpenRef = useTemplateRef('mobile-dropdown-ref')
+const mobileButtonRef = useTemplateRef('mobile-dropdown-button-ref')
 const toggleMenu = () => {
-  isOpen.value = !isOpen.value
+  isOpenMobile.value = !isOpenMobile.value
 }
-const handleSignOut = () => {
-  console.log('signed out')
-}
+
+onClickOutside(DropdownRef, (event) => {
+  if (tooltipButtonRef.value && tooltipButtonRef.value.contains(event.target)) {
+    return
+  }
+  showDropdown.value = false
+})
+// Mobile click outside
+onClickOutside(isOpenRef, () => {
+  if (mobileButtonRef.value && mobileButtonRef.value.contains(event.target)) {
+    return
+  }
+  isOpenMobile.value = false
+})
+
 onMounted(() => {
-  // Find the actual scrolling container (the div with overflow-y-auto)
+  // Finds the actual scrolling container (the div with overflow-y-auto)
   scrollElement = document.querySelector('.overflow-y-auto')
   if (scrollElement) {
     scrollElement.addEventListener('scroll', handleScroll, { passive: true })
@@ -151,9 +164,10 @@ onUnmounted(() => {
     </div>
     <!-- Main nav & Dark mode border (pl-5 to control) -->
     <div class="border-brdr dark:border-brdr group relative ml-4 border-l pl-5">
-      <div v-if="isAuthenticated" class="flex items-center gap-4">
+      <div v-if="isAuthenticated" class="flex items-center gap-8">
         <div>
           <div
+            ref="tooltip-button-ref"
             class="hover:bg-acc overflow-hidden rounded-full"
             :class="[showDropdown ? 'bg-acc' : 'cursor-pointer']"
             @click="toggleDropdown()"
@@ -163,14 +177,29 @@ onUnmounted(() => {
           <div ref="tooltip-ref">
             <Transition>
               <NavDropdown wrapper-class="absolute right-3 top-12" v-if="showDropdown">
-                <div class="text-fg font-sec flex flex-col items-start gap-2">
+                <div class="text-fg font-sec flex flex-col items-start gap-4 p-2 font-medium">
                   <button
-                    class="hover:text-acc cursor-pointer truncate transition duration-200"
+                    class="hover:text-acc flex cursor-pointer items-center gap-3 truncate transition duration-200"
                     @click="toolNewPostNav()"
                   >
+                    <div
+                      class="bg-acc/15 flex size-8 flex-shrink-0 items-center justify-center rounded-md"
+                    >
+                      <PlusIcon class="text-acc size-4"></PlusIcon>
+                    </div>
                     New post
                   </button>
-                  <button class="hover:text-danger cursor-pointer transition duration-200">
+                  <button
+                    class="hover:text-danger flex cursor-pointer items-center gap-3 transition duration-200"
+                    @click="signOut()"
+                  >
+                    <div
+                      class="bg-danger/15 flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-md"
+                    >
+                      <ArrowRightStartOnRectangleIcon
+                        class="text-danger size-4"
+                      ></ArrowRightStartOnRectangleIcon>
+                    </div>
                     Sign out
                   </button>
                 </div>
@@ -178,8 +207,8 @@ onUnmounted(() => {
             </Transition>
           </div>
         </div>
-        <div class="relative">
-          <DarkMode size="8" class="hover:text-acc transition duration-200" />
+        <div class="relative pr-2">
+          <DarkMode size="9" class="hover:text-acc transition duration-200" />
         </div>
       </div>
       <div v-else class="flex gap-4">
@@ -188,48 +217,51 @@ onUnmounted(() => {
     </div>
   </nav>
 
-  <!-- Enhanced Mobile Navigation -->
+  <!-- Mobile Navigation -->
   <nav class="fixed right-0 bottom-0 left-0 z-[99] sm:hidden">
     <div class="fixed right-4 bottom-16 will-change-transform">
       <div
         class="card flex transform-gpu flex-col items-stretch overflow-hidden rounded-t-xl rounded-b-none shadow-xl backdrop-blur-md transition-all duration-400 ease-out"
-        :class="isOpen ? 'w-44' : 'w-20'"
+        :class="isOpenMobile ? 'w-44' : 'w-20'"
       >
         <!-- Admin Button - Optimized for touch -->
         <button
+          ref="mobile-dropdown-button-ref"
           @click="toggleMenu()"
           class="group relative flex h-14 max-h-10 touch-manipulation flex-col items-center justify-center rounded-t-xl px-4 transition-colors duration-300 ease-out"
-          :class="isOpen ? 'bg-sec-light/30' : 'active:bg-sec-light/20'"
+          :class="isOpenMobile ? 'bg-sec-light/30' : 'active:bg-sec-light/20'"
         >
           <ChevronUpIcon
             class="size-5 transition-transform duration-300 ease-out"
-            :class="isOpen ? 'text-acc rotate-180' : 'text-fg-mute'"
+            :class="isOpenMobile ? 'text-acc rotate-180' : 'text-fg-mute'"
           />
           <div
             class="font-sec text-xs font-medium tracking-wide transition-colors duration-150"
-            :class="isOpen ? 'text-acc' : 'text-fg'"
+            :class="isOpenMobile ? 'text-acc' : 'text-fg'"
           >
             admin
           </div>
           <!-- Active indicator -->
           <div
             class="bg-acc absolute bottom-0 left-1/2 h-0.5 transition-all duration-400 ease-out"
-            :class="isOpen ? 'w-12 -translate-x-1/2 opacity-60' : 'w-0 -translate-x-1/2 opacity-0'"
+            :class="
+              isOpenMobile ? 'w-12 -translate-x-1/2 opacity-60' : 'w-0 -translate-x-1/2 opacity-0'
+            "
           ></div>
         </button>
         <!-- Background active admin btn -->
         <div
           class="bg-acc/15 dark:bg-acc/5 pointer-events-none absolute -inset-px -z-10 h-10.5 rounded-t-xl transition-opacity duration-200 ease-out"
-          :class="isOpen ? 'opacity-100' : 'opacity-0'"
+          :class="isOpenMobile ? 'opacity-100' : 'opacity-0'"
         ></div>
-        <!-- Menu Items -->
+
         <div
           class="overflow-hidden transition-all duration-400 ease-out"
-          :class="isOpen ? 'max-h-40 opacity-100' : 'max-h-0 opacity-0'"
+          :class="isOpenMobile ? 'max-h-40 opacity-100' : 'max-h-0 opacity-0'"
+          ref="mobile-dropdown-ref"
         >
           <div class="border-brdr/40 bg-sec/10 border-t">
             <div class="space-y-1 p-3">
-              <!-- New post button -->
               <button
                 class="font-sec active:bg-acc/10 flex w-full items-center gap-3 rounded-lg px-3 py-3 text-left text-sm font-medium transition duration-200 active:scale-95"
               >
@@ -241,10 +273,9 @@ onUnmounted(() => {
                 <span class="text-fg line-clamp-1">New post</span>
               </button>
 
-              <!-- Sign out button -->
               <button
                 class="font-sec active:bg-danger/10 flex w-full items-center gap-3 rounded-lg px-3 py-3 text-left text-sm font-medium transition duration-200 active:scale-95"
-                @click="handleSignOut()"
+                @click="signOut()"
               >
                 <div
                   class="bg-danger/15 flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-md"
@@ -261,14 +292,11 @@ onUnmounted(() => {
       </div>
     </div>
 
-    <!-- Clean Mobile Navigation Background -->
     <div
       class="bg-primary dark:bg-sec/95 border-brdr/30 absolute inset-0 border-t backdrop-blur-md"
     ></div>
 
-    <!-- Spacious Navigation Content -->
     <div class="relative flex items-center justify-around px-2 py-2">
-      <!-- Home Link -->
       <RouterLink
         to="/"
         class="flex flex-col items-center gap-2 text-xs transition-all active:scale-95"
@@ -278,7 +306,6 @@ onUnmounted(() => {
         <span class="font-sec tracking-wide">Home</span>
       </RouterLink>
 
-      <!-- Repairs Link -->
       <RouterLink
         to="/repairs"
         class="flex flex-col items-center gap-2 text-xs transition-all duration-200 ease-out active:scale-95"
@@ -288,7 +315,6 @@ onUnmounted(() => {
         <span class="font-sec font-medium tracking-wide">Repairs</span>
       </RouterLink>
 
-      <!-- My Work Link -->
       <RouterLink
         to="/my-work"
         class="flex flex-col items-center gap-2 text-xs transition-all duration-200 ease-out active:scale-95"
@@ -298,7 +324,6 @@ onUnmounted(() => {
         <span class="font-sec font-medium tracking-wide">My Work</span>
       </RouterLink>
 
-      <!-- Theme Toggle -->
       <button
         class="text-fg flex flex-col items-center gap-2 text-xs transition-all duration-200 ease-out active:scale-95"
       >

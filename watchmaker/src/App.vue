@@ -63,13 +63,7 @@ const toast = useToastStore()
     </div>
 
     <Transition name="toast">
-      <ToastElement
-        v-if="toast.visible"
-        :message="toast.message"
-        :type="toast.type"
-        class="fixed right-4 z-50"
-        :class="{ 'bottom-24 sm:bottom-4': true }"
-      />
+      <ToastElement v-if="toast.visible" :message="toast.message" :type="toast.type" />
     </Transition>
   </main>
 </template>

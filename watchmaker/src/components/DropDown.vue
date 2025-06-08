@@ -38,7 +38,7 @@ const props = defineProps({
       :class="props.triangleClass"
     ></div>
 
-    <!-- Tooltip body - removed hardcoded border-red-500 -->
+    <!-- Tooltip body -->
     <div
       class="dark:bg-sec bg-primary relative min-w-[120px] rounded-md border px-3 py-2 text-center shadow-lg"
       :class="[props.bodyClass, props.borderClass]"

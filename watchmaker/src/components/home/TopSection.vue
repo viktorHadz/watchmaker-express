@@ -24,23 +24,25 @@ import TheLogo from '../logo/TheLogo.vue'
     <!-- Main content -->
     <div class="relative mx-auto max-w-7xl px-6 py-6 sm:py-20">
       <h1
-        class="font-sec text-fg-mute text-center text-2xl font-light tracking-[0.3em] uppercase md:text-3xl"
+        class="font-sec text-fg-mute mb-4 text-center text-2xl font-light tracking-[0.3em] uppercase md:text-4xl"
       >
         Veselin Hadzhiyski
       </h1>
-      <!-- Brand showcase bar -->
-      <div class="mb-12 flex items-center justify-center">
-        <div class="flex items-center space-x-2">
-          <div class="to-brdr h-px w-20 bg-gradient-to-r from-transparent"></div>
-          <span class="text-fg-subtle w-28 text-sm tracking-widest uppercase"></span>
-          <div class="to-brdr h-px w-20 bg-gradient-to-l from-transparent"></div>
+      <!-- Decorative divider -->
+      <div class="flex items-center justify-center space-x-4">
+        <div class="to-acc/70 h-px w-16 bg-gradient-to-r from-transparent"></div>
+        <div class="flex space-x-2">
+          <div class="bg-acc/80 h-1.5 w-1.5 rounded-full"></div>
+          <div class="bg-acc/60 h-1.5 w-1.5 rounded-full"></div>
+          <div class="bg-acc/30 h-1.5 w-1.5 rounded-full"></div>
         </div>
+        <div class="to-acc/70 h-px w-16 bg-gradient-to-l from-transparent"></div>
       </div>
 
       <!-- Main hero content -->
       <div class="text-center">
         <!-- Logo -->
-        <div class="mb-12 flex justify-center">
+        <div class="my-12 flex justify-center">
           <div class="group relative">
             <!-- Glow effect -->
             <div

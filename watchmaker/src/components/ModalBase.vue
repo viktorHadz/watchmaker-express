@@ -18,7 +18,7 @@ onClickOutside(modalRef, () => {
       class="fixed top-0 left-0 z-[100] flex h-full w-full items-center justify-center bg-black/50 transition-all duration-initial sm:items-center"
     >
       <div
-        class="bg-primary max-h-[90dvh] w-full overflow-y-auto rounded-t-2xl shadow-xl sm:max-w-lg sm:rounded-xl"
+        class="bg-primary dark:bg-sec-mute max-h-[90dvh] w-full overflow-y-auto rounded-t-2xl shadow-xl sm:max-w-lg sm:rounded-xl"
       >
         <div class="p-4 sm:p-6" ref="pricing-modal">
           <header v-if="$slots.header">
@@ -29,10 +29,7 @@ onClickOutside(modalRef, () => {
             <slot name="main" />
           </main>
 
-          <footer
-            v-if="$slots.footer"
-            class="bg-primary border-fg/10 sticky bottom-0 mt-6 border-t py-3"
-          >
+          <footer v-if="$slots.footer" class="border-fg/10 sticky bottom-0 mt-6 border-t py-3">
             <slot name="footer">
               <button class="modal-default-button" @click="emit('close')">OK</button>
             </slot>

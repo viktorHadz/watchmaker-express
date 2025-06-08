@@ -1,7 +1,8 @@
 <script setup>
-import { EyeIcon, FolderOpenIcon, PhotoIcon, ShareIcon } from '@heroicons/vue/24/outline'
+import { EyeIcon, ShareIcon } from '@heroicons/vue/24/outline'
 import { ref } from 'vue'
 import PostModal from './FullPost.vue'
+import IconGallery from '../icons/IconGallery.vue'
 // Historic posts filled from DB
 const allPosts = ref([])
 
@@ -36,20 +37,26 @@ const handlePostShare = (post) => {
     <button @click="getAllPosts" class="btn">get all</button>
     <!-- Gallery Header -->
     <div class="mb-12 text-center">
-      <div
-        class="bg-primary/80 dark:border-sec-mute/50 dark:bg-sec/80 inline-flex items-center space-x-3 rounded-2xl border border-white/20 px-6 py-3 backdrop-blur-sm"
-      >
-        <FolderOpenIcon class="text-acc size-6"></FolderOpenIcon>
-        <h2 class="font-sec text-fg text-2xl font-semibold">Workshop Gallery</h2>
+      <div class="mb-16 text-center">
+        <h2 class="font-sec text-fg mb-2 text-4xl font-normal tracking-wide">Workshop Gallery</h2>
+        <div class="mb-6 flex items-center justify-center space-x-4">
+          <div class="to-acc/50 h-px w-20 bg-gradient-to-r from-transparent"></div>
+          <div class="flex space-x-1">
+            <div class="bg-acc h-1.5 w-1.5 rounded-full"></div>
+            <div class="bg-acc/60 h-1.5 w-1.5 rounded-full"></div>
+            <div class="bg-acc/30 h-1.5 w-1.5 rounded-full"></div>
+          </div>
+          <div class="to-acc/50 h-px w-20 bg-gradient-to-l from-transparent"></div>
+        </div>
+        <p class="text-fg/70 mx-auto max-w-2xl text-lg leading-relaxed">
+          A showcase of precision craftsmanship and horological excellence
+        </p>
       </div>
-      <p class="text-fg/70 mx-auto mt-4 max-w-2xl">
-        A showcase of precision craftsmanship and horological excellence
-      </p>
     </div>
 
     <div v-if="allPosts.length === 0 || allPosts.posts?.length === 0" class="py-16 text-center">
       <div class="bg-acc/10 mx-auto mb-6 flex size-24 items-center justify-center rounded-2xl">
-        <PhotoIcon class="text-acc size-12"></PhotoIcon>
+        <IconGallery class="text-acc size-12"></IconGallery>
       </div>
       <h3 class="font-sec text-fg mb-2 text-xl font-semibold">No posts yet</h3>
       <p class="text-fg/60">Create your first post to showcase your work</p>

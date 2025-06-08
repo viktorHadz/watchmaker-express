@@ -82,16 +82,16 @@ async function handleLogin() {
         </div>
         <div class="to-acc h-px w-16 bg-gradient-to-l from-transparent"></div>
       </div>
-      <h2 class="text-fg font-sec mt-10 text-center text-2xl/9 font-bold tracking-tight">
-        Sign in to your account
-      </h2>
     </div>
+    <h2 class="font-sec text-fg mt-6 line-clamp-1 text-center text-4xl font-normal tracking-wide">
+      Sign in to your account
+    </h2>
 
     <div
       class="from-acc/90 mx-auto mt-10 w-full rounded-lg bg-gradient-to-br to-transparent p-[1px] sm:w-lg"
     >
       <form
-        class="from-sec to-sec-mute dark:from-sec-mute dark:to-sec space-y-6 rounded-lg bg-gradient-to-br p-4 sm:p-6"
+        class="from-sec to-sec-mute dark:from-sec-mute dark:to-sec space-y-2 rounded-lg bg-gradient-to-br p-4 sm:p-6"
         @submit.prevent="handleLogin"
       >
         <div class="pt-4">

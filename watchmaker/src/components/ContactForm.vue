@@ -2,6 +2,7 @@
 import { reactive, ref, watch } from 'vue'
 import { useToastStore } from '@/stores/toast'
 import { zodFormSchema } from '@/composables/formZodSchema'
+import { PaperAirplaneIcon } from '@heroicons/vue/24/outline'
 
 const toast = useToastStore()
 const formSchema = zodFormSchema
@@ -404,16 +405,9 @@ const handleFileChange = (event) => {
         <button
           type="submit"
           @click.prevent="onSubmit()"
-          class="from-acc to-acc/80 hover:from-acc/90 hover:to-acc/70 focus:ring-acc/50 inline-flex transform items-center rounded-xl bg-gradient-to-r px-8 py-3 font-semibold text-white shadow-lg transition-all duration-200 hover:scale-[1.02] focus:ring-2 focus:outline-none"
+          class="from-acc to-acc/80 hover:from-acc/90 hover:to-acc/70 focus:ring-acc/50 inline-flex transform cursor-pointer items-center rounded-xl bg-gradient-to-r px-8 py-3 font-semibold text-white shadow-lg transition-all duration-200 hover:scale-[1.02] focus:ring-2 focus:outline-none"
         >
-          <svg class="mr-2 h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              stroke-width="2"
-              d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"
-            ></path>
-          </svg>
+          <PaperAirplaneIcon class="mr-2 size-5 -rotate-90 transform"></PaperAirplaneIcon>
           Send Message
         </button>
       </div>
