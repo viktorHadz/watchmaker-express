@@ -9,7 +9,7 @@ import TheLogo from '../logo/TheLogo.vue'
     <div class="from-primary via-sec-light to-sec absolute inset-0 bg-gradient-to-b">
       <!-- Watch dial texture overlay -->
       <div
-        class="absolute inset-0 opacity-20"
+        class="absolute inset-0 opacity-40"
         style="
           background-image: radial-gradient(
             circle at center,
@@ -24,7 +24,7 @@ import TheLogo from '../logo/TheLogo.vue'
     <!-- Main content -->
     <div class="relative mx-auto max-w-7xl px-6 py-6 sm:py-20">
       <h1
-        class="font-sec text-fg mb-4 text-center text-4xl font-normal tracking-wide md:text-6xl lg:text-6xl"
+        class="font-sec text-fg-mute text-center text-2xl font-light tracking-[0.3em] uppercase md:text-3xl"
       >
         Veselin Hadzhiyski
       </h1>

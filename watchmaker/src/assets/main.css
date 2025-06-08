@@ -138,6 +138,26 @@
   transform-origin: center;
   transform-box: fill-box;
 }
+/* Diagonal transition for the admin menu */
+.diagonal-scale-enter-active {
+  @apply transition-all duration-500 ease-out;
+}
+.diagonal-scale-enter-from {
+  @apply translate-x-3 translate-y-3 scale-0 opacity-0;
+}
+.diagonal-scale-enter-to {
+  @apply translate-x-0 translate-y-0 scale-100 opacity-100;
+}
+
+.diagonal-scale-leave-active {
+  @apply transition-all duration-500 ease-in;
+}
+.diagonal-scale-leave-from {
+  @apply translate-x-0 translate-y-0 scale-100 opacity-100;
+}
+.diagonal-scale-leave-to {
+  @apply translate-x-3 translate-y-3 scale-75 opacity-0;
+}
 
 @layer components {
   .input {

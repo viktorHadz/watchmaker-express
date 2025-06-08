@@ -7,11 +7,15 @@ import {
   ChatBubbleBottomCenterTextIcon,
   PhotoIcon,
   WrenchIcon,
+  ChevronUpIcon,
+  PlusIcon,
+  ArrowRightStartOnRectangleIcon,
 } from '@heroicons/vue/24/outline'
 import DarkMode from './DarkMode.vue'
 import { onClickOutside } from '@vueuse/core'
 
-import ToolTip from './ToolTip.vue'
+import NavDropdown from './DropDown.vue'
+import IconGallery from './icons/IconGallery.vue'
 
 const isVisible = ref(true) // menu
 const lastScrollY = ref(0)
@@ -47,6 +51,28 @@ const handleScroll = () => {
 const router = useRouter()
 const { user, isAuthenticated } = useAuth()
 const avatarUrl = computed(() => `${user.value?.avatar}` || '/default-avatar.png')
+
+const DropdownRef = useTemplateRef('tooltip-ref')
+const showDropdown = ref(false)
+onClickOutside(DropdownRef, () => {
+  showDropdown.value = false
+})
+function toggleDropdown() {
+  showDropdown.value = !showDropdown.value
+}
+function toolNewPostNav() {
+  router.push('/my-work')
+  toggleDropdown()
+}
+
+// Mobile nav slider
+const isOpen = ref(false)
+const toggleMenu = () => {
+  isOpen.value = !isOpen.value
+}
+const handleSignOut = () => {
+  console.log('signed out')
+}
 onMounted(() => {
   // Find the actual scrolling container (the div with overflow-y-auto)
   scrollElement = document.querySelector('.overflow-y-auto')
@@ -60,20 +86,6 @@ onUnmounted(() => {
     scrollElement.removeEventListener('scroll', handleScroll)
   }
 })
-
-const toolRef = useTemplateRef('tooltip-ref')
-const toolVisible = ref(false)
-onClickOutside(toolRef, () => {
-  toolVisible.value = false
-})
-function showTool() {
-  toolVisible.value = !toolVisible.value
-  console.log('showTool: ', toolVisible.value)
-}
-function toolNewPostNav() {
-  router.push('/my-work')
-  showTool()
-}
 </script>
 
 <template>
@@ -142,15 +154,15 @@ function toolNewPostNav() {
       <div v-if="isAuthenticated" class="flex items-center gap-4">
         <div>
           <div
-            class="hover:bg-acc cursor-pointer overflow-hidden rounded-full"
-            :class="[toolVisible ? 'bg-acc' : '']"
-            @click="showTool()"
+            class="hover:bg-acc overflow-hidden rounded-full"
+            :class="[showDropdown ? 'bg-acc' : 'cursor-pointer']"
+            @click="toggleDropdown()"
           >
             <img :src="avatarUrl" alt="avatar" class="max-h-9 w-full object-cover" />
           </div>
           <div ref="tooltip-ref">
             <Transition>
-              <ToolTip wrapper-class="absolute right-3 top-12" v-if="toolVisible">
+              <NavDropdown wrapper-class="absolute right-3 top-12" v-if="showDropdown">
                 <div class="text-fg font-sec flex flex-col items-start gap-2">
                   <button
                     class="hover:text-acc cursor-pointer truncate transition duration-200"
@@ -162,7 +174,7 @@ function toolNewPostNav() {
                     Sign out
                   </button>
                 </div>
-              </ToolTip>
+              </NavDropdown>
             </Transition>
           </div>
         </div>
@@ -176,69 +188,123 @@ function toolNewPostNav() {
     </div>
   </nav>
 
-  <!-- MOBILE NAVIGATION HERE -->
+  <!-- Enhanced Mobile Navigation -->
   <nav class="fixed right-0 bottom-0 left-0 z-[99] sm:hidden">
-    <!-- Glassmorphism backdrop -->
-    <div class="bg-primary/90 border-brdr/30 absolute inset-0 border-t backdrop-blur-lg"></div>
+    <div class="fixed right-4 bottom-16 will-change-transform">
+      <div
+        class="card flex transform-gpu flex-col items-stretch overflow-hidden rounded-t-xl rounded-b-none shadow-xl backdrop-blur-md transition-all duration-400 ease-out"
+        :class="isOpen ? 'w-44' : 'w-20'"
+      >
+        <!-- Admin Button - Optimized for touch -->
+        <button
+          @click="toggleMenu()"
+          class="group relative flex h-14 max-h-10 touch-manipulation flex-col items-center justify-center rounded-t-xl px-4 transition-colors duration-300 ease-out"
+          :class="isOpen ? 'bg-sec-light/30' : 'active:bg-sec-light/20'"
+        >
+          <ChevronUpIcon
+            class="size-5 transition-transform duration-300 ease-out"
+            :class="isOpen ? 'text-acc rotate-180' : 'text-fg-mute'"
+          />
+          <div
+            class="font-sec text-xs font-medium tracking-wide transition-colors duration-150"
+            :class="isOpen ? 'text-acc' : 'text-fg'"
+          >
+            admin
+          </div>
+          <!-- Active indicator -->
+          <div
+            class="bg-acc absolute bottom-0 left-1/2 h-0.5 transition-all duration-400 ease-out"
+            :class="isOpen ? 'w-12 -translate-x-1/2 opacity-60' : 'w-0 -translate-x-1/2 opacity-0'"
+          ></div>
+        </button>
+        <!-- Background active admin btn -->
+        <div
+          class="bg-acc/15 dark:bg-acc/5 pointer-events-none absolute -inset-px -z-10 h-10.5 rounded-t-xl transition-opacity duration-200 ease-out"
+          :class="isOpen ? 'opacity-100' : 'opacity-0'"
+        ></div>
+        <!-- Menu Items -->
+        <div
+          class="overflow-hidden transition-all duration-400 ease-out"
+          :class="isOpen ? 'max-h-40 opacity-100' : 'max-h-0 opacity-0'"
+        >
+          <div class="border-brdr/40 bg-sec/10 border-t">
+            <div class="space-y-1 p-3">
+              <!-- New post button -->
+              <button
+                class="font-sec active:bg-acc/10 flex w-full items-center gap-3 rounded-lg px-3 py-3 text-left text-sm font-medium transition duration-200 active:scale-95"
+              >
+                <div
+                  class="bg-acc/15 flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-md"
+                >
+                  <PlusIcon class="text-acc size-4"></PlusIcon>
+                </div>
+                <span class="text-fg line-clamp-1">New post</span>
+              </button>
 
-    <!-- Navigation content -->
-    <div class="relative flex items-center justify-around px-2 py-3">
+              <!-- Sign out button -->
+              <button
+                class="font-sec active:bg-danger/10 flex w-full items-center gap-3 rounded-lg px-3 py-3 text-left text-sm font-medium transition duration-200 active:scale-95"
+                @click="handleSignOut()"
+              >
+                <div
+                  class="bg-danger/15 flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-md"
+                >
+                  <ArrowRightStartOnRectangleIcon
+                    class="text-danger size-4"
+                  ></ArrowRightStartOnRectangleIcon>
+                </div>
+                <span class="text-fg line-clamp-1">Sign out</span>
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Clean Mobile Navigation Background -->
+    <div
+      class="bg-primary dark:bg-sec/95 border-brdr/30 absolute inset-0 border-t backdrop-blur-md"
+    ></div>
+
+    <!-- Spacious Navigation Content -->
+    <div class="relative flex items-center justify-around px-2 py-2">
+      <!-- Home Link -->
       <RouterLink
         to="/"
-        class="group flex flex-col items-center gap-1.5 text-xs transition-all duration-200"
-        :class="$route.path === '/' ? 'text-acc' : 'text-fg hover:text-acc'"
+        class="flex flex-col items-center gap-2 text-xs transition-all active:scale-95"
+        :class="$route.path === '/' ? 'text-acc' : 'text-fg'"
       >
-        <div class="relative">
-          <HomeIcon class="size-6 transition-transform duration-200" />
-          <!-- Active indicator -->
-          <div
-            v-if="$route.path === '/'"
-            class="bg-acc absolute -top-1 -right-1 h-2 w-2 animate-pulse rounded-full"
-          ></div>
-        </div>
-        <span class="font-medium tracking-wide">Home</span>
+        <HomeIcon class="size-6 stroke-1" />
+        <span class="font-sec tracking-wide">Home</span>
       </RouterLink>
 
+      <!-- Repairs Link -->
       <RouterLink
         to="/repairs"
-        class="group flex flex-col items-center gap-1.5 text-xs transition-all duration-200"
-        :class="$route.path === '/repairs' ? 'text-acc' : 'text-fg hover:text-acc'"
+        class="flex flex-col items-center gap-2 text-xs transition-all duration-200 ease-out active:scale-95"
+        :class="$route.path === '/repairs' ? 'text-acc' : 'text-fg'"
       >
-        <div class="relative">
-          <WrenchIcon class="size-6 transition-transform duration-200" />
-          <!-- Active indicator -->
-          <div
-            v-if="$route.path === '/repairs'"
-            class="bg-acc absolute -top-1 -right-1 h-2 w-2 animate-pulse rounded-full"
-          ></div>
-        </div>
-        <span class="font-medium tracking-wide">Repairs</span>
+        <WrenchIcon class="size-6" />
+        <span class="font-sec font-medium tracking-wide">Repairs</span>
       </RouterLink>
 
+      <!-- My Work Link -->
       <RouterLink
         to="/my-work"
-        class="group flex flex-col items-center gap-1.5 text-xs transition-all duration-200"
-        :class="$route.path === '/my-work' ? 'text-acc' : 'text-fg hover:text-acc'"
+        class="flex flex-col items-center gap-2 text-xs transition-all duration-200 ease-out active:scale-95"
+        :class="$route.path === '/my-work' ? 'text-acc' : 'text-fg'"
       >
-        <div class="relative">
-          <PhotoIcon class="size-6 transition-transform duration-200" />
-          <!-- Active indicator -->
-          <div
-            v-if="$route.path === '/my-work'"
-            class="bg-acc absolute -top-1 -right-1 h-2 w-2 animate-pulse rounded-full"
-          ></div>
-        </div>
-        <span class="font-medium tracking-wide">My Work</span>
+        <IconGallery class="size-6"></IconGallery>
+        <span class="font-sec font-medium tracking-wide">My Work</span>
       </RouterLink>
 
-      <div
-        class="group text-fg hover:text-acc flex flex-col items-center gap-1.5 text-xs transition-all duration-200"
+      <!-- Theme Toggle -->
+      <button
+        class="text-fg flex flex-col items-center gap-2 text-xs transition-all duration-200 ease-out active:scale-95"
       >
-        <div class="transition-transform duration-200">
-          <DarkMode />
-        </div>
-        <span class="font-medium tracking-wide">Theme</span>
-      </div>
+        <DarkMode />
+        <span class="font-sec font-medium tracking-wide">Theme</span>
+      </button>
     </div>
   </nav>
 </template>
@@ -251,5 +317,8 @@ function toolNewPostNav() {
 .v-enter-from,
 .v-leave-to {
   opacity: 0;
+}
+h-auto {
+  height: auto;
 }
 </style>
