@@ -40,7 +40,7 @@
 
   /* Status colors - Muted and sophisticated */
   --color-danger: oklch(0.64 0.23 29); /* Deep burgundy */
-  --color-warning: oklch(62% 0.1 50); /* Amber bronze */
+  --color-warning: oklch(68% 0.14 65); /* Amber bronze */
   --color-success: oklch(48% 0.07 145); /* Forest green */
 }
 

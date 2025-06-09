@@ -1,15 +1,16 @@
 <script setup>
 import { ref } from 'vue'
 import { useDropZone } from '@vueuse/core'
-import placeHolder from './icons/placeHolder.vue'
+import placeHolder from '../icons/placeHolder.vue'
+import pocketWatch from '../icons/pocketWatch.vue'
 import { useToastStore } from '@/stores/toast'
 const toast = useToastStore()
-import pocketWatch from './icons/pocketWatch.vue'
 import { useDateFormat, useNow } from '@vueuse/core'
 import { usePostType } from '@/composables/utils'
-import GalleryEl from './Gallery/GalleryEl.vue'
 import { CloudArrowUpIcon, PaperAirplaneIcon, PlusIcon, TrashIcon } from '@heroicons/vue/24/outline'
+import { useAuth } from '@/composables/useAuth'
 
+const { getAuthToken } = useAuth()
 // Empty object to use when creating new post (for preview only now)
 const newPost = ref({
   title: '',
@@ -19,7 +20,7 @@ const newPost = ref({
   thumbnails: [],
 })
 
-// Store actual files separately for FormData
+// Store files separately for FormData
 const titleFile = ref(null)
 const extraFiles = ref([])
 const thumbnailFiles = ref([])
@@ -105,10 +106,9 @@ function validatePost() {
   return errors
 }
 
+// Create a new post
 async function saveNewPost(e) {
-  console.log('Event log: ', e)
   e.preventDefault()
-  console.log('1. Starting saveNewPost')
   if (isUploading.value) return
 
   // Validate post
@@ -147,7 +147,6 @@ async function saveNewPost(e) {
     })
 
     const success = await sendNewPost(formData)
-    console.log('2. sendNewPost completed, success:', success)
     // Only reset form if upload was successful
     if (success) {
       resetForm()
@@ -163,8 +162,13 @@ async function saveNewPost(e) {
 
 async function sendNewPost(formData) {
   try {
+    const token = getAuthToken()
+    console.log(token)
     const response = await fetch('/api/posts/new-post', {
       method: 'POST',
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
       body: formData,
     })
 
@@ -177,7 +181,7 @@ async function sendNewPost(formData) {
     console.log('Server response:', result)
     return true
   } catch (error) {
-    console.error('Network error:', error)
+    console.error(error)
     toast.showToast(error.message, 'error')
     return false
   }
@@ -200,7 +204,19 @@ function resetForm() {
   if (titleFileInputRef.value) titleFileInputRef.value.value = null
   if (extraFileInputRef.value) extraFileInputRef.value.value = null
 }
+// Remove image functions
+function removeTitleImage() {
+  newPost.value.titleImage = []
+  titleFile.value = null
+}
 
+function removeExtraImage(index) {
+  // Remove from all arrays at the same index
+  newPost.value.extraImages.splice(index, 1)
+  newPost.value.thumbnails.splice(index, 1)
+  extraFiles.value.splice(index, 1)
+  thumbnailFiles.value.splice(index, 1)
+}
 const titleDropZoneRef = ref(null)
 const extraImageDropZoneRef = ref(null)
 
@@ -358,20 +374,6 @@ async function handleFileChange(event) {
   // Clear input for next selection
   event.target.value = ''
 }
-
-// Remove image functions
-function removeTitleImage() {
-  newPost.value.titleImage = []
-  titleFile.value = null
-}
-
-function removeExtraImage(index) {
-  // Remove from all arrays at the same index
-  newPost.value.extraImages.splice(index, 1)
-  newPost.value.thumbnails.splice(index, 1)
-  extraFiles.value.splice(index, 1)
-  thumbnailFiles.value.splice(index, 1)
-}
 </script>
 
 <template>
@@ -399,7 +401,7 @@ function removeExtraImage(index) {
               </div>
               <div>
                 <h2 class="font-sec text-fg text-2xl font-semibold">Create New Post</h2>
-                <p class="text-acc-mute">Share your latest work</p>
+                <p class="text-acc text-lg font-light">Share your latest work</p>
               </div>
             </div>
           </div>
@@ -621,6 +623,5 @@ function removeExtraImage(index) {
         </div>
       </div>
     </div>
-    <GalleryEl></GalleryEl>
   </div>
 </template>

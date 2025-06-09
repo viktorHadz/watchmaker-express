@@ -24,7 +24,7 @@ import TheLogo from '../logo/TheLogo.vue'
     <!-- Main content -->
     <div class="relative mx-auto max-w-7xl px-6 py-6 sm:py-20">
       <h1
-        class="font-sec text-fg-mute mb-4 text-center text-2xl font-light tracking-[0.3em] uppercase md:text-4xl"
+        class="font-sec text-fg mb-4 text-center text-2xl font-light tracking-[0.3em] uppercase md:text-4xl"
       >
         Veselin Hadzhiyski
       </h1>
@@ -66,9 +66,7 @@ import TheLogo from '../logo/TheLogo.vue'
             <div class="to-acc h-px w-16 bg-gradient-to-l from-transparent"></div>
           </div>
 
-          <h2
-            class="font-sec text-fg-mute text-2xl font-light tracking-[0.3em] uppercase md:text-3xl"
-          >
+          <h2 class="font-sec text-fg text-2xl font-light tracking-[0.3em] uppercase md:text-3xl">
             Watchmaker & Repairs
           </h2>
 

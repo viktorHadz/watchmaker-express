@@ -1,10 +1,15 @@
 <script setup>
-import NewGalleryElement from '@/components/AdminNewPost.vue'
+import NewGalleryElement from '@/components/Gallery/AdminNewPost.vue'
+import GalleryEl from '@/components/Gallery/GalleryEl.vue'
+import { useAuth } from '@/composables/useAuth'
+
+const { isAuthenticated } = useAuth()
 </script>
 <template>
   <div class="">
-    <div class="relative mx-auto">
+    <div class="relative mx-auto" v-if="isAuthenticated">
       <NewGalleryElement></NewGalleryElement>
     </div>
+    <GalleryEl></GalleryEl>
   </div>
 </template>

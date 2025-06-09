@@ -1,13 +1,12 @@
 import express from 'express'
 import { db } from '../database.js'
-
 const router = express.Router()
 
 router.get('/get-all', (req, res) => {
   try {
     // Get pagination parameters from query string
     const page = parseInt(req.query.page) || 1
-    const limit = parseInt(req.query.limit) || 10 // Default 10 posts per page
+    const limit = parseInt(req.query.limit) || 12 // Default 10 posts per page
     const offset = (page - 1) * limit
 
     // Get total count for pagination metadata

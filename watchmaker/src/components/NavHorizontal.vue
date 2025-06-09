@@ -2,20 +2,18 @@
 import { ref, onMounted, onUnmounted, computed, useTemplateRef } from 'vue'
 import { useRouter } from 'vue-router'
 import { useAuth } from '@/composables/useAuth'
+import { onClickOutside } from '@vueuse/core'
 import {
   HomeIcon,
-  ChatBubbleBottomCenterTextIcon,
-  PhotoIcon,
-  WrenchIcon,
+  WrenchScrewdriverIcon,
   ChevronUpIcon,
   PlusIcon,
   ArrowRightStartOnRectangleIcon,
 } from '@heroicons/vue/24/outline'
+import IconGallery from './icons/IconGallery.vue'
 import DarkMode from './DarkMode.vue'
-import { onClickOutside } from '@vueuse/core'
 
 import NavDropdown from './DropDown.vue'
-import IconGallery from './icons/IconGallery.vue'
 
 const isVisible = ref(true) // menu
 const lastScrollY = ref(0)
@@ -122,7 +120,7 @@ onUnmounted(() => {
               v-if="$route.path === '/'"
               class="bg-acc absolute top-0 -right-0.5 h-2 w-2 animate-pulse rounded-full"
             ></div>
-            <HomeIcon class="size-5" />
+            <HomeIcon class="size-6 stroke-1" />
             <p>Home</p>
           </div>
         </button>
@@ -139,7 +137,7 @@ onUnmounted(() => {
               v-if="$route.path === '/repairs'"
               class="bg-acc absolute top-0 -right-0.5 h-2 w-2 animate-pulse rounded-full"
             ></div>
-            <ChatBubbleBottomCenterTextIcon class="size-5" />
+            <WrenchScrewdriverIcon class="size-6 stroke-1" />
             Contact
           </div>
         </button>
@@ -156,7 +154,7 @@ onUnmounted(() => {
               v-if="$route.path === '/my-work'"
               class="bg-acc absolute top-0 -right-0.5 h-2 w-2 animate-pulse rounded-full"
             ></div>
-            <PhotoIcon class="size-5" />
+            <IconGallery class="size-6 stroke-1"></IconGallery>
             My Work
           </div>
         </button>
@@ -311,7 +309,7 @@ onUnmounted(() => {
         class="flex flex-col items-center gap-2 text-xs transition-all duration-200 ease-out active:scale-95"
         :class="$route.path === '/repairs' ? 'text-acc' : 'text-fg'"
       >
-        <WrenchIcon class="size-6" />
+        <WrenchScrewdriverIcon class="size-6 stroke-1" />
         <span class="font-sec font-medium tracking-wide">Repairs</span>
       </RouterLink>
 

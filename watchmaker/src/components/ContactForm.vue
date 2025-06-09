@@ -2,7 +2,7 @@
 import { reactive, ref, watch } from 'vue'
 import { useToastStore } from '@/stores/toast'
 import { zodFormSchema } from '@/composables/formZodSchema'
-import { PaperAirplaneIcon } from '@heroicons/vue/24/outline'
+import { PaperAirplaneIcon, PlusIcon } from '@heroicons/vue/24/outline'
 
 const toast = useToastStore()
 const formSchema = zodFormSchema
@@ -311,21 +311,12 @@ const handleFileChange = (event) => {
       <!-- File Upload -->
       <div class="group">
         <div class="mb-4 flex items-center justify-between">
-          <label for="file-upload" class="font-sec text-fg font-medium"
-            >Watch Images (Optional)</label
-          >
+          <label for="file-upload" class="font-sec text-fg font-medium">Watch Images </label>
           <label
             for="file-upload"
             class="bg-acc/10 text-acc hover:bg-acc/20 inline-flex cursor-pointer items-center rounded-lg px-4 py-2 font-medium transition-colors"
           >
-            <svg class="mr-2 h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                stroke-width="2"
-                d="M12 6v6m0 0v6m0-6h6m-6 0H6"
-              ></path>
-            </svg>
+            <PlusIcon class="text-acc mr-2 size-4 flex-shrink-0"></PlusIcon>
             Choose Images
           </label>
         </div>
@@ -347,7 +338,7 @@ const handleFileChange = (event) => {
             class="bg-acc/5 border-acc/20 flex items-center rounded-lg border p-3"
           >
             <svg
-              class="text-acc mr-3 h-5 w-5 flex-shrink-0"
+              class="text-acc mr-3 h-5 w-5"
               fill="none"
               stroke="currentColor"
               viewBox="0 0 24 24"
@@ -363,7 +354,9 @@ const handleFileChange = (event) => {
           </div>
         </div>
 
-        <p class="text-fg/60 mt-2 text-sm">Upload up to 5 images of your watch (JPEG, PNG, WebP)</p>
+        <p class="dark:text-acc/60 text-acc/80 mt-2 text-sm">
+          Upload up to 5 images of your watch (JPEG, PNG, WebP)
+        </p>
       </div>
 
       <!-- Message -->
@@ -399,8 +392,8 @@ const handleFileChange = (event) => {
     <!-- Form Footer -->
     <div class="border-brdr/10 mt-8 border-t pt-6">
       <div class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-        <p class="text-fg/70 text-sm">
-          Fields marked with <span class="text-red-500">*</span> are required
+        <p class="dark:text-acc/60 text-acc/80 text-sm">
+          Fields marked with <span class="text-lg text-red-500">*</span> are required
         </p>
         <button
           type="submit"

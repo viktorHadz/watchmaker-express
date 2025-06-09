@@ -83,6 +83,10 @@ export function useAuth() {
   const logIn = async (email, password) => {
     const { error } = await supabase.auth.signInWithPassword({ email, password })
     if (error) throw error
+    // If user already logged in
+    if (isAuthenticated.value && user.value !== null) {
+      throw new Error('Already logged in. Log out first to use another account.')
+    }
     return { success: true }
   }
 
@@ -97,6 +101,18 @@ export function useAuth() {
     }
   }
 
+  const getAuthToken = () => {
+    console.table('authenticating: ', isAuthenticated.value)
+    if (!isAuthenticated.value) {
+      throw new Error('Not authenticated')
+    }
+    if (!session.value?.access_token) {
+      throw new Error('No access token provided')
+    }
+    console.log(session.value?.access_token)
+    return session.value?.access_token
+  }
+
   return {
     session,
     user,
@@ -106,5 +122,6 @@ export function useAuth() {
     refreshUser,
     logIn,
     signOut,
+    getAuthToken,
   }
 }

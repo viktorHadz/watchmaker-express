@@ -5,8 +5,10 @@ import { loginSchema } from './loginSchema'
 import { ref, computed } from 'vue'
 import { useToastStore } from '@/stores/toast'
 import { useAuth } from '@/composables/useAuth'
+import router from '@/router'
+
 const toast = (message, type) => useToastStore().showToast(message, type)
-const { user, loading, isAuthenticated, logIn } = useAuth()
+const { user, loading, logIn } = useAuth()
 
 const email = ref('')
 const password = ref('')
@@ -59,6 +61,7 @@ async function handleLogin() {
 
     toast(`Logged in successfully. Welcome ${user.value?.username || 'back'}!`, 'success')
     clearInputs()
+    router.push('/my-work')
   } catch (error) {
     console.error('Login error:', error)
     toast(error.message || 'Login failed. Please try again.', 'error')

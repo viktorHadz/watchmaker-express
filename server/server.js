@@ -15,6 +15,8 @@ const __filename = fileURLToPath(import.meta.url) // get the resolved path to th
 const __dirname = path.dirname(__filename) // get the name of the directory
 // Trust the proxy if behind one (important for correct IP detection)
 app.set('trust proxy', 1 /*this needs to be the proxy's ip here not 1 when i implement nginx */)
+
+// Registering Middleware
 // Security headers
 app.use(
   helmet({
@@ -23,8 +25,10 @@ app.use(
     },
   }),
 )
+
 app.use(cors())
 app.use(express.json())
+
 // Registering routes
 app.use('/api/form/', formRouter)
 app.use('/api/posts/', insertPostRouter)
@@ -55,7 +59,7 @@ app.get('/home-baby', (req, res) => {
 
 initializeDatabase()
 // Server start
-const PORT = process.env.PORT || 5000
+const PORT = process.env.PORT
 app.listen(PORT, () => {
   console.log(`-----------------------------`)
   console.log(`Backend running on port ${PORT}`)

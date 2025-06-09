@@ -1,22 +1,58 @@
 <script setup>
 import { EyeIcon, ShareIcon } from '@heroicons/vue/24/outline'
-import { ref } from 'vue'
+import { computed, onMounted, ref, useTemplateRef } from 'vue'
 import PostModal from './FullPost.vue'
 import IconGallery from '../icons/IconGallery.vue'
-// Historic posts filled from DB
-const allPosts = ref([])
+import PaginationMain from '../PaginationMain.vue'
 
-async function getAllPosts() {
+// Historic posts filled from DB
+const postsRef = useTemplateRef('postsRef')
+const allPosts = ref([])
+const totalPagesCount = ref(1)
+const currentPage = ref(1)
+const loading = ref(false)
+
+async function getAllPosts(page = 1) {
   try {
-    const response = await fetch('/api/posts/get-all')
+    loading.value = true
+    const response = await fetch(`/api/posts/get-all?page=${page}`)
     if (!response.ok) throw new Error(`Error getting posts: ${response.status}`)
     const posts = await response.json()
     console.log(posts)
     allPosts.value = posts
+    totalPagesCount.value = posts.pagination.totalPages
+    currentPage.value = posts.pagination.page
   } catch (error) {
     console.error('Error: ', error)
+  } finally {
+    loading.value = false
   }
 }
+
+// Handle page change from pagination component
+const handlePageChange = async (page) => {
+  if (page === currentPage.value || page < 1 || page > totalPagesCount.value) {
+    return // Don't fetch if it's the same page or invalid page
+  }
+
+  await getAllPosts(page)
+
+  // Scroll to posts section using template ref
+  if (postsRef.value) {
+    postsRef.value.scrollIntoView({
+      behavior: 'smooth',
+      block: 'start',
+    })
+  }
+}
+
+const pageNumbers = computed(() => {
+  const pageArr = []
+  for (let i = 1; i <= totalPagesCount.value; i++) {
+    pageArr.push(i)
+  }
+  return pageArr
+})
 
 const showPostModal = ref(false)
 const selectedPost = ref({})
@@ -26,19 +62,23 @@ const openPost = (post) => {
   showPostModal.value = true
 }
 
+// Post sharing logic here
 const handlePostShare = (post) => {
-  // Your custom share logic here
   console.log('Sharing post:', post)
 }
+
+onMounted(() => {
+  getAllPosts()
+})
 </script>
 <template>
   <!-- GALLERY SECTION -->
-  <section class="mx-auto max-w-7xl px-2">
+  <section class="mx-auto max-w-7xl px-2" ref="postsRef">
     <button @click="getAllPosts" class="btn">get all</button>
     <!-- Gallery Header -->
     <div class="mb-12 text-center">
       <div class="mb-16 text-center">
-        <h2 class="font-sec text-fg mb-2 text-4xl font-normal tracking-wide">Workshop Gallery</h2>
+        <h2 class="font-sec text-fg mb-4 text-4xl font-semibold lg:text-5xl">Workshop Gallery</h2>
         <div class="mb-6 flex items-center justify-center space-x-4">
           <div class="to-acc/50 h-px w-20 bg-gradient-to-r from-transparent"></div>
           <div class="flex space-x-1">
@@ -151,19 +191,24 @@ const handlePostShare = (post) => {
           <div class="flex space-x-3">
             <button
               type="button"
-              class="bg-primary/40 hover:bg-primary/60 text-fg/60 hover:text-acc cursor-pointer rounded-lg px-4 py-2 dark:bg-white/20 dark:text-white dark:hover:bg-white/30"
+              class="bg-sec-light hover:bg-primary text-fg-mute hover:text-acc cursor-pointer rounded-lg px-4 py-2 dark:bg-white/20 dark:text-white dark:hover:bg-white/30"
             >
-              <EyeIcon class="size-4"></EyeIcon>
+              <EyeIcon class="size-5"></EyeIcon>
             </button>
             <button
-              class="bg-primary/40 hover:bg-primary/60 text-fg/60 hover:text-acc cursor-pointer rounded-lg px-4 py-2 dark:bg-white/20 dark:text-white dark:hover:bg-white/30"
+              class="bg-sec-light hover:bg-primary text-fg-mute hover:text-acc cursor-pointer rounded-lg px-4 py-2 dark:bg-white/20 dark:text-white dark:hover:bg-white/30"
             >
-              <ShareIcon class="size-4"></ShareIcon>
+              <ShareIcon class="size-5"></ShareIcon>
             </button>
           </div>
         </div>
       </article>
     </div>
+    <PaginationMain
+      :page-numbers="pageNumbers"
+      :pagination-data="allPosts.pagination"
+      @page-change="handlePageChange"
+    />
     <PostModal
       :show="showPostModal"
       :post="selectedPost"

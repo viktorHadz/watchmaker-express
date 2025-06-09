@@ -4,6 +4,7 @@ import multer from 'multer'
 import { db } from '../database.js'
 import path from 'path'
 import fs from 'fs'
+import { verifyUserIdentity } from '../middleware/supabaseAuth.js'
 
 const database = db
 const router = express.Router()
@@ -169,7 +170,7 @@ function cleanupTempFiles(tempPostDir) {
 }
 
 // Creates new post for route /api/posts/new-post
-router.post('/new-post', (req, res) => {
+router.post('/new-post', verifyUserIdentity, (req, res) => {
   const uploadFields = upload.fields([
     { name: 'titleImage', maxCount: 1 },
     { name: 'extraImages', maxCount: 5 },

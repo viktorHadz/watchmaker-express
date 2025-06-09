@@ -4,7 +4,9 @@
     <div class="relative mx-auto max-w-7xl px-4 py-12 sm:px-6 lg:px-8">
       <!-- Header Section -->
       <div class="mb-16 text-center">
-        <h1 class="font-sec text-fg mb-4 text-4xl font-semibold lg:text-5xl">Get in Touch</h1>
+        <h1 class="font-sec text-fg dark:text-fg mb-4 text-4xl font-medium lg:text-5xl">
+          Get in Touch
+        </h1>
         <p class="text-fg/70 mx-auto max-w-3xl text-xl leading-relaxed">
           Ready to restore your timepiece or discuss watchmaking? Let's bring your cherished watches
           back to life.
@@ -26,8 +28,10 @@
             <div
               class="from-acc/10 via-acc/5 border-brdr/10 border-b bg-gradient-to-r to-transparent p-8"
             >
-              <h3 class="font-sec text-fg mb-2 text-2xl font-semibold">Send a Message</h3>
-              <p class="text-fg/70">Tell me about your timepiece and how I can help</p>
+              <h2 class="font-sec text-fg mb-2 text-2xl font-semibold">Send a Message</h2>
+              <p class="text-acc text-lg font-light">
+                Tell me about your timepiece and how I can help
+              </p>
             </div>
 
             <!-- CONTACT FORM  -->

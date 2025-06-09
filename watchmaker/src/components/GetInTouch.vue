@@ -1,6 +1,6 @@
 <script setup>
 import { ref } from 'vue'
-import { CurrencyPoundIcon } from '@heroicons/vue/24/outline'
+import { CurrencyPoundIcon, ClockIcon, ChevronRightIcon } from '@heroicons/vue/24/outline'
 import Modal from '@/components/ModalBase.vue'
 import PriceList from '@/components/PriceList.vue'
 
@@ -17,20 +17,17 @@ const closeModal = () => {
   >
     <!-- Header -->
     <div class="mb-8">
-      <div
-        class="from-acc/20 to-acc/30 mb-6 flex h-16 w-16 items-center justify-center rounded-2xl bg-gradient-to-br"
-      >
-        <svg class="text-acc h-8 w-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path
-            stroke-linecap="round"
-            stroke-linejoin="round"
-            stroke-width="2"
-            d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
-          ></path>
-        </svg>
+      <div class="mb-4 flex items-center gap-4">
+        <div>
+          <div
+            class="from-acc/20 to-acc/30 flex size-16 items-center justify-center rounded-2xl bg-gradient-to-br"
+          >
+            <ClockIcon class="text-acc size-8"></ClockIcon>
+          </div>
+        </div>
+        <h2 class="font-sec text-fg text-2xl font-semibold">Horological Excellence</h2>
       </div>
-      <h2 class="font-sec text-fg mb-3 text-2xl font-semibold">Horological Excellence</h2>
-      <p class="text-acc text-lg font-medium">If it's about watches, you're in the right place</p>
+      <p class="text-acc text-lg font-light">If it's about watches, you're in the right place</p>
     </div>
 
     <!-- Services List -->
@@ -40,8 +37,8 @@ const closeModal = () => {
         <div>
           <h4 class="text-fg mb-2 font-semibold">All Types of Repairs</h4>
           <p class="text-fg/80 text-sm leading-relaxed">
-            Vintage, modern, quartz, automatic — if it's built to be fixed, I'll gladly take a look.
-            Leave me a message and we can decide what it needs.
+            Vintage, modern, quartz, automatic... If it's built to be fixed, I'll gladly take a
+            look. Leave me a message and we can decide what it needs.
           </p>
         </div>
       </div>
@@ -86,19 +83,9 @@ const closeModal = () => {
             <p class="text-fg/60 text-sm">View detailed price list</p>
           </div>
         </div>
-        <svg
-          class="text-acc h-5 w-5 transition-transform group-hover:translate-x-1"
-          fill="none"
-          stroke="currentColor"
-          viewBox="0 0 24 24"
-        >
-          <path
-            stroke-linecap="round"
-            stroke-linejoin="round"
-            stroke-width="2"
-            d="M9 5l7 7-7 7"
-          ></path>
-        </svg>
+        <ChevronRightIcon
+          class="text-acc size-5 transition-transform group-hover:translate-x-1"
+        ></ChevronRightIcon>
       </div>
     </div>
     <!-- Modal for Price List -->
