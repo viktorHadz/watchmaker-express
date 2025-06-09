@@ -2,7 +2,7 @@
 import TheLogo from '@/components/logo/TheLogo.vue'
 import { ArrowRightEndOnRectangleIcon } from '@heroicons/vue/24/outline'
 import { loginSchema } from './loginSchema'
-import { ref, computed } from 'vue'
+import { ref, computed, onMounted, useTemplateRef } from 'vue'
 import { useToastStore } from '@/stores/toast'
 import { useAuth } from '@/composables/useAuth'
 import router from '@/router'
@@ -69,6 +69,10 @@ async function handleLogin() {
     loading.value = false
   }
 }
+const emailInputRef = useTemplateRef('email-input-ref')
+onMounted(() => {
+  emailInputRef.value.focus()
+})
 </script>
 
 <template>
@@ -102,6 +106,7 @@ async function handleLogin() {
             <label for="email" class="input-lbl">Email address</label>
             <div class="mt-2">
               <input
+                ref="email-input-ref"
                 v-model="email"
                 type="email"
                 name="email"

@@ -1,11 +1,14 @@
 <script setup>
-import { EyeIcon, ShareIcon } from '@heroicons/vue/24/outline'
+import { EyeIcon, ShareIcon, TrashIcon, PencilSquareIcon } from '@heroicons/vue/24/outline'
 import { computed, onMounted, ref, useTemplateRef } from 'vue'
 import PostModal from './FullPost.vue'
 import IconGallery from '../icons/IconGallery.vue'
 import PaginationMain from '../PaginationMain.vue'
+import { useToastStore } from '@/stores/toast'
+import { useAuth } from '../../composables/useAuth.js'
 
-// Historic posts filled from DB
+const toast = (message, type) => useToastStore().showToast(message, type)
+const { isAuthenticated, getAuthToken } = useAuth() // Historic posts filled from DB
 const postsRef = useTemplateRef('postsRef')
 const allPosts = ref([])
 const totalPagesCount = ref(1)
@@ -66,7 +69,38 @@ const openPost = (post) => {
 const handlePostShare = (post) => {
   console.log('Sharing post:', post)
 }
+const deletePost = async (postId) => {
+  // make a call to backend
+  // If call succeeeds remove from frontend
+  fetch('/api/posts/delete/', {
+    headers: 'Authorization',
+  })
 
+  try {
+    const token = getAuthToken()
+    console.log(token)
+    const response = await fetch(`/api/posts/delete-post/${postId}`, {
+      method: 'DELETE',
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+      body: 'sdddd',
+    })
+
+    const result = await response.json()
+
+    if (!response.ok) {
+      throw new Error(result.error || `Server error: ${response.status}`)
+    }
+
+    console.log('Server response:', result)
+    return true
+  } catch (error) {
+    console.error(error)
+    toast(error.message, 'error')
+    return false
+  }
+}
 onMounted(() => {
   getAllPosts()
 })
@@ -74,11 +108,12 @@ onMounted(() => {
 <template>
   <!-- GALLERY SECTION -->
   <section class="mx-auto max-w-7xl px-2" ref="postsRef">
-    <button @click="getAllPosts" class="btn">get all</button>
     <!-- Gallery Header -->
-    <div class="mb-12 text-center">
-      <div class="mb-16 text-center">
-        <h2 class="font-sec text-fg mb-4 text-4xl font-semibold lg:text-5xl">Workshop Gallery</h2>
+    <div class="mb-12 py-12 text-center">
+      <div class="mb-2 text-center">
+        <h2 class="font-sec text-fg dark:text-fg mb-4 text-4xl font-medium lg:text-5xl">
+          Workshop Gallery
+        </h2>
         <div class="mb-6 flex items-center justify-center space-x-4">
           <div class="to-acc/50 h-px w-20 bg-gradient-to-r from-transparent"></div>
           <div class="flex space-x-1">
@@ -186,6 +221,26 @@ onMounted(() => {
 
         <!-- Hover Action Buttons -->
         <div
+          v-if="isAuthenticated"
+          class="dark:from-acc/5 from-acc/20 absolute inset-0 flex items-end justify-center bg-gradient-to-t via-transparent to-transparent pb-6 opacity-0 transition-opacity duration-300 group-hover:opacity-100"
+        >
+          <div class="flex space-x-3">
+            <button
+              type="button"
+              class="bg-sec-light hover:bg-primary text-fg-mute cursor-pointer rounded-lg px-4 py-2 hover:text-blue-500 dark:bg-white/20 dark:text-white dark:hover:bg-white/30"
+            >
+              <PencilSquareIcon class="size-5"></PencilSquareIcon>
+            </button>
+            <button
+              @click="deletePost"
+              class="bg-sec-light hover:bg-primary text-fg-mute hover:text-danger cursor-pointer rounded-lg px-4 py-2 dark:bg-white/20 dark:text-white dark:hover:bg-white/30"
+            >
+              <TrashIcon class="size-5"></TrashIcon>
+            </button>
+          </div>
+        </div>
+        <div
+          v-else
           class="dark:from-acc/5 from-acc/20 absolute inset-0 flex items-end justify-center bg-gradient-to-t via-transparent to-transparent pb-6 opacity-0 transition-opacity duration-300 group-hover:opacity-100"
         >
           <div class="flex space-x-3">

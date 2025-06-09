@@ -7,6 +7,15 @@
         <h1 class="font-sec text-fg dark:text-fg mb-4 text-4xl font-medium lg:text-5xl">
           Get in Touch
         </h1>
+        <div class="mb-6 flex items-center justify-center space-x-4">
+          <div class="to-acc/50 h-px w-20 bg-gradient-to-r from-transparent"></div>
+          <div class="flex space-x-1">
+            <div class="bg-acc h-1.5 w-1.5 rounded-full"></div>
+            <div class="bg-acc/60 h-1.5 w-1.5 rounded-full"></div>
+            <div class="bg-acc/30 h-1.5 w-1.5 rounded-full"></div>
+          </div>
+          <div class="to-acc/50 h-px w-20 bg-gradient-to-l from-transparent"></div>
+        </div>
         <p class="text-fg/70 mx-auto max-w-3xl text-xl leading-relaxed">
           Ready to restore your timepiece or discuss watchmaking? Let's bring your cherished watches
           back to life.

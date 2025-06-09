@@ -2,7 +2,6 @@ import { supabase } from '../supabase.js'
 export const verifyUserIdentity = async (req, res, next) => {
   try {
     const authHeader = req.headers.authorization
-    console.log('auth header: ', authHeader)
     if (!authHeader && !authHeader.startsWith('Bearer ')) {
       return res.status(401).json({ error: 'None or bad token provided' })
     }

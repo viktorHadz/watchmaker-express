@@ -4,11 +4,11 @@ import { useDropZone } from '@vueuse/core'
 import placeHolder from '../icons/placeHolder.vue'
 import pocketWatch from '../icons/pocketWatch.vue'
 import { useToastStore } from '@/stores/toast'
-const toast = useToastStore()
 import { useDateFormat, useNow } from '@vueuse/core'
 import { usePostType } from '@/composables/utils'
 import { CloudArrowUpIcon, PaperAirplaneIcon, PlusIcon, TrashIcon } from '@heroicons/vue/24/outline'
 import { useAuth } from '@/composables/useAuth'
+const toast = useToastStore()
 
 const { getAuthToken } = useAuth()
 // Empty object to use when creating new post (for preview only now)
