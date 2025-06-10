@@ -5,8 +5,9 @@ import { useAuth } from '@/composables/useAuth'
 
 const { isAuthenticated } = useAuth()
 </script>
+
 <template>
-  <div class="">
+  <div>
     <div class="relative mx-auto" v-if="isAuthenticated">
       <NewGalleryElement></NewGalleryElement>
     </div>

@@ -63,6 +63,7 @@ async function handleLogin() {
     clearInputs()
     router.push('/my-work')
   } catch (error) {
+    emailInputRef.value.focus()
     console.error('Login error:', error)
     toast(error.message || 'Login failed. Please try again.', 'error')
   } finally {
@@ -136,6 +137,7 @@ onMounted(() => {
                 id="password"
                 autocomplete="current-password"
                 required="true"
+                maxlength="64"
                 class="input"
                 @input="clearFieldError('password')"
               />

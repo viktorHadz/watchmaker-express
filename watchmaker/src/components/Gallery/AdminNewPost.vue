@@ -7,10 +7,12 @@ import { useToastStore } from '@/stores/toast'
 import { useDateFormat, useNow } from '@vueuse/core'
 import { usePostType } from '@/composables/utils'
 import { CloudArrowUpIcon, PaperAirplaneIcon, PlusIcon, TrashIcon } from '@heroicons/vue/24/outline'
-import { useAuth } from '@/composables/useAuth'
+import { usePostsStore } from '@/stores/usePostsStore.js'
+import { storeToRefs } from 'pinia'
+const postsStore = usePostsStore()
+const { isUploading } = storeToRefs(postsStore)
 const toast = useToastStore()
 
-const { getAuthToken } = useAuth()
 // Empty object to use when creating new post (for preview only now)
 const newPost = ref({
   title: '',
@@ -24,9 +26,6 @@ const newPost = ref({
 const titleFile = ref(null)
 const extraFiles = ref([])
 const thumbnailFiles = ref([])
-
-// Loading state to prevent multiple submissions
-const isUploading = ref(false)
 
 // Computes the post type(see return sig)
 const postType = usePostType(newPost)
@@ -85,19 +84,15 @@ function generateThumbnail(file) {
 // Validation function
 function validatePost() {
   const errors = []
-
   if (!newPost.value.title.trim()) {
     errors.push('Title is required')
   }
-
   if (!titleFile.value && extraFiles.value.length === 0) {
     errors.push('At least one image is required')
   }
-
   if (extraFiles.value.length > 5) {
     errors.push('Maximum 5 extra images allowed')
   }
-
   // Validate thumbnails match extra images
   if (extraFiles.value.length !== thumbnailFiles.value.length) {
     errors.push('Thumbnail generation error')
@@ -105,11 +100,9 @@ function validatePost() {
 
   return errors
 }
-
 // Create a new post
 async function saveNewPost(e) {
   e.preventDefault()
-  if (isUploading.value) return
 
   // Validate post
   const errors = validatePost()
@@ -118,9 +111,6 @@ async function saveNewPost(e) {
     console.warn('Validation errors:', errors)
     return
   }
-
-  isUploading.value = true
-
   try {
     const formatedCurrentDate = useDateFormat(useNow(), 'DD-MM-YYYY')
     const date = formatedCurrentDate.value
@@ -146,44 +136,16 @@ async function saveNewPost(e) {
       formData.append('thumbnails', file)
     })
 
-    const success = await sendNewPost(formData)
-    // Only reset form if upload was successful
-    if (success) {
+    // From store
+    const result = await postsStore.createPost(formData)
+
+    if (result.success) {
       resetForm()
-      toast.showToast('Post created successfully!', 'success')
+      // The store already handles the toast and refreshing posts
     }
   } catch (error) {
     console.error('Error saving post:', error)
-    toast.showToast('Failed to save post', 'error')
-  } finally {
-    isUploading.value = false
-  }
-}
-
-async function sendNewPost(formData) {
-  try {
-    const token = getAuthToken()
-    console.log(token)
-    const response = await fetch('/api/posts/new-post', {
-      method: 'POST',
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-      body: formData,
-    })
-
-    const result = await response.json()
-
-    if (!response.ok) {
-      throw new Error(result.error || `Server error: ${response.status}`)
-    }
-
-    console.log('Server response:', result)
-    return true
-  } catch (error) {
-    console.error(error)
-    toast.showToast(error.message, 'error')
-    return false
+    // The store already handles error toasts
   }
 }
 
@@ -247,7 +209,6 @@ const { isOverDropZone } = useDropZone(titleDropZoneRef, {
   dataTypes: ['image/jpeg', 'image/png', 'image/webp'],
   multiple: false,
 })
-
 // Extra Images Drop
 const { isOverDropZone: isOverExtraDropZone } = useDropZone(extraImageDropZoneRef, {
   async onDrop(event) {
@@ -294,12 +255,10 @@ const { isOverDropZone: isOverExtraDropZone } = useDropZone(extraImageDropZoneRe
   dataTypes: ['image/jpeg', 'image/png', 'image/webp'],
   multiple: true,
 })
-
 // File Upload Functions using refs
 function triggerTitleUpload() {
   titleFileInputRef.value?.click()
 }
-
 function triggerExtraUpload() {
   if (extraFiles.value.length >= 5) {
     toast.showToast('Maximum 5 extra images allowed', 'warning')
@@ -307,7 +266,6 @@ function triggerExtraUpload() {
   }
   extraFileInputRef.value?.click()
 }
-
 // File Upload Fallbacks
 async function insertNewTitleImage(event) {
   const file = event.target.files?.[0]

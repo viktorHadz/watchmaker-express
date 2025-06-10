@@ -1,46 +1,29 @@
 <script setup>
 import { EyeIcon, ShareIcon, TrashIcon, PencilSquareIcon } from '@heroicons/vue/24/outline'
-import { computed, onMounted, ref, useTemplateRef } from 'vue'
+import { onMounted, useTemplateRef } from 'vue'
 import PostModal from './FullPost.vue'
 import IconGallery from '../icons/IconGallery.vue'
 import PaginationMain from '../PaginationMain.vue'
-import { useToastStore } from '@/stores/toast'
 import { useAuth } from '../../composables/useAuth.js'
+import { usePostsStore } from '@/stores/usePostsStore'
+import { storeToRefs } from 'pinia'
 
-const toast = (message, type) => useToastStore().showToast(message, type)
-const { isAuthenticated, getAuthToken } = useAuth() // Historic posts filled from DB
+const { isAuthenticated } = useAuth()
 const postsRef = useTemplateRef('postsRef')
-const allPosts = ref([])
-const totalPagesCount = ref(1)
-const currentPage = ref(1)
-const loading = ref(false)
 
-async function getAllPosts(page = 1) {
-  try {
-    loading.value = true
-    const response = await fetch(`/api/posts/get-all?page=${page}`)
-    if (!response.ok) throw new Error(`Error getting posts: ${response.status}`)
-    const posts = await response.json()
-    console.log(posts)
-    allPosts.value = posts
-    totalPagesCount.value = posts.pagination.totalPages
-    currentPage.value = posts.pagination.page
-  } catch (error) {
-    console.error('Error: ', error)
-  } finally {
-    loading.value = false
-  }
-}
+// Use the posts store
+const postsStore = usePostsStore()
 
-// Handle page change from pagination component
-const handlePageChange = async (page) => {
-  if (page === currentPage.value || page < 1 || page > totalPagesCount.value) {
-    return // Don't fetch if it's the same page or invalid page
-  }
+//  Store Posts
+const { allPosts, loading, pageNumbers, showPostModal, selectedPost } = storeToRefs(postsStore)
 
-  await getAllPosts(page)
+// Get actions from store (these don't need storeToRefs)
+const { openPost, closePostModal, handlePageChange, handlePostShare, deletePost, initialize } =
+  postsStore
 
-  // Scroll to posts section using template ref
+// Handle page change with a smooth scroll
+const handlePageChangeWithScroll = async (page) => {
+  await handlePageChange(page)
   if (postsRef.value) {
     postsRef.value.scrollIntoView({
       behavior: 'smooth',
@@ -49,62 +32,11 @@ const handlePageChange = async (page) => {
   }
 }
 
-const pageNumbers = computed(() => {
-  const pageArr = []
-  for (let i = 1; i <= totalPagesCount.value; i++) {
-    pageArr.push(i)
-  }
-  return pageArr
-})
-
-const showPostModal = ref(false)
-const selectedPost = ref({})
-
-const openPost = (post) => {
-  selectedPost.value = post
-  showPostModal.value = true
-}
-
-// Post sharing logic here
-const handlePostShare = (post) => {
-  console.log('Sharing post:', post)
-}
-const deletePost = async (postId) => {
-  // make a call to backend
-  // If call succeeeds remove from frontend
-  fetch('/api/posts/delete/', {
-    headers: 'Authorization',
-  })
-
-  try {
-    const token = getAuthToken()
-    console.log(token)
-    const response = await fetch(`/api/posts/delete-post/${postId}`, {
-      method: 'DELETE',
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
-      body: 'sdddd',
-    })
-
-    const result = await response.json()
-
-    if (!response.ok) {
-      throw new Error(result.error || `Server error: ${response.status}`)
-    }
-
-    console.log('Server response:', result)
-    return true
-  } catch (error) {
-    console.error(error)
-    toast(error.message, 'error')
-    return false
-  }
-}
 onMounted(() => {
-  getAllPosts()
+  initialize()
 })
 </script>
+
 <template>
   <!-- GALLERY SECTION -->
   <section class="mx-auto max-w-7xl px-2" ref="postsRef">
@@ -129,7 +61,17 @@ onMounted(() => {
       </div>
     </div>
 
-    <div v-if="allPosts.length === 0 || allPosts.posts?.length === 0" class="py-16 text-center">
+    <!-- Loading State -->
+    <div v-if="loading" class="flex justify-center py-16">
+      <div class="flex items-center space-x-2">
+        <div class="bg-acc size-3 animate-bounce rounded-full"></div>
+        <div class="bg-acc animation-delay-200 size-3 animate-bounce rounded-full"></div>
+        <div class="bg-acc animation-delay-400 size-3 animate-bounce rounded-full"></div>
+      </div>
+    </div>
+
+    <!-- Empty State -->
+    <div v-else-if="!allPosts.posts || allPosts.posts.length === 0" class="py-16 text-center">
       <div class="bg-acc/10 mx-auto mb-6 flex size-24 items-center justify-center rounded-2xl">
         <IconGallery class="text-acc size-12"></IconGallery>
       </div>
@@ -141,7 +83,7 @@ onMounted(() => {
     <div v-else class="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
       <article
         v-for="(post, i) in allPosts.posts"
-        :key="i"
+        :key="post.postId || i"
         class="group dark:bg-sec/80 bg-primary border-acc/20 hover:border-acc/40 dark:hover:border-acc/40 dark:border-sec-mute/50 cursor-pointer overflow-hidden rounded-2xl border shadow-lg backdrop-blur-sm transition-all duration-300 hover:scale-[1.02] hover:shadow-2xl"
         @click="openPost(post)"
       >
@@ -232,7 +174,7 @@ onMounted(() => {
               <PencilSquareIcon class="size-5"></PencilSquareIcon>
             </button>
             <button
-              @click="deletePost"
+              @click.stop="deletePost(post.postId)"
               class="bg-sec-light hover:bg-primary text-fg-mute hover:text-danger cursor-pointer rounded-lg px-4 py-2 dark:bg-white/20 dark:text-white dark:hover:bg-white/30"
             >
               <TrashIcon class="size-5"></TrashIcon>
@@ -251,6 +193,7 @@ onMounted(() => {
               <EyeIcon class="size-5"></EyeIcon>
             </button>
             <button
+              @click.stop="handlePostShare(post)"
               class="bg-sec-light hover:bg-primary text-fg-mute hover:text-acc cursor-pointer rounded-lg px-4 py-2 dark:bg-white/20 dark:text-white dark:hover:bg-white/30"
             >
               <ShareIcon class="size-5"></ShareIcon>
@@ -259,16 +202,40 @@ onMounted(() => {
         </div>
       </article>
     </div>
+
+    <!-- Pagination -->
     <PaginationMain
       :page-numbers="pageNumbers"
       :pagination-data="allPosts.pagination"
-      @page-change="handlePageChange"
+      @page-change="handlePageChangeWithScroll"
     />
+
+    <!-- Post Modal -->
     <PostModal
       :show="showPostModal"
       :post="selectedPost"
-      @close="showPostModal = false"
+      @close="closePostModal"
       @share="handlePostShare"
     />
   </section>
 </template>
+
+<style scoped>
+@keyframes bounce {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-10px);
+  }
+}
+
+.animation-delay-200 {
+  animation-delay: 200ms;
+}
+
+.animation-delay-400 {
+  animation-delay: 400ms;
+}
+</style>

@@ -102,14 +102,12 @@ export function useAuth() {
   }
 
   const getAuthToken = () => {
-    console.table('authenticating: ', isAuthenticated.value)
     if (!isAuthenticated.value) {
       throw new Error('Not authenticated')
     }
     if (!session.value?.access_token) {
       throw new Error('No access token provided')
     }
-    console.log(session.value?.access_token)
     return session.value?.access_token
   }
 
