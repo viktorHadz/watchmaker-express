@@ -143,6 +143,7 @@ export const usePostsStore = defineStore('posts', () => {
   function closePostModal() {
     showPostModal.value = false
     selectedPost.value = {}
+    cancelEdit()
   }
 
   async function handlePageChange(page) {
@@ -161,7 +162,42 @@ export const usePostsStore = defineStore('posts', () => {
   function initialize() {
     fetchPosts()
   }
+  const editing = ref(false)
+  const isEditing = computed(() => {
+    if (editing.value) {
+      return true
+    } else {
+      return false
+    }
+  })
+  const editForm = ref({
+    postTitle: '',
+    postBody: '',
+    // other editable fields in future
+  })
+  function initEdit(post) {
+    editing.value = true
+    selectedPost.value = post // For display reference
+    // Copy values to edit form
+    editForm.value = {
+      postTitle: post.postTitle,
+      postBody: post.postBody,
+    }
+    showPostModal.value = true
+  }
 
+  function saveEdit() {
+    // Then API call
+    // Then Apply changes back to original if successfull
+    selectedPost.value.postTitle = editForm.value.postTitle
+    selectedPost.value.postBody = editForm.value.postBody
+    editing.value = false
+  }
+
+  function cancelEdit() {
+    editing.value = false
+    // editForm automatically gets reset on next initEdit
+  }
   return {
     // State
     posts,
@@ -172,6 +208,8 @@ export const usePostsStore = defineStore('posts', () => {
     totalPagesCount,
     showPostModal,
     selectedPost,
+    isEditing,
+    editForm,
 
     // Computed
     pageNumbers,
@@ -181,10 +219,12 @@ export const usePostsStore = defineStore('posts', () => {
     fetchPosts,
     createPost,
     deletePost,
+    initEdit,
     openPost,
     closePostModal,
     handlePageChange,
     handlePostShare,
     initialize,
+    cancelEdit,
   }
 })

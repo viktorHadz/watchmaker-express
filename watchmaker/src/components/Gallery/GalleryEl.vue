@@ -18,8 +18,15 @@ const postsStore = usePostsStore()
 const { allPosts, loading, pageNumbers, showPostModal, selectedPost } = storeToRefs(postsStore)
 
 // Get actions from store (these don't need storeToRefs)
-const { openPost, closePostModal, handlePageChange, handlePostShare, deletePost, initialize } =
-  postsStore
+const {
+  openPost,
+  closePostModal,
+  handlePageChange,
+  handlePostShare,
+  deletePost,
+  initialize,
+  initEdit,
+} = postsStore
 
 // Handle page change with a smooth scroll
 const handlePageChangeWithScroll = async (page) => {
@@ -136,10 +143,10 @@ onMounted(() => {
           <!-- Additional Images Indicator -->
           <div
             v-if="post.thumbImages && post.thumbImages.length > 0"
-            class="border-brdr dark:border-sec-mute mt-4 border-t pt-4"
+            class="border-brdr dark:border-sec-mute mt-4 border-t pt-3"
           >
             <div class="flex items-center justify-between">
-              <span class="text-fg/60 text-xs">Additional photos</span>
+              <span class="text-fg/60 text-sm">Additional photos</span>
               <div class="flex -space-x-2">
                 <div
                   v-for="(img, idx) in post.thumbImages.slice(0, 3)"
@@ -167,7 +174,9 @@ onMounted(() => {
           class="dark:from-acc/5 from-acc/20 absolute inset-0 flex items-end justify-center bg-gradient-to-t via-transparent to-transparent pb-6 opacity-0 transition-opacity duration-300 group-hover:opacity-100"
         >
           <div class="flex space-x-3">
+            <!-- Open post with deep clone .stop necessary -->
             <button
+              @click.stop="initEdit(post)"
               type="button"
               class="bg-sec-light hover:bg-primary text-fg-mute cursor-pointer rounded-lg px-4 py-2 hover:text-blue-500 dark:bg-white/20 dark:text-white dark:hover:bg-white/30"
             >

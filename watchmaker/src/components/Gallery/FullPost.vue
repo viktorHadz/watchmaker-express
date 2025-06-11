@@ -1,5 +1,7 @@
 <script setup>
 import { ref, computed, watch } from 'vue'
+import { usePostsStore } from '@/stores/usePostsStore'
+import { useAuth } from '@/composables/useAuth'
 import {
   XMarkIcon,
   CalendarIcon,
@@ -7,8 +9,11 @@ import {
   ChevronLeftIcon,
   ChevronRightIcon,
   PhotoIcon,
+  PencilIcon,
+  CheckBadgeIcon,
 } from '@heroicons/vue/24/outline'
-
+import IconGallery from '../icons/IconGallery.vue'
+import { storeToRefs } from 'pinia'
 const props = defineProps({
   post: {
     type: Object,
@@ -21,6 +26,11 @@ const props = defineProps({
 })
 
 const emit = defineEmits(['close', 'share'])
+
+// Passed State
+const { isAuthenticated } = useAuth()
+const postsStore = usePostsStore()
+const { isEditing, editForm } = storeToRefs(postsStore)
 
 const currentImageIndex = ref(0)
 
@@ -130,13 +140,32 @@ watch(
             <!-- Title and buttons row -->
             <div class="flex items-start justify-between gap-3">
               <div class="min-w-0 flex-1">
-                <h2 class="font-sec text-fg dark:text-fg2 text-xl font-semibold sm:text-2xl">
+                <div v-if="isAuthenticated && isEditing" class="flex gap-2">
+                  <input
+                    type="text"
+                    class="input max-w-fit"
+                    placeholder="Editable Post Title"
+                    v-model="editForm.postTitle"
+                  />
+                  <div class="flex h-full items-start">
+                    <PencilIcon class="text-acc/80 size-5 animate-pulse"></PencilIcon>
+                  </div>
+                </div>
+                <h2 v-else class="font-sec text-fg dark:text-fg2 text-xl font-semibold sm:text-2xl">
                   {{ post.postTitle }}
                 </h2>
               </div>
 
               <div class="flex flex-shrink-0 items-center space-x-2">
                 <button
+                  v-if="isAuthenticated && isEditing"
+                  class="text-acc dark:bg-sec dark:hover:bg-sec-mute bg-acc/20 hover:bg-acc flex size-9 cursor-pointer items-center justify-center rounded-xl transition-colors hover:text-white sm:size-10"
+                >
+                  <CheckBadgeIcon class="size-4 sm:size-5"></CheckBadgeIcon>
+                </button>
+
+                <button
+                  v-else
                   @click="handleShare"
                   class="text-acc dark:bg-sec dark:hover:bg-sec-mute bg-acc/20 hover:bg-acc flex size-9 cursor-pointer items-center justify-center rounded-xl transition-colors hover:text-white sm:size-10"
                 >
@@ -237,19 +266,40 @@ watch(
 
             <!-- Post Content -->
             <div class="p-4 sm:p-6">
-              <div v-if="post.postBody" class="w-full max-w-full py-8 sm:max-w-none">
-                <div class="text-fg leading-relaxed break-words whitespace-pre-wrap">
-                  {{ post.postBody }}
+              <div v-if="isAuthenticated && isEditing" class="flex gap-2">
+                <textarea
+                  name="message"
+                  id="message"
+                  maxlength="1000"
+                  rows="11"
+                  class="text-fg placeholder-fg/50 focus:ring-acc/50 focus:border-acc input w-full resize-none rounded-xl"
+                  placeholder="Tell me about your watch, what issues you're experiencing, or any specific requirements..."
+                  v-model="editForm.postBody"
+                />
+                <div class="flex h-full items-start">
+                  <PencilIcon class="text-acc/80 size-5 animate-pulse"></PencilIcon>
                 </div>
               </div>
-
-              <div v-else class="py-8 text-center">
-                <div
-                  class="bg-acc/10 mx-auto mb-4 flex size-16 items-center justify-center rounded-2xl"
-                >
-                  <PhotoIcon class="text-acc size-8" />
+              <div v-else>
+                <div v-if="post.postBody" class="w-full max-w-full py-8 sm:max-w-none">
+                  <div class="text-fg leading-relaxed break-words whitespace-pre-wrap">
+                    {{ post.postBody }}
+                  </div>
                 </div>
-                <p class="text-fg/60">No description available for this post</p>
+                <!-- Default Empty Post -->
+                <div
+                  v-else
+                  class="dark:border-acc/50 border-acc bg-acc/5 flex flex-col gap-y-18 rounded-2xl border-3 border-dashed py-10 text-center"
+                >
+                  <div
+                    class="bg-acc/5 mx-auto flex size-72 items-center justify-center rounded-2xl"
+                  >
+                    <IconGallery class="text-acc/80 size-64" />
+                  </div>
+                  <p class="text-fg text-4xl font-medium tracking-wider capitalize">
+                    No description available for this post
+                  </p>
+                </div>
               </div>
             </div>
           </div>
