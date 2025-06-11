@@ -7,12 +7,28 @@ const router = express.Router()
 router.delete('/delete/:postid', verifyUserIdentity, (req, res) => {
   try {
     const postId = req.params.postid
-    console.log(postId)
     if (!postId) throw new Error('Bad post id')
-    console.log(postId)
-  } catch {
-    console.error('Server error deleting post')
+    console.log('Deleting post with id: ', postId)
+
+    const stmtDeletePost = db.prepare(`DELETE FROM posts WHERE id = ?`)
+    const result = stmtDeletePost.run(postId)
+    if (result.changes === 0) {
+      return res.status(404).send({ success: false, error: 'Post not found' })
+    }
+
+    res.json({
+      success: true,
+      message: 'Post deleted successfully',
+      deletedId: postId,
+    })
+  } catch (error) {
+    console.error('Caught: ', error)
+    res.status(500).json({
+      success: false,
+      message: 'Failed to delete post',
+      error: error.message,
+    })
   }
-  res.send('Got a DELETE request at /user')
+  // NEEED TOOO DELETE THE FKKKEEEEN PHOTOOOS  TOOOO O OFFFUUUK
 })
 export default router

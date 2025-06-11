@@ -40,7 +40,6 @@ loginRouter.post('/login', (req, res) => {
   const user = { name: email }
   // const pass = req.body.password
   const token = generateAccessToken(user)
-  console.log(token)
   res.json(token)
 })
 
