@@ -1,6 +1,7 @@
 <script setup>
-import { useLocalStorage } from '@vueuse/core'
-const mode = useLocalStorage('vueuse-color-scheme')
+import { useColorMode } from '@vueuse/core'
+
+const mode = useColorMode()
 </script>
 <template>
   <div>

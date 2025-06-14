@@ -1,5 +1,11 @@
 <script setup>
-import { EyeIcon, ShareIcon, TrashIcon, PencilSquareIcon } from '@heroicons/vue/24/outline'
+import {
+  EyeIcon,
+  ShareIcon,
+  TrashIcon,
+  PencilSquareIcon,
+  CalendarIcon,
+} from '@heroicons/vue/24/outline'
 import { onMounted, useTemplateRef } from 'vue'
 import PostModal from './FullPost.vue'
 import IconGallery from '../icons/IconGallery.vue'
@@ -91,7 +97,7 @@ onMounted(() => {
       <article
         v-for="(post, i) in allPosts.posts"
         :key="post.postId || i"
-        class="group dark:bg-sec/80 bg-primary border-acc/20 hover:border-acc/40 dark:hover:border-acc/40 dark:border-sec-mute/50 cursor-pointer overflow-hidden rounded-2xl border shadow-lg backdrop-blur-sm transition-all duration-300 hover:scale-[1.02] hover:shadow-2xl"
+        class="group dark:bg-sec/80 bg-primary border-acc/20 hover:border-acc/40 dark:hover:border-acc/40 dark:border-sec-mute/50 cursor-pointer overflow-hidden rounded-2xl border shadow-lg backdrop-blur-sm transition-all duration-200 hover:shadow-xl"
         @click="openPost(post)"
       >
         <!-- Image -->
@@ -99,7 +105,7 @@ onMounted(() => {
           <img
             :src="`/public${post.titleImage.titlePath}` || '/assets/pictures/placeholder.webp'"
             :alt="post.title"
-            class="h-full w-full object-cover transition-transform duration-500 group-hover:scale-110"
+            class="h-full w-full object-cover"
           />
           <div
             class="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent opacity-0 transition-opacity duration-300 group-hover:opacity-100"
@@ -108,8 +114,9 @@ onMounted(() => {
           <!-- Date Badge -->
           <div class="absolute top-3 right-3">
             <span
-              class="text-fg dark:bg-sec group-hover:text-acc inline-flex items-center rounded-full border border-white/20 bg-white/90 px-2 py-1 text-xs font-medium"
+              class="text-fg dark:bg-sec group-hover:text-acc inline-flex items-center gap-1 rounded-full border border-white/20 bg-white/90 px-2 py-1 text-xs font-medium"
             >
+              <CalendarIcon class="size-4" />
               {{ post.date }}
             </span>
           </div>
@@ -171,43 +178,39 @@ onMounted(() => {
         <!-- Hover Action Buttons -->
         <div
           v-if="isAuthenticated"
-          class="dark:from-acc/5 from-acc/20 absolute inset-0 flex items-end justify-center bg-gradient-to-t via-transparent to-transparent pb-6 opacity-0 transition-opacity duration-300 group-hover:opacity-100"
+          class="absolute top-3 left-3 flex space-x-2 opacity-100 transition-opacity duration-200 md:opacity-0 md:group-hover:opacity-100"
         >
-          <div class="flex space-x-3">
-            <!-- Open post with deep clone .stop necessary -->
-            <button
-              @click.stop="initEdit(post)"
-              type="button"
-              class="bg-sec-light hover:bg-primary text-fg-mute cursor-pointer rounded-lg px-4 py-2 hover:text-blue-500 dark:bg-white/20 dark:text-white dark:hover:bg-white/30"
-            >
-              <PencilSquareIcon class="size-5"></PencilSquareIcon>
-            </button>
-            <button
-              @click.stop="deletePost(post.postId)"
-              class="bg-sec-light hover:bg-primary text-fg-mute hover:text-danger cursor-pointer rounded-lg px-4 py-2 dark:bg-white/20 dark:text-white dark:hover:bg-white/30"
-            >
-              <TrashIcon class="size-5"></TrashIcon>
-            </button>
-          </div>
+          <button
+            @click.stop="initEdit(post)"
+            type="button"
+            class="rounded-lg bg-white/90 p-2 text-gray-700 shadow-sm backdrop-blur-sm hover:bg-white hover:text-blue-600"
+          >
+            <PencilSquareIcon class="size-4"></PencilSquareIcon>
+          </button>
+          <button
+            @click.stop="deletePost(post.postId)"
+            class="rounded-lg bg-white/90 p-2 text-gray-700 shadow-sm backdrop-blur-sm hover:bg-white hover:text-red-600"
+          >
+            <TrashIcon class="size-4"></TrashIcon>
+          </button>
         </div>
+
         <div
           v-else
-          class="dark:from-acc/5 from-acc/20 absolute inset-0 flex items-end justify-center bg-gradient-to-t via-transparent to-transparent pb-6 opacity-0 transition-opacity duration-300 group-hover:opacity-100"
+          class="absolute top-3 left-3 flex space-x-2 opacity-100 transition-opacity duration-200 md:opacity-0 md:group-hover:opacity-100"
         >
-          <div class="flex space-x-3">
-            <button
-              type="button"
-              class="bg-sec-light hover:bg-primary text-fg-mute hover:text-acc cursor-pointer rounded-lg px-4 py-2 dark:bg-white/20 dark:text-white dark:hover:bg-white/30"
-            >
-              <EyeIcon class="size-5"></EyeIcon>
-            </button>
-            <button
-              @click.stop="handlePostShare(post)"
-              class="bg-sec-light hover:bg-primary text-fg-mute hover:text-acc cursor-pointer rounded-lg px-4 py-2 dark:bg-white/20 dark:text-white dark:hover:bg-white/30"
-            >
-              <ShareIcon class="size-5"></ShareIcon>
-            </button>
-          </div>
+          <button
+            type="button"
+            class="rounded-lg bg-white/90 p-2 text-gray-700 shadow-sm backdrop-blur-sm hover:bg-white hover:text-blue-600"
+          >
+            <EyeIcon class="size-4"></EyeIcon>
+          </button>
+          <button
+            @click.stop="handlePostShare(post)"
+            class="rounded-lg bg-white/90 p-2 text-gray-700 shadow-sm backdrop-blur-sm hover:bg-white hover:text-blue-600"
+          >
+            <ShareIcon class="size-4"></ShareIcon>
+          </button>
         </div>
       </article>
     </div>

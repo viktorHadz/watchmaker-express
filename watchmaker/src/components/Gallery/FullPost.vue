@@ -11,9 +11,12 @@ import {
   PhotoIcon,
   PencilIcon,
   CheckBadgeIcon,
+  EyeSlashIcon,
+  EyeIcon,
 } from '@heroicons/vue/24/outline'
 import IconGallery from '../icons/IconGallery.vue'
 import { storeToRefs } from 'pinia'
+
 const props = defineProps({
   post: {
     type: Object,
@@ -33,6 +36,7 @@ const postsStore = usePostsStore()
 const { isEditing, editForm } = storeToRefs(postsStore)
 
 const currentImageIndex = ref(0)
+const showImageGallery = ref(true)
 
 // Computed property to get all images (title + extra images)
 const allImages = computed(() => {
@@ -64,15 +68,17 @@ const setCurrentImage = (index) => {
   currentImageIndex.value = index
 }
 
+const toggleImageGallery = () => {
+  showImageGallery.value = !showImageGallery.value
+}
+
 const closeModal = () => {
   emit('close')
 }
 
 const handleShare = () => {
-  // You can customize this - for now it copies the post title to clipboard
   if (navigator.clipboard) {
     navigator.clipboard.writeText(`Check out this post: ${props.post.postTitle}`)
-    // You could add a toast notification here
   }
   emit('share', props.post)
 }
@@ -82,6 +88,7 @@ watch(
   () => props.post.postId,
   () => {
     currentImageIndex.value = 0
+    showImageGallery.value = true
   },
 )
 
@@ -115,7 +122,7 @@ watch(
 
 <template>
   <Teleport to="body">
-    <!-- Backdrop with separate transition -->
+    <!-- Backdrop -->
     <Transition name="backdrop" appear>
       <div
         v-if="show"
@@ -124,76 +131,140 @@ watch(
       ></div>
     </Transition>
 
-    <!-- Modal Content with separate transition -->
+    <!-- Modal Content -->
     <Transition name="modal" appear>
       <div
         v-if="show"
-        class="pointer-events-none fixed inset-0 z-[101] flex items-center justify-center sm:p-4"
+        class="pointer-events-none fixed inset-0 z-[101] flex items-center justify-center p-2 sm:p-4"
       >
         <div
-          class="dark:bg-sec/80 dark:border-sec-mute bg-primary pointer-events-auto relative flex h-full w-full max-w-4xl flex-col overflow-hidden border border-white/20 shadow-2xl backdrop-blur-md sm:max-h-[90vh] sm:rounded-2xl"
+          class="dark:bg-sec/95 dark:border-sec-mute bg-primary/95 pointer-events-auto relative flex h-full w-full max-w-4xl flex-col overflow-hidden border border-white/20 shadow-2xl backdrop-blur-xl sm:max-h-[95vh] sm:rounded-2xl"
         >
-          <!-- Header -->
+          <!-- Sticky Header -->
           <div
-            class="dark:border-sec-mute dark:bg-sec/80 from-acc/10 via-acc/5 bg-primary sticky top-0 flex flex-col space-y-4 border-b border-white/10 bg-gradient-to-r to-transparent p-4 backdrop-blur-md sm:p-6"
+            class="dark:border-brdr/30 dark:bg-sec/80 from-acc/5 via-primary/90 to-primary/90 border-brdr/20 sticky top-0 z-10 border-b bg-gradient-to-r backdrop-blur-md"
           >
-            <!-- Title and buttons row -->
-            <div class="flex items-start justify-between gap-3">
-              <div class="min-w-0 flex-1">
-                <div v-if="isAuthenticated && isEditing" class="flex gap-2">
-                  <input
-                    type="text"
-                    class="input max-w-fit"
-                    placeholder="Editable Post Title"
-                    v-model="editForm.postTitle"
-                  />
-                  <div class="flex h-full items-start">
-                    <PencilIcon class="text-acc/80 size-5 animate-pulse"></PencilIcon>
+            <div class="px-4 py-4 sm:px-6">
+              <div class="items-center sm:flex">
+                <!-- Title Section -->
+                <div class="min-w-0 flex-1">
+                  <div v-if="isAuthenticated && isEditing">
+                    <input
+                      type="text"
+                      class="input font-sec text-fg dark:text-fg2 focus:ring-acc/30 border-brdr/30 w-full rounded-lg text-lg font-light tracking-wide focus:ring-2 sm:text-xl"
+                      placeholder="Post Title"
+                      v-model="editForm.postTitle"
+                    />
+                  </div>
+                  <div v-else>
+                    <h2
+                      class="font-sec text-fg dark:text-fg2 line-clamp-2 text-lg font-light tracking-wide sm:text-xl"
+                    >
+                      {{ post.postTitle }}
+                    </h2>
                   </div>
                 </div>
-                <h2 v-else class="font-sec text-fg dark:text-fg2 text-xl font-semibold sm:text-2xl">
-                  {{ post.postTitle }}
-                </h2>
-              </div>
 
-              <div class="flex flex-shrink-0 items-center space-x-2">
-                <button
-                  v-if="isAuthenticated && isEditing"
-                  class="text-acc dark:bg-sec dark:hover:bg-sec-mute bg-acc/20 hover:bg-acc flex size-9 cursor-pointer items-center justify-center rounded-xl transition-colors hover:text-white sm:size-10"
-                >
-                  <CheckBadgeIcon class="size-4 sm:size-5"></CheckBadgeIcon>
-                </button>
+                <!-- Action Buttons -->
+                <div class="flex items-center gap-2">
+                  <!-- Toggle Gallery Button -->
+                  <button
+                    v-if="allImages.length > 0"
+                    @click="toggleImageGallery"
+                    class="group relative size-9 sm:size-10"
+                    :title="showImageGallery ? 'Hide images' : 'Show images'"
+                  >
+                    <div
+                      :class="[
+                        'absolute inset-0 rounded-xl bg-gradient-to-br transition-all duration-300',
+                        showImageGallery
+                          ? 'from-acc/20 to-acc/10 group-hover:from-acc/30 group-hover:to-acc/20'
+                          : 'from-gray-500/20 to-gray-500/10 group-hover:from-gray-500/30 group-hover:to-gray-500/20',
+                      ]"
+                    ></div>
+                    <div
+                      :class="[
+                        'relative flex h-full w-full items-center justify-center rounded-xl border backdrop-blur-sm transition-all duration-300',
+                        showImageGallery
+                          ? 'border-acc/30 group-hover:border-acc/50 bg-primary/50 dark:bg-sec/50'
+                          : 'bg-primary/50 dark:bg-sec/50 border-gray-500/30 group-hover:border-gray-500/50',
+                      ]"
+                    >
+                      <EyeIcon
+                        v-if="showImageGallery"
+                        class="text-acc size-4 transition-all duration-300"
+                      />
+                      <EyeSlashIcon
+                        v-else
+                        class="size-4 text-gray-500 transition-all duration-300"
+                      />
+                    </div>
+                  </button>
 
-                <button
-                  v-else
-                  @click="handleShare"
-                  class="text-acc dark:bg-sec dark:hover:bg-sec-mute bg-acc/20 hover:bg-acc flex size-9 cursor-pointer items-center justify-center rounded-xl transition-colors hover:text-white sm:size-10"
-                >
-                  <ShareIcon class="size-4 sm:size-5" />
-                </button>
-                <button
-                  @click="closeModal"
-                  class="text-acc dark:bg-sec dark:hover:bg-sec-mute bg-acc/20 hover:bg-acc flex size-9 cursor-pointer items-center justify-center rounded-xl transition-colors hover:text-white sm:size-10"
-                >
-                  <XMarkIcon class="size-4 sm:size-5" />
-                </button>
+                  <!-- Save/Share Button -->
+                  <button
+                    v-if="isAuthenticated && isEditing"
+                    class="group relative size-9 sm:size-10"
+                    @click="saveEdit"
+                  >
+                    <div
+                      class="absolute inset-0 rounded-xl bg-gradient-to-br from-green-500/20 to-green-500/10 transition-all duration-300 group-hover:from-green-500/30 group-hover:to-green-500/20"
+                    ></div>
+                    <div
+                      class="bg-primary/50 dark:bg-sec/50 relative flex h-full w-full items-center justify-center rounded-xl border border-green-500/30 backdrop-blur-sm transition-all duration-300 group-hover:border-green-500/50"
+                    >
+                      <CheckBadgeIcon
+                        class="size-4 text-green-500 transition-transform group-hover:scale-110"
+                      />
+                    </div>
+                  </button>
+
+                  <button v-else @click="handleShare" class="group relative size-9 sm:size-10">
+                    <div
+                      class="from-acc/20 to-acc/10 group-hover:from-acc/30 group-hover:to-acc/20 absolute inset-0 rounded-xl bg-gradient-to-br transition-all duration-300"
+                    ></div>
+                    <div
+                      class="border-acc/30 bg-primary/50 dark:bg-sec/50 group-hover:border-acc/50 relative flex h-full w-full items-center justify-center rounded-xl border backdrop-blur-sm transition-all duration-300"
+                    >
+                      <ShareIcon
+                        class="text-acc size-4 transition-transform group-hover:scale-110"
+                      />
+                    </div>
+                  </button>
+
+                  <!-- Close Button -->
+                  <button @click="closeModal" class="group relative size-9 sm:size-10">
+                    <div
+                      class="absolute inset-0 rounded-xl bg-gradient-to-br from-red-500/20 to-red-500/10 transition-all duration-300 group-hover:from-red-500/30 group-hover:to-red-500/20"
+                    ></div>
+                    <div
+                      class="bg-primary/50 dark:bg-sec/50 relative flex h-full w-full items-center justify-center rounded-xl border border-red-500/30 backdrop-blur-sm transition-all duration-300 group-hover:border-red-500/50"
+                    >
+                      <XMarkIcon
+                        class="size-4 text-red-500 transition-all duration-300 group-hover:rotate-90"
+                      />
+                    </div>
+                  </button>
+                </div>
               </div>
             </div>
           </div>
 
-          <!-- Content -->
-          <div class="flex-1 overflow-y-auto">
-            <!-- Image Gallery Section -->
-            <div v-if="allImages.length > 0" class="relative">
+          <!-- Collapsible Image Gallery Section -->
+          <Transition name="gallery" mode="out-in">
+            <div
+              v-if="allImages.length > 0 && showImageGallery"
+              class="border-brdr/20 dark:border-sec-mute/30 border-b"
+            >
               <!-- Main Image Display -->
-              <div class="dark:bg-sec bg-primary relative">
+              <div class="relative bg-black/5">
                 <img
                   v-if="allImages[currentImageIndex]"
                   :src="allImages[currentImageIndex]"
                   :alt="`${post.postTitle || 'Post'} image ${currentImageIndex + 1}`"
-                  class="h-auto max-h-[50vh] w-full object-contain"
+                  class="h-64 w-full object-contain sm:h-96"
                 />
-                <div v-else class="flex h-64 items-center justify-center">
+                <div v-else class="flex h-64 items-center justify-center sm:h-80">
                   <PhotoIcon class="text-fg/30 size-16" />
                 </div>
 
@@ -205,9 +276,9 @@ watch(
                   <button
                     @click="prevImage"
                     :disabled="currentImageIndex === 0"
-                    class="hover:text-acc ml-4 flex size-10 items-center justify-center rounded-full bg-black/50 text-white backdrop-blur-sm transition-all hover:bg-black/70 disabled:cursor-not-allowed disabled:opacity-50"
+                    class="hover:text-acc ml-2 flex size-8 items-center justify-center rounded-full bg-black/50 text-white backdrop-blur-sm transition-all hover:bg-black/70 disabled:cursor-not-allowed disabled:opacity-50 sm:ml-4 sm:size-10"
                   >
-                    <ChevronLeftIcon class="size-5" />
+                    <ChevronLeftIcon class="size-4 sm:size-5" />
                   </button>
                 </div>
 
@@ -218,35 +289,39 @@ watch(
                   <button
                     @click="nextImage"
                     :disabled="currentImageIndex === allImages.length - 1"
-                    class="hover:text-acc mr-4 flex size-10 items-center justify-center rounded-full bg-black/50 text-white backdrop-blur-sm transition-all hover:bg-black/70 disabled:cursor-not-allowed disabled:opacity-50"
+                    class="hover:text-acc mr-2 flex size-8 items-center justify-center rounded-full bg-black/50 text-white backdrop-blur-sm transition-all hover:bg-black/70 disabled:cursor-not-allowed disabled:opacity-50 sm:mr-4 sm:size-10"
                   >
-                    <ChevronRightIcon class="size-5" />
+                    <ChevronRightIcon class="size-4 sm:size-5" />
                   </button>
                 </div>
 
                 <!-- Image Counter -->
-                <div v-if="allImages.length > 1" class="absolute right-4 bottom-4">
+                <div
+                  v-if="allImages.length > 1"
+                  class="absolute right-2 bottom-2 sm:right-4 sm:bottom-4"
+                >
                   <span
-                    class="rounded-full bg-black/50 px-3 py-1 text-sm text-white backdrop-blur-sm"
+                    class="rounded-full bg-black/60 px-2 py-1 text-xs text-white backdrop-blur-sm sm:px-3 sm:text-sm"
                   >
                     {{ currentImageIndex + 1 }} / {{ allImages.length }}
                   </span>
                 </div>
               </div>
+
               <!-- Thumbnail Navigation -->
               <div
                 v-if="allImages.length > 1"
-                class="dark:border-sec-mute border-b border-white/10 p-4"
+                class="border-brdr/20 dark:border-sec-mute/30 border-t"
               >
-                <div class="scrollbar-hide flex space-x-3 overflow-x-auto px-2 py-1">
+                <div class="scrollbar-hide flex space-x-2 overflow-x-auto p-4 sm:p-4">
                   <button
                     v-for="(image, index) in allImages"
                     :key="index"
                     @click="setCurrentImage(index)"
                     :class="[
-                      'relative size-16 flex-shrink-0 rounded-lg border-2 transition-all',
+                      'relative size-12 flex-shrink-0 rounded-lg border-2 transition-all sm:size-14',
                       currentImageIndex === index
-                        ? 'border-acc scale-110 shadow-lg'
+                        ? 'border-acc scale-105 shadow-lg'
                         : 'hover:border-acc/50 dark:border-sec-light border-white/20',
                     ]"
                   >
@@ -263,60 +338,92 @@ watch(
                 </div>
               </div>
             </div>
+          </Transition>
 
-            <!-- Post Content -->
-            <div class="p-4 sm:p-6">
-              <div v-if="isAuthenticated && isEditing" class="flex gap-2">
+          <!-- Scrollable Content Area -->
+          <div class="custom-scrollbar flex-1 overflow-y-auto">
+            <div class="p-2 sm:p-6">
+              <!-- Editing Mode -->
+              <div v-if="isAuthenticated && isEditing" class="relative">
                 <textarea
                   name="message"
                   id="message"
-                  maxlength="1000"
-                  rows="11"
-                  class="text-fg placeholder-fg/50 focus:ring-acc/50 focus:border-acc input w-full resize-none rounded-xl"
-                  placeholder="Tell me about your watch, what issues you're experiencing, or any specific requirements..."
+                  class="text-fg placeholder-fg/50 focus:ring-acc/50 focus:border-acc input custom-scrollbar min-h-96 w-full resize-none overflow-y-auto rounded-xl p-4 pr-12 text-sm leading-relaxed sm:text-base"
+                  placeholder="Share your story, describe the craftsmanship, or explain what makes this piece special. The more details you provide, the better others can appreciate your work."
                   v-model="editForm.postBody"
                 />
-                <div class="flex h-full items-start">
-                  <PencilIcon class="text-acc/80 size-5 animate-pulse"></PencilIcon>
+                <!-- Pencil icon positioned inside -->
+                <div class="pointer-events-none absolute top-4 right-4">
+                  <PencilIcon class="text-acc/60 size-4 animate-pulse sm:size-5"></PencilIcon>
                 </div>
               </div>
+
+              <!-- Reading Mode -->
               <div v-else>
-                <div v-if="post.postBody" class="w-full max-w-full py-8 sm:max-w-none">
-                  <div class="text-fg leading-relaxed break-words whitespace-pre-wrap">
-                    {{ post.postBody }}
+                <div v-if="post.postBody">
+                  <div
+                    class="bg-primary/20 dark:bg-sec/20 border-brdr/20 dark:border-sec-mute/30 rounded-xl border p-4 sm:p-6"
+                  >
+                    <div
+                      class="text-fg space-y-4 text-sm leading-relaxed break-words whitespace-pre-wrap sm:text-base"
+                    >
+                      <!-- create paragraphs by spliting content using double line break-->
+                      <p
+                        v-for="(paragraph, index) in post.postBody
+                          .split('\n\n')
+                          .filter((p) => p.trim())"
+                        :key="index"
+                        class="text-fg leading-relaxed"
+                      >
+                        {{ paragraph.trim() }}
+                      </p>
+                    </div>
                   </div>
                 </div>
-                <!-- Default Empty Post -->
-                <div
-                  v-else
-                  class="dark:border-acc/50 border-acc bg-acc/5 flex flex-col gap-y-18 rounded-2xl border-3 border-dashed py-10 text-center"
-                >
+
+                <!-- Empty State -->
+                <div v-else class="flex items-center justify-center py-16">
                   <div
-                    class="bg-acc/5 mx-auto flex size-72 items-center justify-center rounded-2xl"
+                    class="dark:border-acc/50 border-acc bg-acc/5 flex max-w-md flex-col items-center justify-center rounded-2xl border-2 border-dashed px-6 py-12 text-center sm:px-8 sm:py-16"
                   >
-                    <IconGallery class="text-acc/80 size-64" />
+                    <div
+                      class="bg-acc/10 mb-6 flex size-24 items-center justify-center rounded-2xl sm:mb-8 sm:size-32"
+                    >
+                      <IconGallery class="text-acc/80 size-16 sm:size-20" />
+                    </div>
+                    <p class="text-fg text-lg font-medium tracking-wide sm:text-xl">
+                      No description available
+                    </p>
+                    <p class="text-fg/60 mt-2 text-xs sm:text-sm">
+                      This post hasn't been given a description yet
+                    </p>
                   </div>
-                  <p class="text-fg text-4xl font-medium tracking-wider capitalize">
-                    No description available for this post
-                  </p>
                 </div>
               </div>
             </div>
           </div>
-          <!-- Footer -->
+
+          <!-- Fixed Footer -->
           <div
-            v-if="allImages.length > 0"
-            class="dark:border-sec-mute dark:bg-sec/80 from-acc/10 via-acc/5 bg-primary sticky bottom-0 border-t border-white/10 bg-gradient-to-r to-transparent backdrop-blur-md"
+            class="dark:border-brdr/30 dark:bg-sec/80 border-brdr/20 bg-primary/80 border-t backdrop-blur-md"
           >
-            <div class="text-fg flex items-center justify-between px-6 py-2 text-sm">
-              <span class="flex items-center gap-2">
-                <PhotoIcon class="text-fg size-4"></PhotoIcon>
-                {{ allImages.length }}
-                {{ allImages.length === 1 ? 'image' : 'images' }} total</span
+            <div class="flex items-center justify-between px-4 py-3 sm:px-6">
+              <span
+                v-if="allImages.length > 0"
+                class="text-fg-mute flex items-center gap-2 text-xs font-light sm:text-sm"
               >
-              <span v-if="post.date" class="flex items-center gap-2">
-                <CalendarIcon class="text-fg size-4"> </CalendarIcon> {{ post.date }}</span
+                <PhotoIcon class="size-3 sm:size-4"></PhotoIcon>
+                <span
+                  >{{ allImages.length }} {{ allImages.length === 1 ? 'image' : 'images' }}</span
+                >
+              </span>
+              <span
+                v-if="post.date"
+                class="text-fg-mute flex items-center gap-2 text-xs font-light sm:text-sm"
               >
+                <CalendarIcon class="size-3 sm:size-4"></CalendarIcon>
+                <span>{{ post.date }}</span>
+              </span>
             </div>
           </div>
         </div>
@@ -334,7 +441,49 @@ watch(
   display: none;
 }
 
-/* Backdrop transitions - appears first, no scale */
+.custom-scrollbar {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(59, 130, 246, 0.3) transparent;
+}
+
+.custom-scrollbar::-webkit-scrollbar {
+  width: 6px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-track {
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 3px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb {
+  background: rgba(59, 130, 246, 0.3);
+  border-radius: 3px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb:hover {
+  background: rgba(59, 130, 246, 0.5);
+}
+
+/* Gallery collapse transition */
+.gallery-enter-active,
+.gallery-leave-active {
+  transition: all 0.3s ease;
+  overflow: hidden;
+}
+
+.gallery-enter-from,
+.gallery-leave-to {
+  max-height: 0;
+  opacity: 0;
+}
+
+.gallery-enter-to,
+.gallery-leave-from {
+  max-height: 500px;
+  opacity: 1;
+}
+
+/* Backdrop transitions */
 .backdrop-enter-active {
   transition: opacity 0.2s ease-out;
 }
@@ -348,7 +497,7 @@ watch(
   opacity: 0;
 }
 
-/* Modal transitions - content only */
+/* Modal transitions */
 .modal-enter-active {
   transition: all 0.3s ease-out;
 }
@@ -365,5 +514,15 @@ watch(
 .modal-leave-to {
   opacity: 0;
   transform: scale(0.95);
+}
+
+/* Responsive text sizing */
+@media (max-width: 640px) {
+  .line-clamp-2 {
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
 }
 </style>
