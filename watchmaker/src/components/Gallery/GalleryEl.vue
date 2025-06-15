@@ -54,7 +54,7 @@ onMounted(() => {
   <!-- GALLERY SECTION -->
   <section class="mx-auto max-w-7xl px-2" ref="postsRef">
     <!-- Gallery Header -->
-    <div class="mb-12 py-12 text-center">
+    <div class="py-12 text-center">
       <div class="mb-2 text-center">
         <h2 class="font-sec text-fg dark:text-fg mb-4 text-4xl font-medium lg:text-5xl">
           Workshop Gallery
@@ -183,13 +183,13 @@ onMounted(() => {
           <button
             @click.stop="initEdit(post)"
             type="button"
-            class="rounded-lg bg-white/90 p-2 text-gray-700 shadow-sm backdrop-blur-sm hover:bg-white hover:text-blue-600"
+            class="cursor-pointer rounded-lg bg-white/90 p-2 text-gray-700 shadow-sm backdrop-blur-sm hover:bg-white hover:text-blue-600"
           >
             <PencilSquareIcon class="size-4"></PencilSquareIcon>
           </button>
           <button
             @click.stop="deletePost(post.postId)"
-            class="rounded-lg bg-white/90 p-2 text-gray-700 shadow-sm backdrop-blur-sm hover:bg-white hover:text-red-600"
+            class="cursor-pointer rounded-lg bg-white/90 p-2 text-gray-700 shadow-sm backdrop-blur-sm hover:bg-white hover:text-red-600"
           >
             <TrashIcon class="size-4"></TrashIcon>
           </button>
@@ -201,13 +201,13 @@ onMounted(() => {
         >
           <button
             type="button"
-            class="rounded-lg bg-white/90 p-2 text-gray-700 shadow-sm backdrop-blur-sm hover:bg-white hover:text-blue-600"
+            class="cursor-pointer rounded-lg bg-white/90 p-2 text-gray-700 shadow-sm backdrop-blur-sm hover:bg-white hover:text-blue-600"
           >
             <EyeIcon class="size-4"></EyeIcon>
           </button>
           <button
             @click.stop="handlePostShare(post)"
-            class="rounded-lg bg-white/90 p-2 text-gray-700 shadow-sm backdrop-blur-sm hover:bg-white hover:text-blue-600"
+            class="cursor-pointer rounded-lg bg-white/90 p-2 text-gray-700 shadow-sm backdrop-blur-sm hover:bg-white hover:text-blue-600"
           >
             <ShareIcon class="size-4"></ShareIcon>
           </button>

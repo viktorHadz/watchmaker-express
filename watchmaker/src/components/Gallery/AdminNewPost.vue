@@ -345,7 +345,7 @@ async function handleFileChange(event) {
         </p>
       </div>
       <!-- CREATE NEW POST SECTION -->
-      <div class="mx-auto mb-16 max-w-6xl">
+      <div class="mx-auto max-w-6xl">
         <div
           class="bg-primary/90 dark:border-sec-mute/50 dark:bg-sec/90 overflow-hidden rounded-2xl border border-white/20 shadow-2xl backdrop-blur-sm"
         >

@@ -34,6 +34,7 @@ const emit = defineEmits(['close', 'share'])
 const { isAuthenticated } = useAuth()
 const postsStore = usePostsStore()
 const { isEditing, editForm } = storeToRefs(postsStore)
+const { saveEdit } = postsStore
 
 const currentImageIndex = ref(0)
 const showImageGallery = ref(true)
@@ -145,12 +146,13 @@ watch(
             class="dark:border-brdr/30 dark:bg-sec/80 from-acc/5 via-primary/90 to-primary/90 border-brdr/20 sticky top-0 z-10 border-b bg-gradient-to-r backdrop-blur-md"
           >
             <div class="px-4 py-4 sm:px-6">
-              <div class="items-center sm:flex">
+              <div class="items-center gap-4 space-y-2 sm:flex">
                 <!-- Title Section -->
                 <div class="min-w-0 flex-1">
                   <div v-if="isAuthenticated && isEditing">
                     <input
                       type="text"
+                      id="editing-post-id"
                       class="input font-sec text-fg dark:text-fg2 focus:ring-acc/30 border-brdr/30 w-full rounded-lg text-lg font-light tracking-wide focus:ring-2 sm:text-xl"
                       placeholder="Post Title"
                       v-model="editForm.postTitle"
@@ -166,7 +168,7 @@ watch(
                 </div>
 
                 <!-- Action Buttons -->
-                <div class="flex items-center gap-2">
+                <div class="flex items-center justify-end gap-2">
                   <!-- Toggle Gallery Button -->
                   <button
                     v-if="allImages.length > 0"
@@ -205,7 +207,7 @@ watch(
                   <button
                     v-if="isAuthenticated && isEditing"
                     class="group relative size-9 sm:size-10"
-                    @click="saveEdit"
+                    @click="saveEdit(post.postId)"
                   >
                     <div
                       class="absolute inset-0 rounded-xl bg-gradient-to-br from-green-500/20 to-green-500/10 transition-all duration-300 group-hover:from-green-500/30 group-hover:to-green-500/20"
@@ -347,7 +349,7 @@ watch(
               <div v-if="isAuthenticated && isEditing" class="relative">
                 <textarea
                   name="message"
-                  id="message"
+                  id="editing-message"
                   class="text-fg placeholder-fg/50 focus:ring-acc/50 focus:border-acc input custom-scrollbar min-h-96 w-full resize-none overflow-y-auto rounded-xl p-4 pr-12 text-sm leading-relaxed sm:text-base"
                   placeholder="Share your story, describe the craftsmanship, or explain what makes this piece special. The more details you provide, the better others can appreciate your work."
                   v-model="editForm.postBody"
@@ -362,21 +364,13 @@ watch(
               <div v-else>
                 <div v-if="post.postBody">
                   <div
-                    class="bg-primary/20 dark:bg-sec/20 border-brdr/20 dark:border-sec-mute/30 rounded-xl border p-4 sm:p-6"
+                    class="bg-primary/20 dark:bg-sec border-brdr/20 dark:border-sec-mute/30 border p-4 sm:rounded-xl sm:p-4"
                   >
-                    <div
-                      class="text-fg space-y-4 text-sm leading-relaxed break-words whitespace-pre-wrap sm:text-base"
-                    >
-                      <!-- create paragraphs by spliting content using double line break-->
-                      <p
-                        v-for="(paragraph, index) in post.postBody
-                          .split('\n\n')
-                          .filter((p) => p.trim())"
-                        :key="index"
-                        class="text-fg leading-relaxed"
-                      >
-                        {{ paragraph.trim() }}
-                      </p>
+                    <div class="text-fg space-y-4 text-sm leading-relaxed break-words sm:text-base">
+                      <!-- Remove the paragraph splitting and just display the whole content -->
+                      <div class="text-fg leading-relaxed whitespace-pre-line">
+                        {{ post.postBody }}
+                      </div>
                     </div>
                   </div>
                 </div>
@@ -514,15 +508,5 @@ watch(
 .modal-leave-to {
   opacity: 0;
   transform: scale(0.95);
-}
-
-/* Responsive text sizing */
-@media (max-width: 640px) {
-  .line-clamp-2 {
-    display: -webkit-box;
-    -webkit-line-clamp: 2;
-    -webkit-box-orient: vertical;
-    overflow: hidden;
-  }
 }
 </style>

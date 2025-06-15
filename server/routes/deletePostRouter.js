@@ -8,6 +8,7 @@ router.delete('/delete/:postid', verifyUserIdentity, (req, res) => {
   try {
     const postId = req.params.postid
     if (!postId) throw new Error('Bad post id')
+    if (isNaN(postId)) throw new Error('Bad post id: not a number')
     console.log('Deleting post with id: ', postId)
 
     const stmtDeletePost = db.prepare(`DELETE FROM posts WHERE id = ?`)
@@ -22,7 +23,7 @@ router.delete('/delete/:postid', verifyUserIdentity, (req, res) => {
       deletedId: postId,
     })
   } catch (error) {
-    console.error('Caught: ', error)
+    console.error('Error: ', error)
     res.status(500).json({
       success: false,
       message: 'Failed to delete post',

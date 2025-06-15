@@ -108,7 +108,7 @@ watch(
   },
 )
 
-const onSubmit = () => {
+const onSubmit = async () => {
   // Mark all fields as touched on submit
   Object.keys(fieldStates).forEach((field) => {
     fieldStates[field].touched = true
@@ -130,9 +130,47 @@ const onSubmit = () => {
   }
 
   console.log('Form submitted:', result.data)
-  postData(result.data)
-  clearForm()
-  toast.showToast('Your message was sent successfully!', 'success')
+
+  // Wait for the server response
+  const success = await postData(result.data)
+
+  // Only clear form and show success if server responded successfully
+  if (success) {
+    clearForm()
+    toast.showToast('Your message was sent successfully!', 'success')
+  }
+}
+
+// Update postData to return success/failure
+const postData = async (formData) => {
+  try {
+    const res = await fetch('/api/form/data', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(formData),
+    })
+
+    if (res.status === 429) {
+      const retryAfter = res.headers.get('Retry-After')
+      const remaining = Math.round(retryAfter / 60)
+      console.log('Rate limited. Retry-After:', retryAfter)
+      toast.showToast(`Too many submissions! Try again in ${remaining} minutes.`, 'error')
+      return false
+    }
+
+    const result = await res.json()
+
+    if (!res.ok) {
+      toast.showToast(result.message || 'Submission failed', 'error')
+      return false
+    }
+
+    return true
+  } catch (error) {
+    console.error('Submission error:', error)
+    toast.showToast('Submission failed. Please try again later.', 'error')
+    return false
+  }
 }
 
 const clearForm = () => {
@@ -150,23 +188,6 @@ const clearForm = () => {
   Object.keys(displayErrors).forEach((key) => {
     displayErrors[key] = ''
   })
-}
-
-const postData = async (formData) => {
-  try {
-    const res = await fetch('/api/form/data', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(formData),
-    })
-    const result = await res.json()
-    console.log('Server response:', result)
-  } catch (error) {
-    console.error('Submission error:', error)
-    toast.showToast('Submission failed. Try again later.', 'error')
-  }
 }
 
 const selectedFiles = ref([])

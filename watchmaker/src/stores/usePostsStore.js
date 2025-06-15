@@ -15,6 +15,11 @@ export const usePostsStore = defineStore('posts', () => {
     totalPosts: 0,
   })
 
+  const toast = (message, type) => {
+    const useToast = useToastStore()
+    useToast.showToast(message, type)
+  }
+
   const loading = ref(false)
   const isUploading = ref(false)
   const currentPage = ref(1)
@@ -54,8 +59,8 @@ export const usePostsStore = defineStore('posts', () => {
       return data
     } catch (error) {
       console.error('Error fetching posts:', error)
-      const toast = useToastStore()
-      toast.showToast('Failed to load posts', 'error')
+
+      toast('Failed to load posts', 'error')
       throw error
     } finally {
       loading.value = false
@@ -64,7 +69,6 @@ export const usePostsStore = defineStore('posts', () => {
 
   async function createPost(formData) {
     const { getAuthToken } = useAuth()
-    const toast = useToastStore()
 
     try {
       isUploading.value = true
@@ -86,12 +90,12 @@ export const usePostsStore = defineStore('posts', () => {
 
       // Refresh posts if successful creation
       await fetchPosts(currentPage.value)
-      toast.showToast('Post created successfully!', 'success')
+      toast('Post created successfully!', 'success')
 
       return { success: true, data: result }
     } catch (error) {
       console.error('Error creating post:', error)
-      toast.showToast(error.message || 'Failed to create post', 'error')
+      toast(error.message || 'Failed to create post', 'error')
       return { success: false, error }
     } finally {
       isUploading.value = false
@@ -100,7 +104,6 @@ export const usePostsStore = defineStore('posts', () => {
 
   async function deletePost(postId) {
     const { getAuthToken } = useAuth()
-    const toast = useToastStore()
 
     try {
       const token = getAuthToken()
@@ -126,11 +129,11 @@ export const usePostsStore = defineStore('posts', () => {
       // Refresh posts
       await fetchPosts(currentPage.value)
 
-      toast.showToast('Post deleted successfully', 'success')
+      toast('Post deleted successfully', 'success')
       return true
     } catch (error) {
       console.error('Error deleting post:', error)
-      toast.showToast(error.message || 'Failed to delete post', 'error')
+      toast(error.message || 'Failed to delete post', 'error')
       return false
     }
   }
@@ -173,7 +176,7 @@ export const usePostsStore = defineStore('posts', () => {
   const editForm = ref({
     postTitle: '',
     postBody: '',
-    // other editable fields in future
+    // Other editable fields in future
   })
   function initEdit(post) {
     editing.value = true
@@ -186,12 +189,43 @@ export const usePostsStore = defineStore('posts', () => {
     showPostModal.value = true
   }
 
-  function saveEdit() {
-    // Then API call
-    // Then Apply changes back to original if successfull
-    selectedPost.value.postTitle = editForm.value.postTitle
-    selectedPost.value.postBody = editForm.value.postBody
-    editing.value = false
+  async function saveEdit(postId) {
+    const { getAuthToken } = useAuth()
+
+    try {
+      const token = getAuthToken()
+
+      console.log('Edit form title: ', editForm.value.postTitle)
+      console.log('Edit form body: ', editForm.value.postBody)
+
+      // Then API call
+      const response = await fetch(`/api/posts/edit/${postId}`, {
+        method: 'PATCH',
+        headers: {
+          Authorization: `Bearer ${token}`,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          postTitle: editForm.value.postTitle,
+          postBody: editForm.value.postBody,
+        }),
+      })
+
+      const result = await response.json()
+
+      if (!response.ok) {
+        throw new Error(result.error || `Error in response: ${response.status}`)
+      }
+      console.log('Resultata: ', result)
+      // If success update UI
+      selectedPost.value.postTitle = editForm.value.postTitle
+      selectedPost.value.postBody = editForm.value.postBody
+      editing.value = false
+      toast(result.message)
+    } catch (error) {
+      toast(error.message, 'error')
+      console.error(error)
+    }
   }
 
   function cancelEdit() {
@@ -226,5 +260,6 @@ export const usePostsStore = defineStore('posts', () => {
     handlePostShare,
     initialize,
     cancelEdit,
+    saveEdit,
   }
 })

@@ -24,7 +24,7 @@ export const zodFormSchema = z.object({
     .string()
     .trim()
     .min(10, { message: 'Message must be at least 10 characters' })
-    .max(1000, { message: 'Message is too long' })
+    .max(10000, { message: 'Message is too long' })
     .nonempty({ message: 'Message field cannot be empty' }),
   phone: z
     .string()
