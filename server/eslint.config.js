@@ -1,22 +1,17 @@
-import { defineConfig, globalIgnores } from 'eslint/config'
-import globals from 'globals'
+import { defineConfig } from 'eslint/config'
 import js from '@eslint/js'
+import globals from 'globals'
 
 export default defineConfig([
+  js.configs.recommended,
   {
-    name: 'app/files-to-lint',
-    files: ['**/*.{js,mjs,jsx}'],
-  },
-
-  globalIgnores(['**/dist/**', '**/dist-ssr/**', '**/coverage/**']),
-
-  {
+    files: ['**/*.js'],
     languageOptions: {
+      ecmaVersion: 'latest',
+      sourceType: 'module',
       globals: {
-        ...globals.browser,
+        ...globals.node,
       },
     },
   },
-
-  js.configs.recommended,
 ])

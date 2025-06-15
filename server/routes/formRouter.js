@@ -1,15 +1,34 @@
 import express from 'express'
 import { limiter } from '../middleware/rateLimiter.js'
 import { validateAndSanitize, formSchema } from '../middleware/validationMiddleware.js'
+import { Resend } from 'resend'
 
 const router = express.Router()
+const resend = new Resend(process.env.RESEND_KEY_TOKEN)
 
 // POST form submission with rate limiting
-router.post('/data', limiter, validateAndSanitize(formSchema), (req, res) => {
+router.post('/data', limiter, validateAndSanitize(formSchema), async (req, res) => {
   try {
     console.log('Sanitized and validated form data:', req.body)
 
     // TODO: Send email with req.body data
+    console.log('Emailing...')
+    const { data, error } = await resend.emails.send({
+      from: 'Acme <onboarding@resend.dev>',
+      to: ['watchmaker.ves@gmail.com'],
+      subject: 'hello world',
+      html: `
+      <strong>it works!</strong>
+      </br>
+      ${JSON.stringify(req.body)}
+      `,
+    })
+
+    if (error) {
+      res.status(400).json({ error })
+      console.log(error)
+      throw new Error('Error emailing: ', error)
+    }
 
     res.status(200).json({
       message: 'Form received',

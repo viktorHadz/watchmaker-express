@@ -12,7 +12,7 @@ import { storeToRefs } from 'pinia'
 import { useImageCompression } from '@/composables/useImageCompression'
 
 const MAX_EXTRA_IMAGES = 5
-const MAX_FILE_SIZE = 20 * 1024 * 1024 // 20MB
+const MAX_FILE_SIZE = 25 * 1024 * 1024 // 20MB
 const ALLOWED_TYPES = ['image/jpeg', 'image/png', 'image/webp']
 
 const postsStore = usePostsStore()
