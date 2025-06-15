@@ -9,11 +9,18 @@ import { usePostType } from '@/composables/utils'
 import { CloudArrowUpIcon, PaperAirplaneIcon, PlusIcon, TrashIcon } from '@heroicons/vue/24/outline'
 import { usePostsStore } from '@/stores/usePostsStore.js'
 import { storeToRefs } from 'pinia'
+import { useImageCompression } from '@/composables/useImageCompression'
+
+const MAX_EXTRA_IMAGES = 5
+const MAX_FILE_SIZE = 20 * 1024 * 1024 // 20MB
+const ALLOWED_TYPES = ['image/jpeg', 'image/png', 'image/webp']
+
 const postsStore = usePostsStore()
 const { isUploading } = storeToRefs(postsStore)
-const toast = useToastStore()
+const toastStore = useToastStore()
+const toast = (msg, type = 'info') => toastStore.showToast(msg, type)
 
-// Empty object to use when creating new post (for preview only now)
+// State
 const newPost = ref({
   title: '',
   bodyText: '',
@@ -22,315 +29,201 @@ const newPost = ref({
   thumbnails: [],
 })
 
-// Store files separately for FormData
 const titleFile = ref(null)
 const extraFiles = ref([])
 const thumbnailFiles = ref([])
 
-// Computes the post type(see return sig)
 const postType = usePostType(newPost)
-
-// Refs for file inputs
 const titleFileInputRef = ref(null)
 const extraFileInputRef = ref(null)
 
-// Image compression function with better quality
-function compressImage(file, maxWidth = 1200, quality = 0.7) {
-  return new Promise((resolve) => {
-    const canvas = document.createElement('canvas')
-    const ctx = canvas.getContext('2d')
-    const img = new Image()
+const { compressImage } = useImageCompression()
+const generateThumbnail = (file) => compressImage(file, 150, 0.5)
 
-    img.onload = () => {
-      // Calculate new dimensions
-      let { width, height } = img
-      if (width > maxWidth) {
-        height = (height * maxWidth) / width
-        width = maxWidth
-      }
-
-      // Set canvas size and draw compressed image
-      canvas.width = width
-      canvas.height = height
-      ctx.drawImage(img, 0, 0, width, height)
-
-      // Determine output format based on original file type
-      let outputType = 'image/jpeg'
-      if (file.type === 'image/png') outputType = 'image/png'
-      if (file.type === 'image/webp') outputType = 'image/webp'
-
-      // Convert back to blob with original filename info
-      canvas.toBlob(
-        (blob) => {
-          // Add filename property to blob for better handling
-          blob.name = file.name
-          blob.lastModified = file.lastModified
-          resolve(blob)
-        },
-        outputType,
-        quality,
-      )
-    }
-
-    img.src = URL.createObjectURL(file)
+// Helpers with error handling
+const createPreview = (file) =>
+  new Promise((resolve, reject) => {
+    const reader = new FileReader()
+    reader.onload = (e) => resolve(e.target.result)
+    reader.onerror = reject
+    reader.readAsDataURL(file)
   })
+
+const validateImageFile = (file) => {
+  if (!file?.type?.startsWith('image/')) return false
+  if (!ALLOWED_TYPES.includes(file.type)) {
+    toast('Only JPEG, PNG, and WebP images are allowed', 'warning')
+    return false
+  }
+  if (file.size > MAX_FILE_SIZE) {
+    toast(`File size must be less than ${MAX_FILE_SIZE / 1024 / 1024}MB`, 'error')
+    return false
+  }
+  return true
 }
 
-// Generate thumbnail with lower quality and smaller size
-function generateThumbnail(file) {
-  return compressImage(file, 150, 0.5)
+const canAddExtraImages = (count = 1) => {
+  if (extraFiles.value.length + count > MAX_EXTRA_IMAGES) {
+    toast(`Maximum ${MAX_EXTRA_IMAGES} extra images allowed`, 'warning')
+    return false
+  }
+  return true
 }
 
-// Validation function
-function validatePost() {
+// Image processing
+async function processImage(file, isExtra = false) {
+  if (!validateImageFile(file)) return false
+  if (isExtra && !canAddExtraImages()) return false
+
+  try {
+    const compressed = await compressImage(file)
+
+    if (isExtra) {
+      const thumbnail = await generateThumbnail(file)
+      const [preview, thumbPreview] = await Promise.all([
+        createPreview(compressed),
+        createPreview(thumbnail),
+      ])
+
+      extraFiles.value.push(compressed)
+      thumbnailFiles.value.push(thumbnail)
+      newPost.value.extraImages.push(preview)
+      newPost.value.thumbnails.push(thumbPreview)
+    } else {
+      titleFile.value = compressed
+      newPost.value.titleImage = [await createPreview(compressed)]
+    }
+    return true
+  } catch (error) {
+    console.error('Error processing image:', error)
+    toast('Failed to process image. Please try again.', 'error')
+    return false
+  }
+}
+
+// Batch processing for multiple files
+async function processFiles(files, isExtra = false) {
+  const toProcess = isExtra
+    ? files.slice(0, MAX_EXTRA_IMAGES - extraFiles.value.length)
+    : [files[0]]
+  let processed = 0
+
+  for (const file of toProcess) {
+    if (await processImage(file, isExtra)) processed++
+  }
+
+  return processed
+}
+
+// Drop zones with unified handler
+const createDropHandler = (isExtra = false) => ({
+  async onDrop(files) {
+    try {
+      await processFiles(Array.from(files), isExtra)
+    } catch (error) {
+      console.error('Error processing dropped files:', error)
+      toast('Error processing images. Please try again.', 'error')
+    }
+  },
+  dataTypes: ALLOWED_TYPES,
+  multiple: isExtra,
+})
+
+const titleDropZoneRef = ref(null)
+const extraImageDropZoneRef = ref(null)
+const { isOverDropZone } = useDropZone(titleDropZoneRef, createDropHandler(false))
+const { isOverDropZone: isOverExtraDropZone } = useDropZone(
+  extraImageDropZoneRef,
+  createDropHandler(true),
+)
+
+// File inputs
+const handleFileInput = async (event, isExtra = false) => {
+  const files = Array.from(event.target.files || [])
+  if (files.length) {
+    await processFiles(files, isExtra)
+    event.target.value = ''
+  }
+}
+
+const triggerTitleUpload = () => titleFileInputRef.value?.click()
+const triggerExtraUpload = () => canAddExtraImages() && extraFileInputRef.value?.click()
+
+// Validation
+const validatePost = () => {
   const errors = []
-  if (!newPost.value.title.trim()) {
-    errors.push('Title is required')
-  }
-  if (!titleFile.value && extraFiles.value.length === 0) {
-    errors.push('At least one image is required')
-  }
-  if (extraFiles.value.length > 5) {
-    errors.push('Maximum 5 extra images allowed')
-  }
-  // Validate thumbnails match extra images
-  if (extraFiles.value.length !== thumbnailFiles.value.length) {
+  if (!newPost.value.title.trim()) errors.push('Title is required')
+  if (!titleFile.value && !extraFiles.value.length) errors.push('At least one image is required')
+  if (extraFiles.value.length !== thumbnailFiles.value.length)
     errors.push('Thumbnail generation error')
-  }
-
   return errors
 }
-// Create a new post
-async function saveNewPost(e) {
-  e.preventDefault()
 
-  // Validate post
+// Save
+async function saveNewPost(e) {
+  e?.preventDefault()
+
   const errors = validatePost()
-  if (errors.length > 0) {
-    toast.showToast(errors[0], 'warning')
-    console.warn('Validation errors:', errors)
+  if (errors.length) {
+    toast(errors[0], 'warning')
     return
   }
+
   try {
-    const formatedCurrentDate = useDateFormat(useNow(), 'DD-MM-YYYY')
-    const date = formatedCurrentDate.value
-
-    // Create FormData
     const formData = new FormData()
-    formData.append('title', newPost.value.title)
-    formData.append('bodyText', newPost.value.bodyText)
-    formData.append('date', date)
-    formData.append('type', postType.value)
+    const date = useDateFormat(useNow(), 'DD-MM-YYYY').value
 
-    // Add files
-    if (titleFile.value) {
-      formData.append('titleImage', titleFile.value)
-    }
+    Object.entries({
+      title: newPost.value.title.trim(),
+      bodyText: newPost.value.bodyText.trim(),
+      date,
+      type: postType.value,
+    }).forEach(([k, v]) => formData.append(k, v))
 
-    // Add extra images and their thumbnails
-    extraFiles.value.forEach((file) => {
-      formData.append('extraImages', file)
-    })
+    if (titleFile.value) formData.append('titleImage', titleFile.value)
+    extraFiles.value.forEach((f) => formData.append('extraImages', f))
+    thumbnailFiles.value.forEach((f) => formData.append('thumbnails', f))
 
-    thumbnailFiles.value.forEach((file) => {
-      formData.append('thumbnails', file)
-    })
-
-    // From store
     const result = await postsStore.createPost(formData)
-
-    if (result.success) {
+    if (result?.success) {
       resetForm()
-      // The store already handles the toast and refreshing posts
+      toast('Post created successfully!', 'success')
     }
   } catch (error) {
     console.error('Error saving post:', error)
-    // The store already handles error toasts
+    toast('Failed to save post. Please try again.', 'error')
   }
 }
 
-// Reset form function
-function resetForm() {
-  newPost.value = {
+// Reset & Remove
+const resetForm = () => {
+  Object.assign(newPost.value, {
     title: '',
     bodyText: '',
     titleImage: [],
     extraImages: [],
     thumbnails: [],
-  }
+  })
   titleFile.value = null
   extraFiles.value = []
   thumbnailFiles.value = []
-
-  // Reset file inputs
-  if (titleFileInputRef.value) titleFileInputRef.value.value = null
-  if (extraFileInputRef.value) extraFileInputRef.value.value = null
+  titleFileInputRef.value && (titleFileInputRef.value.value = '')
+  extraFileInputRef.value && (extraFileInputRef.value.value = '')
 }
-// Remove image functions
-function removeTitleImage() {
+
+const removeTitleImage = () => {
   newPost.value.titleImage = []
   titleFile.value = null
+  titleFileInputRef.value && (titleFileInputRef.value.value = '')
 }
 
-function removeExtraImage(index) {
-  // Remove from all arrays at the same index
+const removeExtraImage = (index) => {
+  if (index < 0 || index >= extraFiles.value.length) return
+
   newPost.value.extraImages.splice(index, 1)
   newPost.value.thumbnails.splice(index, 1)
   extraFiles.value.splice(index, 1)
   thumbnailFiles.value.splice(index, 1)
-}
-const titleDropZoneRef = ref(null)
-const extraImageDropZoneRef = ref(null)
-
-// Title Image Drop
-const { isOverDropZone } = useDropZone(titleDropZoneRef, {
-  async onDrop(event) {
-    const file = Array.from(event)[0]
-    if (!file || !file.type.startsWith('image/')) return
-
-    // Check file type
-    const allowedTypes = ['image/jpeg', 'image/png', 'image/webp']
-    if (!allowedTypes.includes(file.type)) {
-      toast.showToast('Only JPEG, PNG, and WebP images are allowed', 'warning')
-      return
-    }
-
-    // Compress the file
-    const compressedFile = await compressImage(file)
-    titleFile.value = compressedFile
-
-    // Create preview
-    const reader = new FileReader()
-    reader.onload = (e) => {
-      newPost.value.titleImage = [e.target.result]
-    }
-    reader.readAsDataURL(compressedFile)
-  },
-  dataTypes: ['image/jpeg', 'image/png', 'image/webp'],
-  multiple: false,
-})
-// Extra Images Drop
-const { isOverDropZone: isOverExtraDropZone } = useDropZone(extraImageDropZoneRef, {
-  async onDrop(event) {
-    const files = Array.from(event)
-
-    // Check total count
-    if (extraFiles.value.length + files.length > 5) {
-      toast.showToast('Maximum 5 extra images allowed', 'warning')
-      return
-    }
-
-    for (const file of files) {
-      if (!file || !file.type.startsWith('image/')) continue
-
-      // Check file type
-      const allowedTypes = ['image/jpeg', 'image/png', 'image/webp']
-      if (!allowedTypes.includes(file.type)) {
-        toast.showToast('Only JPEG, PNG, and WebP images are allowed', 'warning')
-        continue
-      }
-
-      // Compress main image and generate thumbnail
-      const compressedFile = await compressImage(file)
-      const thumbnailFile = await generateThumbnail(file)
-
-      extraFiles.value.push(compressedFile)
-      thumbnailFiles.value.push(thumbnailFile)
-
-      // Create preview for extra image
-      const reader = new FileReader()
-      reader.onload = (e) => {
-        newPost.value.extraImages.push(e.target.result)
-      }
-      reader.readAsDataURL(compressedFile)
-
-      // Create preview for thumbnail
-      const thumbReader = new FileReader()
-      thumbReader.onload = (e) => {
-        newPost.value.thumbnails.push(e.target.result)
-      }
-      thumbReader.readAsDataURL(thumbnailFile)
-    }
-  },
-  dataTypes: ['image/jpeg', 'image/png', 'image/webp'],
-  multiple: true,
-})
-// File Upload Functions using refs
-function triggerTitleUpload() {
-  titleFileInputRef.value?.click()
-}
-function triggerExtraUpload() {
-  if (extraFiles.value.length >= 5) {
-    toast.showToast('Maximum 5 extra images allowed', 'warning')
-    return
-  }
-  extraFileInputRef.value?.click()
-}
-// File Upload Fallbacks
-async function insertNewTitleImage(event) {
-  const file = event.target.files?.[0]
-  if (!file) return
-
-  // Check file type
-  const allowedTypes = ['image/jpeg', 'image/png', 'image/webp']
-  if (!allowedTypes.includes(file.type)) {
-    toast.showToast('Only JPEG, PNG, and WebP images are allowed', 'warning')
-    return
-  }
-
-  // Compress the file
-  const compressedFile = await compressImage(file)
-  titleFile.value = compressedFile
-
-  // Create preview
-  const reader = new FileReader()
-  reader.onload = (e) => {
-    newPost.value.titleImage = [e.target.result]
-  }
-  reader.readAsDataURL(compressedFile)
-}
-
-async function handleFileChange(event) {
-  const files = Array.from(event.target.files || [])
-
-  // Check total count
-  if (extraFiles.value.length + files.length > 5) {
-    toast.showToast('Maximum 5 extra images allowed', 'warning')
-    return
-  }
-
-  for (const file of files) {
-    // Check file type
-    const allowedTypes = ['image/jpeg', 'image/png', 'image/webp']
-    if (!allowedTypes.includes(file.type)) {
-      toast.showToast('Only JPEG, PNG, and WebP images are allowed', 'warning')
-      continue
-    }
-
-    // Compress main image and generate thumbnail
-    const compressedFile = await compressImage(file)
-    const thumbnailFile = await generateThumbnail(file)
-
-    extraFiles.value.push(compressedFile)
-    thumbnailFiles.value.push(thumbnailFile)
-
-    // Create preview for extra image
-    const reader = new FileReader()
-    reader.onload = (e) => {
-      newPost.value.extraImages.push(e.target.result)
-    }
-    reader.readAsDataURL(compressedFile)
-
-    // Create preview for thumbnail (optional - remove if not needed)
-    const thumbReader = new FileReader()
-    thumbReader.onload = (e) => {
-      newPost.value.thumbnails.push(e.target.result)
-    }
-    thumbReader.readAsDataURL(thumbnailFile)
-  }
-
-  // Clear input for next selection
-  event.target.value = ''
 }
 </script>
 
@@ -351,15 +244,17 @@ async function handleFileChange(event) {
         >
           <!-- Form Header -->
           <div
-            class="from-acc/10 via-acc/5 border-brdr/10 border-b bg-gradient-to-r to-transparent p-8"
+            class="from-acc/10 via-acc/5 border-brdr/10 border-b bg-gradient-to-r to-transparent p-4 sm:p-8"
           >
             <div class="flex items-center space-x-4">
-              <div class="bg-acc/20 flex h-12 w-12 items-center justify-center rounded-xl">
+              <div
+                class="bg-acc/20 flex size-10 items-center justify-center rounded-lg sm:size-12 sm:rounded-xl"
+              >
                 <PlusIcon class="text-acc size-6"></PlusIcon>
               </div>
               <div>
-                <h2 class="font-sec text-fg text-2xl font-semibold">Create New Post</h2>
-                <p class="text-acc text-lg font-light">Share your latest work</p>
+                <h2 class="font-sec text-fg text-xl font-semibold sm:text-2xl">Create New Post</h2>
+                <p class="text-acc text-md font-light sm:text-lg">Share your latest work</p>
               </div>
             </div>
           </div>
@@ -394,7 +289,7 @@ async function handleFileChange(event) {
                     <div class="space-y-2">
                       <p class="text-fg font-medium">Drop your featured image here</p>
                       <p class="text-fg/60 text-sm">or click to browse files</p>
-                      <p class="text-fg/40 text-xs">JPEG, PNG, WebP up to 10MB</p>
+                      <p class="text-fg/40 text-xs">JPEG, PNG, WebP up to 20MB</p>
                     </div>
                   </div>
 
@@ -415,7 +310,7 @@ async function handleFileChange(event) {
                       class="h-64 w-full object-cover"
                     />
                     <div
-                      class="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent opacity-0 transition-opacity group-hover:opacity-100"
+                      class="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent opacity-0 transition-opacity group-hover:opacity-100 md:opacity-0 md:group-hover:opacity-100"
                     >
                       <div
                         class="absolute right-4 bottom-4 left-4 flex items-center justify-between"
@@ -432,6 +327,14 @@ async function handleFileChange(event) {
                         </button>
                       </div>
                     </div>
+                    <!-- Mobile remove button - always visible -->
+                    <button
+                      type="button"
+                      @click="removeTitleImage"
+                      class="absolute top-2 right-2 flex h-8 w-8 items-center justify-center rounded-full bg-red-500 text-white shadow-lg md:hidden"
+                    >
+                      <TrashIcon class="size-4"></TrashIcon>
+                    </button>
                   </div>
                 </div>
 
@@ -441,7 +344,7 @@ async function handleFileChange(event) {
                   name="title_image_file"
                   accept="image/jpeg,image/png,image/webp"
                   class="hidden"
-                  @change="insertNewTitleImage"
+                  @change="handleFileInput($event, false)"
                 />
               </div>
 
@@ -492,21 +395,30 @@ async function handleFileChange(event) {
                         <div class="relative aspect-square overflow-hidden rounded-lg">
                           <img :src="img" class="h-full w-full object-cover" />
                           <div
-                            class="absolute inset-0 flex items-center justify-center bg-black/0 transition-colors group-hover:bg-black/30"
+                            class="absolute inset-0 flex items-center justify-center bg-black/0 transition-colors group-hover:bg-black/30 md:bg-black/0 md:group-hover:bg-black/30"
                           >
                             <button
                               type="button"
                               @click.stop="removeExtraImage(index)"
-                              class="h-8 w-8 rounded-full bg-red-500 text-white opacity-0 transition-opacity group-hover:opacity-100 hover:bg-red-600"
+                              class="h-8 w-8 rounded-full bg-red-500 text-white opacity-100 transition-opacity hover:bg-red-600 md:opacity-0 md:group-hover:opacity-100"
                             >
                               <TrashIcon class="mx-auto size-4"></TrashIcon>
                             </button>
                           </div>
+                          <!-- Mobile remove button - always visible -->
+                          <button
+                            type="button"
+                            @click.stop="removeExtraImage(index)"
+                            class="absolute top-1 right-1 flex h-6 w-6 items-center justify-center rounded-full bg-red-500 text-white shadow-md md:hidden"
+                          >
+                            <TrashIcon class="size-3"></TrashIcon>
+                          </button>
                         </div>
                       </div>
 
                       <!-- Add More Button -->
                       <div
+                        v-if="extraFiles.length < MAX_EXTRA_IMAGES"
                         class="border-acc/30 hover:bg-acc/5 flex aspect-square items-center justify-center rounded-lg border-2 border-dashed transition-colors"
                       >
                         <PlusIcon class="text-acc/60 size-8"></PlusIcon>
@@ -522,7 +434,7 @@ async function handleFileChange(event) {
                   accept="image/jpeg,image/png,image/webp"
                   multiple
                   class="hidden"
-                  @change="handleFileChange"
+                  @change="handleFileInput($event, true)"
                 />
               </div>
             </div>
@@ -559,7 +471,7 @@ async function handleFileChange(event) {
                   rows="4"
                   id="new-post-body"
                   class="text-fg placeholder-fg/50 focus:ring-acc/50 focus:border-acc input w-full resize-none rounded-xl"
-                  placeholder="Describe the work done, techniques used, or story behind this piece..."
+                  placeholder="Describe the work done, techniques used, or story behind this watch piece..."
                 ></textarea>
               </div>
             </div>

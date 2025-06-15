@@ -1,11 +1,5 @@
 <script setup>
-import {
-  EyeIcon,
-  ShareIcon,
-  TrashIcon,
-  PencilSquareIcon,
-  CalendarIcon,
-} from '@heroicons/vue/24/outline'
+import { ShareIcon, TrashIcon, PencilSquareIcon, CalendarIcon } from '@heroicons/vue/24/outline'
 import { onMounted, useTemplateRef } from 'vue'
 import PostModal from './FullPost.vue'
 import IconGallery from '../icons/IconGallery.vue'
@@ -93,7 +87,10 @@ onMounted(() => {
     </div>
 
     <!-- Gallery Grid -->
-    <div v-else class="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+    <div
+      v-else
+      class="grid grid-cols-1 gap-6 px-6 sm:grid-cols-2 sm:gap-8 md:gap-10 lg:grid-cols-3 xl:grid-cols-4"
+    >
       <article
         v-for="(post, i) in allPosts.posts"
         :key="post.postId || i"
@@ -123,14 +120,14 @@ onMounted(() => {
         </div>
 
         <!-- Content -->
-        <div class="p-6">
-          <div v-if="post.extraImages?.length > 0" class="space-y-3">
+        <div class="p-3 sm:p-6">
+          <div v-if="post.extraImages?.length > 0" class="space-y-1 sm:space-y-3">
             <h3
               class="font-sec text-fg group-hover:text-acc line-clamp-2 text-lg font-semibold transition-colors"
             >
               {{ post.postTitle }}
             </h3>
-            <p class="text-fg/70 line-clamp-3 text-sm leading-relaxed">
+            <p class="text-fg/70 line-clamp-1 text-sm leading-relaxed sm:line-clamp-2">
               {{ post.postBody }}
             </p>
           </div>
@@ -150,7 +147,7 @@ onMounted(() => {
           <!-- Additional Images Indicator -->
           <div
             v-if="post.thumbImages && post.thumbImages.length > 0"
-            class="border-brdr dark:border-sec-mute mt-4 border-t pt-3"
+            class="border-brdr dark:border-sec-mute mt-3 border-t pt-2 sm:mt-4 sm:pt-3"
           >
             <div class="flex items-center justify-between">
               <span class="text-fg/60 text-sm">Additional photos</span>
@@ -158,7 +155,7 @@ onMounted(() => {
                 <div
                   v-for="(img, idx) in post.thumbImages.slice(0, 3)"
                   :key="idx"
-                  class="border-brdr dark:border-sec h-6 w-6 overflow-hidden rounded-full border-2"
+                  class="border-brdr dark:border-sec size-7 overflow-hidden rounded-full border-2 sm:size-6"
                 >
                   <img :src="`/public${img.path}`" class="h-full w-full object-cover" />
                 </div>
@@ -197,19 +194,13 @@ onMounted(() => {
 
         <div
           v-else
-          class="absolute top-3 left-3 flex space-x-2 opacity-100 transition-opacity duration-200 md:opacity-0 md:group-hover:opacity-100"
+          class="absolute bottom-2.5 left-[60%] flex space-x-2 opacity-100 transition-opacity duration-200 sm:top-3 sm:left-3 md:opacity-0 md:group-hover:opacity-100"
         >
-          <button
-            type="button"
-            class="cursor-pointer rounded-lg bg-white/90 p-2 text-gray-700 shadow-sm backdrop-blur-sm hover:bg-white hover:text-blue-600"
-          >
-            <EyeIcon class="size-4"></EyeIcon>
-          </button>
           <button
             @click.stop="handlePostShare(post)"
             class="cursor-pointer rounded-lg bg-white/90 p-2 text-gray-700 shadow-sm backdrop-blur-sm hover:bg-white hover:text-blue-600"
           >
-            <ShareIcon class="size-4"></ShareIcon>
+            <ShareIcon class="size-3.5 sm:size-4"></ShareIcon>
           </button>
         </div>
       </article>
@@ -233,16 +224,6 @@ onMounted(() => {
 </template>
 
 <style scoped>
-@keyframes bounce {
-  0%,
-  100% {
-    transform: translateY(0);
-  }
-  50% {
-    transform: translateY(-10px);
-  }
-}
-
 .animation-delay-200 {
   animation-delay: 200ms;
 }

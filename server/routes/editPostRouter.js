@@ -25,7 +25,7 @@ router.patch(
       if (isNaN(id)) throw new ValidationError('Post ID must be a valid number')
 
       const postEdit = req.body
-
+      console.log('attempting to enter: ', postEdit)
       const stmtUpdate = db.prepare(
         `UPDATE posts 
          SET post_title = ?, post_body = ?

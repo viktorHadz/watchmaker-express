@@ -14,7 +14,6 @@ import {
   EyeSlashIcon,
   EyeIcon,
 } from '@heroicons/vue/24/outline'
-import IconGallery from '../icons/IconGallery.vue'
 import { storeToRefs } from 'pinia'
 
 const props = defineProps({
@@ -376,15 +375,10 @@ watch(
                 </div>
 
                 <!-- Empty State -->
-                <div v-else class="flex items-center justify-center py-16">
+                <div v-else class="flex items-center justify-center py-2">
                   <div
                     class="dark:border-acc/50 border-acc bg-acc/5 flex max-w-md flex-col items-center justify-center rounded-2xl border-2 border-dashed px-6 py-12 text-center sm:px-8 sm:py-16"
                   >
-                    <div
-                      class="bg-acc/10 mb-6 flex size-24 items-center justify-center rounded-2xl sm:mb-8 sm:size-32"
-                    >
-                      <IconGallery class="text-acc/80 size-16 sm:size-20" />
-                    </div>
                     <p class="text-fg text-lg font-medium tracking-wide sm:text-xl">
                       No description available
                     </p>

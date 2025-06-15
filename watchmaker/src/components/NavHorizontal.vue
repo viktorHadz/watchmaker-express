@@ -217,7 +217,7 @@ onUnmounted(() => {
 
   <!-- Mobile Navigation -->
   <nav class="fixed right-0 bottom-0 left-0 z-[99] sm:hidden">
-    <div class="fixed right-4 bottom-16 will-change-transform">
+    <div v-if="isAuthenticated" class="fixed right-4 bottom-16 will-change-transform">
       <div
         class="card flex transform-gpu flex-col items-stretch overflow-hidden rounded-t-xl rounded-b-none shadow-xl backdrop-blur-md transition-all duration-400 ease-out"
         :class="isOpenMobile ? 'w-44' : 'w-20'"

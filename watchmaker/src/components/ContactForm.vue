@@ -134,7 +134,7 @@ const onSubmit = async () => {
   // Wait for the server response
   const success = await postData(result.data)
 
-  // Only clear form and show success if server responded successfully
+  // If server responded successfully
   if (success) {
     clearForm()
     toast.showToast('Your message was sent successfully!', 'success')

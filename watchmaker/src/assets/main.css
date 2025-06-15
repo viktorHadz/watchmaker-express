@@ -62,8 +62,8 @@
   /* Text */
   --color-fg: oklch(88% 0.006 230); /* Warm silver text */
   --color-fg2: oklch(95% 0.004 225); /* Bright silver (for dark backgrounds) */
-  --color-fg-mute: oklch(68% 0.01 235); /* Muted blue-gray */
-  --color-fg-subtle: oklch(48% 0.012 240); /* Subtle blue-gray */
+  --color-fg-mute: oklch(75% 0.01 235); /* Muted blue-gray */
+  --color-fg-subtle: oklch(65% 0.01 235); /* Subtle blue-gray */
 
   /* Status colors */
   --color-danger: oklch(58% 0.18 25); /* Warm red */

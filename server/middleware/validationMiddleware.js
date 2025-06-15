@@ -68,7 +68,7 @@ export const validateAndSanitize = (schema) => {
  */
 export const editPostSchema = z.object({
   postTitle: z.string().min(1).max(200),
-  postBody: z.string().min(1).max(10000),
+  postBody: z.string().min(0).max(10000),
 })
 /**
  * V-DOC: Ensure you add any extra fields to the postschema
