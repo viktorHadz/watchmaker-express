@@ -92,7 +92,7 @@ const closeModal = () => {
     <Teleport to="body">
       <Modal :show="showModal" @close="closeModal">
         <template #header>
-          <h2 class="text-fg font-sec text-center text-2xl font-medium tracking-wider">
+          <h2 class="text-fg font-sec text-center text-xl font-semibold tracking-wider sm:text-2xl">
             Service Price List
           </h2>
         </template>

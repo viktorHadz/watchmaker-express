@@ -2,7 +2,9 @@
 import { reactive, ref, watch } from 'vue'
 import { useToastStore } from '@/stores/toast'
 import { zodFormSchema } from '@/composables/formZodSchema'
-import { PaperAirplaneIcon, PlusIcon } from '@heroicons/vue/24/outline'
+import { PaperAirplaneIcon, PlusIcon, XMarkIcon } from '@heroicons/vue/24/outline'
+import IconGallery from './icons/IconGallery.vue'
+import { useDropZone } from '@vueuse/core'
 
 const toast = useToastStore()
 const formSchema = zodFormSchema
@@ -14,6 +16,7 @@ const form = reactive({
   phone: '',
   message: '',
 })
+const uploadedImages = ref([])
 
 const fieldStates = reactive({
   firstName: { touched: false, focused: false },
@@ -117,7 +120,6 @@ const onSubmit = async () => {
   const result = formSchema.safeParse(form)
 
   if (!result.success) {
-    // Update all field errors
     const formattedError = result.error.format()
     displayErrors.firstName = formattedError.firstName?._errors[0] || ''
     displayErrors.lastName = formattedError.lastName?._errors[0] || ''
@@ -128,7 +130,8 @@ const onSubmit = async () => {
     toast.showToast('Please fix the errors.', 'error')
     return
   }
-
+  // Adding images to form
+  result.data = { ...result.data, images: uploadedImages.value }
   console.log('Form submitted:', result.data)
 
   // Wait for the server response
@@ -173,36 +176,135 @@ const postData = async (formData) => {
   }
 }
 
+// Convert file to base64 for preview AND email sending
+const fileToBase64 = (file) => {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader()
+    reader.onload = (e) => resolve(e.target.result)
+    reader.onerror = reject
+    reader.readAsDataURL(file)
+  })
+}
+
+// Validate files (fixed to be more permissive)
+const validateFiles = (files) => {
+  const maxSize = 10 * 1024 * 1024 // 10MB
+  const errors = []
+  const validTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp']
+
+  for (const file of files) {
+    // More permissive type checking
+    if (!validTypes.includes(file.type.toLowerCase())) {
+      errors.push(`${file.name} is not a supported image format (${file.type})`)
+    }
+    if (file.size > maxSize) {
+      errors.push(`${file.name} is too large (${(file.size / 1024 / 1024).toFixed(1)}MB, max 10MB)`)
+    }
+    if (file.size === 0) {
+      errors.push(`${file.name} appears to be empty`)
+    }
+  }
+  return errors
+}
+
+// Centralized file processing function
+const processFiles = async (files) => {
+  if (!files?.length) {
+    toast.showToast('No files selected.', 'error')
+    return false
+  }
+
+  // Check limit before processing
+  const remainingSlots = 5 - uploadedImages.value.length
+  if (files.length > remainingSlots) {
+    toast.showToast(
+      `You can only add ${remainingSlots} more image${remainingSlots !== 1 ? 's' : ''}.`,
+      'error',
+    )
+    return false
+  }
+
+  // Validate files
+  const errors = validateFiles(files)
+  if (errors.length) {
+    toast.showToast(errors.join('; '), 'error')
+    return false
+  }
+
+  // Convert all files to base64 immediately
+  try {
+    const base64Files = await Promise.all(
+      files.map(async (file, index) => {
+        console.log(`Processing file ${index + 1}:`, file.name, file.type, file.size)
+        return {
+          name: file.name,
+          type: file.type,
+          size: file.size,
+          data: await fileToBase64(file),
+          id: `${file.name}-${file.lastModified}-${Date.now()}-${index}`, // More unique ID
+        }
+      }),
+    )
+
+    console.log(`Successfully processed ${base64Files.length} files`)
+    uploadedImages.value.push(...base64Files)
+    return true
+  } catch (error) {
+    console.error('Error processing images:', error)
+    toast.showToast('Error processing images. Please try again.', 'error')
+    return false
+  }
+}
+
+// Fixed file input handler
+const handleFileChange = async (ev) => {
+  const files = Array.from(ev.target.files || [])
+  console.log('File input changed:', files.length, 'files')
+
+  await processFiles(files)
+
+  // Always clear the input to allow re-selecting the same files
+  ev.target.value = ''
+}
+
+// Dropzone setup
+const dropZoneRef = ref()
+
+const onDrop = async (files) => {
+  console.log('Files dropped:', files?.length)
+  if (files) {
+    await processFiles(Array.from(files))
+  }
+}
+
+const { isOverDropZone } = useDropZone(dropZoneRef, {
+  onDrop,
+  // Only accept image files
+  dataTypes: ['image/jpeg', 'image/png', 'image/webp'],
+})
+
+const removeImage = (index) => {
+  console.log('Removing image at index:', index)
+  uploadedImages.value.splice(index, 1)
+}
+
+// Update clearForm to include images
 const clearForm = () => {
   Object.keys(form).forEach((key) => {
     form[key] = ''
   })
 
-  // Reset field states
   Object.keys(fieldStates).forEach((key) => {
     fieldStates[key].touched = false
     fieldStates[key].focused = false
   })
 
-  // Clear errors
   Object.keys(displayErrors).forEach((key) => {
     displayErrors[key] = ''
   })
-}
 
-const selectedFiles = ref([])
-
-const handleFileChange = (event) => {
-  const files = Array.from(event.target.files)
-  const combined = [...selectedFiles.value, ...files]
-  const unique = Array.from(new Map(combined.map((f) => [f.name, f])).values())
-  selectedFiles.value = unique.slice(0, 5)
-
-  if (combined.length > 5) {
-    toast.showToast('You can only upload up to 5 images.', 'error')
-  }
-
-  event.target.value = ''
+  uploadedImages.value = []
+  console.log('Form and images cleared')
 }
 </script>
 
@@ -329,55 +431,177 @@ const handleFileChange = (event) => {
         </div>
       </div>
 
-      <!-- File Upload -->
+      <!-- File Upload with Dropzone -->
       <div class="group">
         <div class="mb-4 flex items-center justify-between">
-          <label for="file-upload" class="font-sec text-fg font-medium">Watch Images </label>
-          <label
-            for="file-upload"
-            class="bg-acc/10 text-acc hover:bg-acc/20 inline-flex cursor-pointer items-center rounded-lg px-4 py-2 font-medium transition-colors"
-          >
-            <PlusIcon class="text-acc mr-2 size-4 flex-shrink-0"></PlusIcon>
-            Choose Images
-          </label>
+          <label for="file-upload" class="font-sec text-fg font-medium"> Watch Images </label>
+
+          <div class="flex items-center gap-3">
+            <label
+              for="file-upload"
+              :class="[
+                'inline-flex cursor-pointer items-center rounded-lg px-4 py-2 font-medium transition-all duration-200',
+                uploadedImages.length < 5
+                  ? 'bg-acc/10 text-acc hover:bg-acc/20 hover:scale-[1.02]'
+                  : 'bg-acc/10 text-acc cursor-not-allowed',
+              ]"
+            >
+              <PlusIcon class="text-acc mr-2 size-4 flex-shrink-0" />
+              Choose Images
+            </label>
+          </div>
         </div>
 
         <input
           type="file"
           name="images"
-          accept="image/jpeg,image/png,image/webp"
+          accept="image/jpeg,image/jpg,image/png,image/webp"
           multiple
           class="hidden"
           id="file-upload"
+          :disabled="uploadedImages.length >= 5"
           @change="handleFileChange"
         />
 
-        <div v-if="selectedFiles.length > 0" class="grid grid-cols-2 gap-3">
-          <div
-            v-for="(file, index) in selectedFiles"
-            :key="index"
-            class="bg-acc/5 border-acc/20 flex items-center rounded-lg border p-3"
-          >
-            <svg
-              class="text-acc mr-3 h-5 w-5"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                stroke-width="2"
-                d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 2h12a2 2 0 012 2v12a2 2 0 01-2 2H6a2 2 0 01-2-2V4a2 2 0 012-2z"
-              ></path>
-            </svg>
-            <span class="text-fg truncate text-sm">{{ file.name }}</span>
+        <!-- Dropzone Area - Remove opacity when full -->
+        <div
+          ref="dropZoneRef"
+          :class="[
+            'relative rounded-lg border-2 border-dashed transition-all duration-200',
+            isOverDropZone
+              ? 'border-acc bg-acc/10 scale-[1.02]'
+              : uploadedImages.length < 5
+                ? 'border-acc/30 bg-acc/5 hover:border-acc/50 hover:bg-acc/10 cursor-pointer'
+                : 'border-acc/20 dark:bg-sec bg-sec-light cursor-not-allowed',
+          ]"
+          @click="uploadedImages.length < 5 && $refs.fileInput?.click()"
+        >
+          <!-- Hidden file input for dropzone -->
+          <input
+            ref="fileInput"
+            type="file"
+            accept="image/jpeg,image/jpg,image/png,image/webp"
+            multiple
+            class="hidden"
+            :disabled="uploadedImages.length >= 5"
+            @change="handleFileChange"
+          />
+
+          <!-- Image Preview Grid or Empty State -->
+          <div v-if="uploadedImages.length > 0" class="p-4">
+            <div class="grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5">
+              <div
+                v-for="(image, index) in uploadedImages"
+                :key="image.id"
+                class="bg-sec/80 border-acc/20 group hover:border-acc/40 relative flex flex-col rounded-lg border p-2 transition-all duration-200 hover:shadow-md"
+              >
+                <!-- Image Preview -->
+                <div class="relative mb-2 overflow-hidden rounded-md">
+                  <img
+                    :src="image.data"
+                    :alt="`Preview of ${image.name}`"
+                    class="h-20 w-full object-cover transition-transform duration-200 group-hover:scale-105 sm:h-24"
+                    loading="lazy"
+                  />
+
+                  <!-- Remove button -->
+                  <button
+                    @click.stop="removeImage(index)"
+                    class="bg-danger hover:bg-danger/90 focus:ring-danger/50 pointer-events-auto absolute top-1 right-1 z-10 cursor-pointer rounded-full p-1.5 text-white opacity-0 shadow-md transition-all duration-200 group-hover:opacity-100 hover:scale-110 focus:opacity-100 focus:ring-2 focus:outline-none"
+                    type="button"
+                    :aria-label="`Remove ${image.name}`"
+                  >
+                    <XMarkIcon class="size-3" />
+                  </button>
+                </div>
+
+                <!-- File Info -->
+                <div class="flex flex-col gap-1">
+                  <span
+                    class="text-fg truncate px-1 text-center text-xs font-medium"
+                    :title="image.name"
+                  >
+                    {{ image.name }}
+                  </span>
+                  <span class="text-fg-subtle text-center text-xs">
+                    {{ (image.size / 1024 / 1024).toFixed(1) }}MB
+                  </span>
+                </div>
+              </div>
+
+              <!-- Add More Card (if under limit) -->
+              <div
+                v-if="uploadedImages.length < 5"
+                class="bg-acc/5 border-acc/30 hover:bg-acc/10 hover:border-acc/50 pointer-events-auto flex h-28 cursor-pointer flex-col items-center justify-center rounded-lg border-2 border-dashed transition-all duration-200 hover:scale-[1.02] sm:h-32"
+                @click.stop="$refs.fileInput?.click()"
+              >
+                <PlusIcon class="text-acc mb-1 size-6" />
+                <span class="text-acc text-xs font-medium">Add More</span>
+                <span class="text-fg-subtle text-xs">{{ 5 - uploadedImages.length }} left</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Empty State -->
+          <div v-else class="flex flex-col items-center justify-center p-8 text-center">
+            <!-- Drag & Drop Indicator -->
+            <div v-if="isOverDropZone" class="text-acc flex flex-col items-center">
+              <IconGallery class="mb-3 size-16 animate-bounce" />
+              <p class="text-lg font-semibold">Drop your images here!</p>
+              <p class="text-sm opacity-80">Release to upload</p>
+            </div>
+
+            <!-- Default State -->
+            <div v-else class="flex flex-col items-center">
+              <IconGallery class="text-acc mb-3 size-12" />
+              <p class="text-fg mb-2 font-medium">Drag & drop images here</p>
+              <p class="text-fg-subtle mb-3 text-sm">or click to browse files</p>
+              <div class="bg-acc/10 text-acc rounded-lg px-4 py-2 text-sm font-medium">
+                Choose up to 5 images
+              </div>
+              <p class="text-fg-subtle mt-2 text-xs">JPEG, PNG, WebP • Max 10MB each</p>
+            </div>
           </div>
         </div>
 
-        <p class="dark:text-acc/60 text-acc/80 mt-2 text-sm">
-          Upload up to 5 images of your watch (JPEG, PNG, WebP)
-        </p>
+        <div class="flex items-center justify-between px-2 py-3">
+          <!-- Helper Text -->
+          <p class="text-acc/80 max-w-xs text-sm leading-relaxed">
+            <span class="font-medium">Tip: </span> You can drag and drop multiple images at once, or
+            click to browse.
+          </p>
+          <!--Progress bar -->
+          <div class="flex items-center gap-3">
+            <div class="bg-sec border-brdr relative h-4 w-16 overflow-hidden rounded-full border">
+              <div
+                class="bg-acc h-full transition-all duration-500 ease-out"
+                :style="{ width: `${(uploadedImages.length / 5) * 100}%` }"
+              ></div>
+              <!-- Subtle inner shadow for depth -->
+              <div class="pointer-events-none absolute inset-0 rounded-full shadow-inner"></div>
+            </div>
+
+            <!-- Status indicator -->
+            <div class="flex items-center gap-3">
+              <span
+                :class="[
+                  'font-sec text-sm font-medium tabular-nums',
+                  uploadedImages.length === 5 ? 'text-acc' : 'text-fg-subtle',
+                ]"
+              >
+                {{ uploadedImages.length }}/5
+              </span>
+
+              <!-- Full indicator -->
+              <div
+                v-if="uploadedImages.length === 5"
+                class="bg-acc text-fg2 flex items-center rounded-full px-2.5 py-1 text-xs font-bold"
+              >
+                <span>✓ </span> FULL
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
 
       <!-- Message -->
