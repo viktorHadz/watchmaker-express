@@ -1,4 +1,4 @@
-// TODO: ISSUE WITH COMPRESSION
+// TODO: ISSUE WITH COMPRESSION composable
 
 // Handles route /api/posts/
 import express from 'express'
