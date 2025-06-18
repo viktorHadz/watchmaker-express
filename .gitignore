@@ -19,3 +19,5 @@ build/
 
 # BASH 
 secret.sh
+
+/server/logs/SecurityLog.txt 

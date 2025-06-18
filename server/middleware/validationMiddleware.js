@@ -1,5 +1,6 @@
 import * as z from 'zod'
 import sanitizeHtml from 'sanitize-html'
+import { securityLogger } from '../utils/security.js'
 
 const cleanStringInputs = (input) =>
   typeof input === 'string'
@@ -46,11 +47,12 @@ export const validateAndSanitize = (schema) => {
       )
 
       const validatedData = schema.parse(cleanBody)
-
       req.body = validatedData
       next()
     } catch (error) {
       if (error instanceof z.ZodError) {
+        // Logs potentially dangerous entry attempts.
+        securityLogger(req, error)
         return res.status(400).json({
           success: false,
           message: 'Validation failed',
@@ -68,7 +70,7 @@ export const validateAndSanitize = (schema) => {
  */
 export const editPostSchema = z.object({
   postTitle: z.string().min(1).max(200),
-  postBody: z.string().min(0).max(10000),
+  postBody: z.string().min(0).max(20000),
 })
 /**
  * V-DOC: Ensure you add any extra fields to the postschema
@@ -78,6 +80,6 @@ export const formSchema = z.object({
   firstName: z.string().trim().min(1).max(50).nonempty(),
   lastName: z.string().trim().min(1).max(50).nonempty(),
   email: z.string().trim().email().max(254).nonempty(),
-  message: z.string().trim().min(10).max(10000).nonempty(),
+  message: z.string().trim().min(10).max(20000).nonempty(),
   phone: z.string().trim().max(25).optional().or(z.literal('')),
 })

@@ -1,3 +1,5 @@
+// TODO: ISSUE WITH COMPRESSION
+
 // Handles route /api/posts/
 import express from 'express'
 import multer from 'multer'
@@ -5,17 +7,10 @@ import { db } from '../database.js'
 import path from 'path'
 import fs from 'fs'
 import { verifyUserIdentity } from '../middleware/supabaseAuth.js'
+import { getNormalDate } from '../utils/security.js'
 
 const database = db
 const router = express.Router()
-
-function getNormalDate() {
-  const date = new Date()
-  const dd = String(date.getDate()).padStart(2, '0')
-  const mm = String(date.getMonth() + 1).padStart(2, '0')
-  const yyyy = date.getFullYear()
-  return `${dd}_${mm}_${yyyy}`
-}
 
 // Base upload directory - use temp directory first
 const tempUploadDir = './temp/uploads'

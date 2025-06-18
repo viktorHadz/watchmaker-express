@@ -4,7 +4,9 @@ import { useToastStore } from '@/stores/toast'
 import { zodFormSchema } from '@/composables/formZodSchema'
 import { PaperAirplaneIcon, PlusIcon, XMarkIcon } from '@heroicons/vue/24/outline'
 import IconGallery from './icons/IconGallery.vue'
+import IconPlusGallery from './icons/IconPlusGallery.vue'
 import { useDropZone } from '@vueuse/core'
+import { useFileSize } from '@/composables/usefmtFileSize.js'
 
 const toast = useToastStore()
 const formSchema = zodFormSchema
@@ -74,42 +76,15 @@ const debounceValidation = (fieldName, value, delay = 300) => {
     }
   }, delay)
 }
-
+// Size formatter
+const { formatFileSize, toMB } = useFileSize()
 // Watch form fields for changes
-watch(
-  () => form.firstName,
-  (newVal) => {
-    debounceValidation('firstName', newVal)
-  },
-)
-
-watch(
-  () => form.lastName,
-  (newVal) => {
-    debounceValidation('lastName', newVal)
-  },
-)
-
-watch(
-  () => form.email,
-  (newVal) => {
-    debounceValidation('email', newVal)
-  },
-)
-
-watch(
-  () => form.phone,
-  (newVal) => {
-    debounceValidation('phone', newVal)
-  },
-)
-
-watch(
-  () => form.message,
-  (newVal) => {
-    debounceValidation('message', newVal)
-  },
-)
+Object.keys(displayErrors).forEach((fieldName) => {
+  watch(
+    () => form[fieldName],
+    (newVal) => debounceValidation(fieldName, newVal),
+  )
+})
 
 const onSubmit = async () => {
   // Mark all fields as touched on submit
@@ -188,17 +163,17 @@ const fileToBase64 = (file) => {
 
 // Validate files (fixed to be more permissive)
 const validateFiles = (files) => {
-  const maxSize = 10 * 1024 * 1024 // 10MB
+  const maxSize = 10 * 1000 * 1000 // 10MB in decimal
   const errors = []
   const validTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp']
 
   for (const file of files) {
-    // More permissive type checking
     if (!validTypes.includes(file.type.toLowerCase())) {
       errors.push(`${file.name} is not a supported image format (${file.type})`)
     }
     if (file.size > maxSize) {
-      errors.push(`${file.name} is too large (${(file.size / 1024 / 1024).toFixed(1)}MB, max 10MB)`)
+      const fileSizeMB = toMB(file.size)
+      errors.push(`${file.name} is too large (${fileSizeMB}MB, max 10MB)`)
     }
     if (file.size === 0) {
       errors.push(`${file.name} appears to be empty`)
@@ -231,7 +206,7 @@ const processFiles = async (files) => {
     return false
   }
 
-  // Convert all files to base64 immediately
+  // Converts all files to base64 immediately
   try {
     const base64Files = await Promise.all(
       files.map(async (file, index) => {
@@ -309,7 +284,7 @@ const clearForm = () => {
 </script>
 
 <template>
-  <form action="#" method="POST" class="p-8">
+  <form action="#" method="POST" class="p-4 md:p-8">
     <div class="space-y-8">
       <!-- Name Row -->
       <div class="grid grid-cols-1 gap-6 md:grid-cols-2">
@@ -432,22 +407,22 @@ const clearForm = () => {
       </div>
 
       <!-- File Upload with Dropzone -->
-      <div class="group">
+      <div>
         <div class="mb-4 flex items-center justify-between">
           <label for="file-upload" class="font-sec text-fg font-medium"> Watch Images </label>
 
-          <div class="flex items-center gap-3">
+          <div class="lg flex items-center gap-3">
             <label
               for="file-upload"
               :class="[
-                'inline-flex cursor-pointer items-center rounded-lg px-4 py-2 font-medium transition-all duration-200',
+                'inline-flex items-center rounded-lg px-3 py-2 font-medium transition-all duration-200 sm:px-4 sm:py-2',
                 uploadedImages.length < 5
-                  ? 'bg-acc/10 text-acc hover:bg-acc/20 hover:scale-[1.02]'
-                  : 'bg-acc/10 text-acc cursor-not-allowed',
+                  ? 'bg-acc/10 text-acc hover:bg-acc/20 cursor-pointer hover:scale-[1.02]'
+                  : 'bg-success/10 text-fg cursor-not-allowed',
               ]"
             >
-              <PlusIcon class="text-acc mr-2 size-4 flex-shrink-0" />
-              Choose Images
+              <IconPlusGallery class="mr-2 size-4" />
+              <span class="font-sec leading-0 font-semibold"> Add</span>
             </label>
           </div>
         </div>
@@ -463,11 +438,11 @@ const clearForm = () => {
           @change="handleFileChange"
         />
 
-        <!-- Dropzone Area - Remove opacity when full -->
+        <!-- Dropzone Area -->
         <div
           ref="dropZoneRef"
           :class="[
-            'relative rounded-lg border-2 border-dashed transition-all duration-200',
+            'group relative rounded-lg border-2 border-dashed transition-all duration-200',
             isOverDropZone
               ? 'border-acc bg-acc/10 scale-[1.02]'
               : uploadedImages.length < 5
@@ -476,7 +451,7 @@ const clearForm = () => {
           ]"
           @click="uploadedImages.length < 5 && $refs.fileInput?.click()"
         >
-          <!-- Hidden file input for dropzone -->
+          <!-- Input for dropzone -->
           <input
             ref="fileInput"
             type="file"
@@ -487,16 +462,15 @@ const clearForm = () => {
             @change="handleFileChange"
           />
 
-          <!-- Image Preview Grid or Empty State -->
           <div v-if="uploadedImages.length > 0" class="p-4">
-            <div class="grid grid-cols-2 gap-3 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5">
+            <div class="grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5">
               <div
                 v-for="(image, index) in uploadedImages"
                 :key="image.id"
-                class="bg-sec/80 border-acc/20 group hover:border-acc/40 relative flex flex-col rounded-lg border p-2 transition-all duration-200 hover:shadow-md"
+                class="bg-sec/80 border-acc/20 group hover:border-acc/40 relative flex flex-col overflow-hidden rounded-lg border transition-all duration-200 hover:shadow-md"
               >
                 <!-- Image Preview -->
-                <div class="relative mb-2 overflow-hidden rounded-md">
+                <div class="relative mb-2 overflow-hidden">
                   <img
                     :src="image.data"
                     :alt="`Preview of ${image.name}`"
@@ -507,7 +481,7 @@ const clearForm = () => {
                   <!-- Remove button -->
                   <button
                     @click.stop="removeImage(index)"
-                    class="bg-danger hover:bg-danger/90 focus:ring-danger/50 pointer-events-auto absolute top-1 right-1 z-10 cursor-pointer rounded-full p-1.5 text-white opacity-0 shadow-md transition-all duration-200 group-hover:opacity-100 hover:scale-110 focus:opacity-100 focus:ring-2 focus:outline-none"
+                    class="bg-danger hover:bg-danger/90 focus:ring-danger/50 pointer-events-auto absolute top-1 right-1 z-10 cursor-pointer rounded-full p-1.5 text-white opacity-100 shadow-md transition-all duration-200 hover:scale-110 focus:opacity-100 focus:ring-2 focus:outline-none xl:opacity-0 xl:group-hover:opacity-100"
                     type="button"
                     :aria-label="`Remove ${image.name}`"
                   >
@@ -516,15 +490,15 @@ const clearForm = () => {
                 </div>
 
                 <!-- File Info -->
-                <div class="flex flex-col gap-1">
+                <div class="flex flex-col justify-between gap-1 justify-self-end">
                   <span
-                    class="text-fg truncate px-1 text-center text-xs font-medium"
+                    class="text-fg line-clamp-2 px-1 text-center text-xs font-medium"
                     :title="image.name"
                   >
                     {{ image.name }}
                   </span>
                   <span class="text-fg-subtle text-center text-xs">
-                    {{ (image.size / 1024 / 1024).toFixed(1) }}MB
+                    {{ formatFileSize(image.size) }}
                   </span>
                 </div>
               </div>
@@ -532,7 +506,7 @@ const clearForm = () => {
               <!-- Add More Card (if under limit) -->
               <div
                 v-if="uploadedImages.length < 5"
-                class="bg-acc/5 border-acc/30 hover:bg-acc/10 hover:border-acc/50 pointer-events-auto flex h-28 cursor-pointer flex-col items-center justify-center rounded-lg border-2 border-dashed transition-all duration-200 hover:scale-[1.02] sm:h-32"
+                class="bg-acc/5 border-acc/30 hover:bg-acc/10 hover:border-acc/50 pointer-events-auto flex min-h-32 cursor-pointer flex-col items-center justify-center rounded-lg border-2 border-dashed transition-all duration-200 hover:scale-[1.02]"
                 @click.stop="$refs.fileInput?.click()"
               >
                 <PlusIcon class="text-acc mb-1 size-6" />
@@ -564,29 +538,30 @@ const clearForm = () => {
           </div>
         </div>
 
-        <div class="flex items-center justify-between px-2 py-3">
-          <!-- Helper Text -->
-          <p class="text-acc/80 max-w-xs text-sm leading-relaxed">
-            <span class="font-medium">Tip: </span> You can drag and drop multiple images at once, or
-            click to browse.
-          </p>
+        <div class="flex w-full justify-end px-2 py-3">
           <!--Progress bar -->
-          <div class="flex items-center gap-3">
-            <div class="bg-sec border-brdr relative h-4 w-16 overflow-hidden rounded-full border">
+          <div class="flex items-center gap-3" v-if="uploadedImages.length > 0">
+            <div
+              class="bg-sec relative h-4 w-16 overflow-hidden rounded-full border"
+              :class="[
+                uploadedImages.length < 5
+                  ? 'drop-shadow-acc/50 border-acc drop-shadow-sm'
+                  : 'drop-shadow-success/50 border-success drop-shadow-sm',
+              ]"
+            >
               <div
-                class="bg-acc h-full transition-all duration-500 ease-out"
+                class="h-full transition-all duration-500 ease-out"
+                :class="[uploadedImages.length < 5 ? 'bg-acc' : 'bg-success']"
                 :style="{ width: `${(uploadedImages.length / 5) * 100}%` }"
               ></div>
-              <!-- Subtle inner shadow for depth -->
-              <div class="pointer-events-none absolute inset-0 rounded-full shadow-inner"></div>
             </div>
 
             <!-- Status indicator -->
             <div class="flex items-center gap-3">
               <span
                 :class="[
-                  'font-sec text-sm font-medium tabular-nums',
-                  uploadedImages.length === 5 ? 'text-acc' : 'text-fg-subtle',
+                  'font-medium',
+                  uploadedImages.length === 5 ? 'text-success' : 'text-fg-subtle',
                 ]"
               >
                 {{ uploadedImages.length }}/5
@@ -595,9 +570,9 @@ const clearForm = () => {
               <!-- Full indicator -->
               <div
                 v-if="uploadedImages.length === 5"
-                class="bg-acc text-fg2 flex items-center rounded-full px-2.5 py-1 text-xs font-bold"
+                class="bg-success text-fg2 drop-shadow-success flex items-center rounded-full px-2.5 py-2 leading-0 font-semibold drop-shadow-sm"
               >
-                <span>✓ </span> FULL
+                <span class="text-lg leading-1">✓ </span> Done
               </div>
             </div>
           </div>
@@ -605,7 +580,7 @@ const clearForm = () => {
       </div>
 
       <!-- Message -->
-      <div class="group">
+      <div>
         <div class="mb-2 flex items-baseline">
           <label for="message" class="font-sec text-fg font-medium">Message</label>
           <span class="ml-1 text-red-500">*</span>
@@ -615,8 +590,8 @@ const clearForm = () => {
             name="message"
             id="message"
             maxlength="1000"
-            rows="6"
-            class="text-fg placeholder-fg/50 focus:ring-acc/50 focus:border-acc input w-full resize-none rounded-xl"
+            rows="8"
+            class="text-fg placeholder-fg/50 focus:ring-acc/50 focus:border-acc input custom-scrollbar w-full resize-none rounded-xl"
             placeholder="Tell me about your watch, what issues you're experiencing, or any specific requirements..."
             v-model="form.message"
             @focus="handleFocus('message')"
@@ -636,7 +611,7 @@ const clearForm = () => {
 
     <!-- Form Footer -->
     <div class="border-brdr/10 mt-8 border-t pt-6">
-      <div class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+      <div class="flex flex-col items-center justify-between gap-4 sm:flex-row">
         <p class="dark:text-acc/60 text-acc/80 text-sm">
           Fields marked with <span class="text-lg text-red-500">*</span> are required
         </p>

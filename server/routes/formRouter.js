@@ -14,14 +14,21 @@ router.post('/data', limiter, validateAndSanitize(formSchema), async (req, res) 
     // TODO: Send email with req.body data
     console.log('Emailing...')
     const { data, error } = await resend.emails.send({
-      from: 'Acme <onboarding@resend.dev>',
+      from: 'Viktor <onboarding@resend.dev>',
       to: ['watchmaker.ves@gmail.com'],
       subject: 'hello world',
       html: `
-      <strong>it works!</strong>
-      </br>
-      ${JSON.stringify(req.body)}
+        <strong>New Contact Form Submission</strong><br/>
+        <strong>Name:</strong> ${req.body.firstName} ${req.body.lastName}<br/>
+        <strong>Email:</strong> ${req.body.email}<br/>
+        <strong>Phone:</strong> ${req.body.phone ? req.body.phone : 'No phone provided'}<br/>
+        <strong>Message:</strong><br/>
+        <pre>${req.body.message}</pre>
       `,
+      // attachments: {
+      //   content: 'attachment', // This needs the base64
+      //   filename: `userImage.png`,
+      // },
     })
 
     if (error) {
