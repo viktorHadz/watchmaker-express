@@ -2,9 +2,38 @@ import express from 'express'
 import { limiter } from '../middleware/rateLimiter.js'
 import { validateAndSanitize, formSchema } from '../middleware/validationMiddleware.js'
 import { Resend } from 'resend'
+import multer from 'multer'
 
 const router = express.Router()
 const resend = new Resend(process.env.RESEND_KEY_TOKEN)
+// Multer configuration with memory storage first
+const storage = multer.memoryStorage()
+
+const upload = multer({
+  storage,
+  limits: {
+    fileSize: 7 * 1024 * 1024, // 7MB each
+    files: 5, // 5 user uploaded images *
+  },
+  fileFilter: (req, file, cb) => {
+    const allowedTypes = ['image/jpeg', 'image/png', 'image/webp']
+    if (allowedTypes.includes(file.mimetype)) {
+      cb(null, true)
+    } else {
+      cb(new Error('Only JPEG, PNG, and WebP images are allowed!'), false)
+    }
+  },
+})
+function getExtensionFromMimetype(mimetype) {
+  switch (mimetype) {
+    case 'image/png':
+      return '.png'
+    case 'image/webp':
+      return '.webp'
+    default:
+      return '.jpg'
+  }
+}
 
 // POST form submission with rate limiting
 router.post('/data', limiter, validateAndSanitize(formSchema), async (req, res) => {

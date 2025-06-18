@@ -105,7 +105,7 @@ const onSubmit = async () => {
     toast.showToast('Please fix the errors.', 'error')
     return
   }
-  // Adding images to form
+  // Adding images to form - PROBLEMATIC !!! - I NEED TO USE THE FILES OBJECT
   result.data = { ...result.data, images: uploadedImages.value }
   console.log('Form submitted:', result.data)
 
@@ -119,7 +119,6 @@ const onSubmit = async () => {
   }
 }
 
-// Update postData to return success/failure
 const postData = async (formData) => {
   try {
     const res = await fetch('/api/form/data', {
@@ -163,7 +162,7 @@ const fileToBase64 = (file) => {
 
 // Validate files (fixed to be more permissive)
 const validateFiles = (files) => {
-  const maxSize = 10 * 1000 * 1000 // 10MB in decimal
+  const maxSize = 7 * 1000 * 1000 // 7MB in decimal
   const errors = []
   const validTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp']
 
@@ -173,7 +172,7 @@ const validateFiles = (files) => {
     }
     if (file.size > maxSize) {
       const fileSizeMB = toMB(file.size)
-      errors.push(`${file.name} is too large (${fileSizeMB}MB, max 10MB)`)
+      errors.push(`${file.name} is too large (${fileSizeMB}MB, max 7MB per file)`)
     }
     if (file.size === 0) {
       errors.push(`${file.name} appears to be empty`)
