@@ -18,6 +18,7 @@ defineProps({
       'bg-success/90 border border-green-500': type === 'success',
       'bg-danger/80 border border-red-500': type === 'error',
       'bg-warn/90 border border-orange-500': type === 'warning',
+      'border border-blue-200 bg-blue-500': type === 'info',
     }"
   >
     {{ message }}

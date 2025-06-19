@@ -32,7 +32,6 @@ ${content}
 ${'-'.repeat(80)}
     `
 
-    // Write to file
     fs.writeFile(logPath, logEntry, { flag: 'a+' }, (err) => {
       if (err) {
         console.error('SecLogger "Write Err": ', err.message)
@@ -45,23 +44,31 @@ ${'-'.repeat(80)}
   }
 }
 
-export const securityLogger = (req, error) => {
+/**
+ * Simple, concise security logger
+ * @param {Object} req - Express request object
+ * @param {Object} error - Error object with validation errors
+ * @param {string} context - Brief context like 'FILE_VALIDATION' or 'FORM_VALIDATION'
+ */
+export const securityLogger = (req, error, context = 'VALIDATION_ERROR') => {
   try {
-    const simpleErrors =
-      error?.errors?.map((err) => ({
-        field: err.path.join('.'),
-        issue: err.code,
-        message: err.message,
-        received: err.received || 'N/A',
-      })) || []
+    const errorCount = error?.errors?.length || 0
+    const criticalErrors =
+      error?.errors?.filter((err) =>
+        ['mime_type_mismatch', 'invalid_file_type', 'buffer_error'].includes(err.code),
+      ) || []
 
     const logObj = {
-      timestamp: getNormalDate(true),
-      ip: req.ip || 'unknown',
-      userAgent: req.get('User-Agent') || 'unknown',
-      originalBody: req.body || {},
-      validationErrors: simpleErrors,
-      errorSummary: simpleErrors.map((e) => `${e.field}: ${e.issue}`).join(', '),
+      event: context,
+      ip: req.ip,
+      userAgent: req.get('User-Agent')?.substring(0, 50) + '...' || 'unknown',
+      path: req.path,
+      method: req.method,
+      fileCount: req.files?.length || 0,
+      errorCount,
+      criticalCount: criticalErrors.length,
+      // Only log the actual critical errors, not all the noise
+      criticalErrors: criticalErrors.map((err) => `${err.path?.join('.')}: ${err.message}`),
     }
 
     writeToLog(JSON.stringify(logObj, null, 2))
