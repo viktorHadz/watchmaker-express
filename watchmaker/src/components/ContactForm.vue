@@ -79,7 +79,7 @@ const debounceValidation = (fieldName, value, delay = 300) => {
   }, delay)
 }
 // Size formatter
-const { formatFileSize, toMB } = useFileSize()
+const { toMB } = useFileSize()
 // Watch form fields for changes
 Object.keys(displayErrors).forEach((fieldName) => {
   watch(
@@ -87,7 +87,154 @@ Object.keys(displayErrors).forEach((fieldName) => {
     (newVal) => debounceValidation(fieldName, newVal),
   )
 })
-// Sends the data to the backend
+// Processes images
+const processFiles = async (files) => {
+  if (!files?.length) {
+    console.error('No files selected.')
+    toast.showToast('No files selected.', 'error')
+    return false
+  }
+
+  // Check limit before processing
+  const remainingSlots = 5 - uploadedImages.value.length
+  if (files.length > remainingSlots) {
+    toast.showToast(
+      `You can only add ${remainingSlots} more image${remainingSlots !== 1 ? 's' : ''}.`,
+      'error',
+    )
+    return false
+  }
+
+  // Validates before compression
+  const errors = validateFiles(files)
+  if (errors.length) {
+    toast.showToast(errors.join('; '), 'error')
+    return false
+  }
+
+  try {
+    // Process each file individually to handle errors gracefully
+    const processedFiles = []
+    const failedFiles = []
+
+    for (let i = 0; i < files.length; i++) {
+      const file = files[i]
+
+      try {
+        // Creates thumbnail version for UI
+        const thumbnailBlob = await compressImage(file, 200, 0.6, {
+          preserveFormat: false, // Converts to JPEG
+          aggressiveResize: true,
+          outputFormat: 'image/jpeg', // for thumbnails
+        })
+
+        // Create email version
+        const sendBlob = await compressImage(file, 1920, 0.85, {
+          preserveFormat: false,
+          aggressiveResize: true,
+        })
+
+        // Create File objects
+        const thumbnailFile = new File([thumbnailBlob], `thumb_${file.name}`, {
+          type: 'image/jpeg',
+          lastModified: Date.now(),
+        })
+
+        const sendFile = new File([sendBlob], file.name, {
+          type: sendBlob.type || file.type,
+          lastModified: Date.now(),
+        })
+
+        // Creates preview data with thumbnail
+        const previewData = {
+          name: file.name,
+          type: file.type,
+          size: sendFile.size, // Show the send file size in UI
+          originalSize: file.size,
+          thumbnailData: await fileToBase64(thumbnailFile), // Small base64 for preview
+          thumbnailSize: thumbnailFile.size,
+        }
+
+        processedFiles.push({ sendFile, preview: previewData })
+      } catch (compressionError) {
+        console.warn(`Failed to compress ${file.name}, using fallback:`, compressionError)
+
+        try {
+          // Fallback - basic thumbnail if compression fails
+          const fallbackThumbnail = await compressImage(file, 150, 0.5, {
+            outputFormat: 'image/jpeg',
+          })
+
+          const previewData = {
+            name: file.name,
+            type: file.type,
+            size: file.size,
+            originalSize: file.size,
+            thumbnailData: await fileToBase64(
+              new File([fallbackThumbnail], file.name, { type: 'image/jpeg' }),
+            ),
+            thumbnailSize: fallbackThumbnail.size,
+          }
+
+          processedFiles.push({ sendFile: file, preview: previewData })
+        } catch (fallbackError) {
+          console.error(`All compression methods failed for ${file.name}:`, fallbackError)
+          try {
+            // Final fallback - uses original file with smaller preview
+            const previewData = {
+              name: file.name,
+              type: file.type,
+              size: file.size,
+              originalSize: file.size,
+              thumbnailData: await fileToBase64(file), // Uses original as fallback
+              thumbnailSize: file.size,
+            }
+
+            processedFiles.push({ sendFile: file, preview: previewData })
+          } catch (finalError) {
+            console.error(`Complete failure processing ${file.name}:`, finalError)
+            failedFiles.push({ name: file.name, error: finalError.message })
+          }
+        }
+      }
+    }
+
+    // Show warning if some files failed
+    if (failedFiles.length > 0) {
+      const failedNames = failedFiles.map((f) => f.name).join(', ')
+      toast.showToast(
+        `Warning: Could not process ${failedFiles.length} file(s): ${failedNames}`,
+        'warning',
+      )
+    }
+
+    // Continue with successfully processed files
+    if (processedFiles.length === 0) {
+      toast.showToast('No images could be processed', 'error')
+      return false
+    }
+
+    // Adds compressed files to form data
+    const sendFiles = processedFiles.map((item) => item.sendFile)
+    form.images.push(...sendFiles)
+
+    // Adds preview data using small thumbnails
+    const previewData = processedFiles.map((item) => item.preview)
+    uploadedImages.value.push(...previewData)
+
+    toast.showToast(
+      `Added ${processedFiles.length} image${processedFiles.length !== 1 ? 's' : ''} `,
+      'success',
+    )
+
+    return true
+  } catch (error) {
+    console.error('Error processing images:', error)
+    toast.showToast('Error processing images. Please try again.', 'error')
+    return false
+  }
+}
+// Sends to backend
 const postData = async (formData) => {
   try {
     const form = new FormData()
@@ -139,7 +286,6 @@ const onSubmit = async () => {
 
   const result = zodFormSchema.safeParse(form)
   const images = form.images
-  console.log('IMG:::::', images)
   if (!result.success) {
     const formattedError = result.error.format()
     displayErrors.firstName = formattedError.firstName?._errors[0] || ''
@@ -152,13 +298,7 @@ const onSubmit = async () => {
     toast.showToast('Please fix the errors.', 'error')
     return
   }
-  // Adding images to form - PROBLEMATIC !!! - I NEED TO USE THE FILES OBJECT
-  // I destructure data and attach images to it
-  // result.data = { ...result.data, images: uploadedImages.value }
   result.data = { ...result.data, images }
-  // const formDataObject = result.data.map(()=> {
-  //   formDataObject.append()
-  // })
   console.log('Form submitted:', result.data)
 
   // send validated form and images
@@ -168,177 +308,6 @@ const onSubmit = async () => {
   if (success) {
     clearForm()
     toast.showToast('Your message was sent successfully!', 'success')
-  }
-}
-// Sends the data to the backend
-const processFiles = async (files) => {
-  if (!files?.length) {
-    toast.showToast('No files selected.', 'error')
-    return false
-  }
-
-  // Check limit before processing
-  const remainingSlots = 5 - uploadedImages.value.length
-  if (files.length > remainingSlots) {
-    toast.showToast(
-      `You can only add ${remainingSlots} more image${remainingSlots !== 1 ? 's' : ''}.`,
-      'error',
-    )
-    return false
-  }
-
-  // Validate files first (before compression)
-  const errors = validateFiles(files)
-  if (errors.length) {
-    toast.showToast(errors.join('; '), 'error')
-    return false
-  }
-
-  try {
-    // Process each file individually to handle errors gracefully
-    const processedFiles = []
-    const failedFiles = []
-
-    for (let i = 0; i < files.length; i++) {
-      const file = files[i]
-      console.log(`Processing file ${i + 1}:`, file.name, file.type, formatFileSize(file.size))
-
-      try {
-        // Create thumbnail version (very small and compressed for UI preview)
-        const thumbnailBlob = await compressImage(file, 200, 0.6, {
-          preserveFormat: false, // Convert everything to JPEG for thumbnails
-          aggressiveResize: true,
-          outputFormat: 'image/jpeg', // Force JPEG for smallest thumbnails
-        })
-
-        // Create send version (better quality but still compressed for emailing)
-        const sendBlob = await compressImage(file, 1920, 0.85, {
-          preserveFormat: false, // Allow PNG->JPEG conversion
-          aggressiveResize: true,
-        })
-
-        // Create File objects
-        const thumbnailFile = new File([thumbnailBlob], `thumb_${file.name}`, {
-          type: 'image/jpeg',
-          lastModified: Date.now(),
-        })
-
-        const sendFile = new File([sendBlob], file.name, {
-          type: sendBlob.type || file.type,
-          lastModified: Date.now(),
-        })
-
-        console.log(`Compressed ${file.name}:`)
-        console.log(`  Original: ${formatFileSize(file.size)}`)
-        console.log(`  Thumbnail: ${formatFileSize(thumbnailFile.size)}`)
-        console.log(`  Send: ${formatFileSize(sendFile.size)}`)
-
-        // Create preview data with thumbnail - this matches your template expectations
-        const previewData = {
-          name: file.name,
-          type: file.type,
-          size: sendFile.size, // Show the send file size in UI
-          originalSize: file.size,
-          thumbnailData: await fileToBase64(thumbnailFile), // Small base64 for preview
-          thumbnailSize: thumbnailFile.size,
-        }
-
-        processedFiles.push({ sendFile, preview: previewData })
-      } catch (compressionError) {
-        console.warn(`Failed to compress ${file.name}, using fallback:`, compressionError)
-
-        try {
-          // Fallback: create a basic thumbnail if compression fails
-          const fallbackThumbnail = await compressImage(file, 150, 0.5, {
-            outputFormat: 'image/jpeg',
-          })
-
-          const previewData = {
-            name: file.name,
-            type: file.type,
-            size: file.size,
-            originalSize: file.size,
-            thumbnailData: await fileToBase64(
-              new File([fallbackThumbnail], file.name, { type: 'image/jpeg' }),
-            ),
-            thumbnailSize: fallbackThumbnail.size,
-          }
-
-          processedFiles.push({ sendFile: file, preview: previewData })
-        } catch (fallbackError) {
-          console.error(`All compression methods failed for ${file.name}:`, fallbackError)
-
-          try {
-            // Ultimate fallback - use original file but create smaller preview
-            const previewData = {
-              name: file.name,
-              type: file.type,
-              size: file.size,
-              originalSize: file.size,
-              thumbnailData: await fileToBase64(file), // Use original as fallback
-              thumbnailSize: file.size,
-            }
-
-            processedFiles.push({ sendFile: file, preview: previewData })
-          } catch (finalError) {
-            console.error(`Complete failure processing ${file.name}:`, finalError)
-            failedFiles.push({ name: file.name, error: finalError.message })
-          }
-        }
-      }
-    }
-
-    // Show warning if some files failed
-    if (failedFiles.length > 0) {
-      const failedNames = failedFiles.map((f) => f.name).join(', ')
-      toast.showToast(
-        `Warning: Could not process ${failedFiles.length} file(s): ${failedNames}`,
-        'warning',
-      )
-    }
-
-    // Continue with successfully processed files
-    if (processedFiles.length === 0) {
-      toast.showToast('No images could be processed', 'error')
-      return false
-    }
-
-    // Add compressed files to form data (for sending)
-    const sendFiles = processedFiles.map((item) => item.sendFile)
-    form.images.push(...sendFiles)
-
-    // Add preview data (for display) - using small thumbnails
-    const previewData = processedFiles.map((item) => item.preview)
-    uploadedImages.value.push(...previewData)
-
-    // Show success message with compression stats
-    const totalOriginalSize = processedFiles.reduce(
-      (acc, item) => acc + item.preview.originalSize,
-      0,
-    )
-    const totalSendSize = processedFiles.reduce((acc, item) => acc + item.preview.size, 0)
-    const totalThumbnailSize = processedFiles.reduce(
-      (acc, item) => acc + item.preview.thumbnailSize,
-      0,
-    )
-
-    const compressionRatio = ((1 - totalSendSize / totalOriginalSize) * 100).toFixed(1)
-
-    console.log(`Compression complete:`)
-    console.log(`  Original total: ${formatFileSize(totalOriginalSize)}`)
-    console.log(`  Send total: ${formatFileSize(totalSendSize)} (${compressionRatio}% reduction)`)
-    console.log(`  Thumbnail total: ${formatFileSize(totalThumbnailSize)}`)
-
-    toast.showToast(
-      `Added ${processedFiles.length} image${processedFiles.length !== 1 ? 's' : ''} `,
-      'success',
-    )
-
-    return true
-  } catch (error) {
-    console.error('Error processing images:', error)
-    toast.showToast('Error processing images. Please try again.', 'error')
-    return false
   }
 }
 
@@ -359,14 +328,13 @@ const handleFileChange = async (ev) => {
 
   await processFiles(files)
 
-  // Always clear the input to allow re-selecting the same files
+  // Clears the input to allow reselecting the same files
   ev.target.value = ''
 }
 
 /* HELPERS  */
-// Validate files (fixed to be more permissive)
 const validateFiles = (files) => {
-  const maxSize = 20 * 1000 * 1000 // 20MB since we'll compress heavily
+  const maxSize = 20 * 1000 * 1000 // 20MB max
   const errors = []
   const validTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp']
 
@@ -405,7 +373,7 @@ const removeImage = (index) => {
   // Remove from preview array
   uploadedImages.value.splice(index, 1)
 
-  // Remove from form images array (the files being sent)
+  // Remove from form images array
   if (form.images[index]) {
     form.images.splice(index, 1)
   }
@@ -498,7 +466,6 @@ const clearForm = () => {
           </div>
         </div>
       </div>
-
       <!-- Email -->
       <div class="group">
         <div class="mb-2 flex items-baseline">
@@ -528,7 +495,6 @@ const clearForm = () => {
           </Transition>
         </div>
       </div>
-
       <!-- Phone -->
       <div class="group">
         <label for="phone-number" class="font-sec text-fg mb-2 block font-medium"
@@ -557,8 +523,7 @@ const clearForm = () => {
           </Transition>
         </div>
       </div>
-
-      <!-- File Upload with Dropzone -->
+      <!-- File Upload / Dropzone -->
       <div>
         <div class="mb-4 flex items-center justify-between">
           <label for="file-upload" class="font-sec text-fg font-medium"> Watch Images </label>
@@ -603,7 +568,6 @@ const clearForm = () => {
           ]"
           @click="uploadedImages.length < 5 && $refs.fileInput?.click()"
         >
-          <!-- Input for dropzone -->
           <input
             ref="fileInput"
             type="file"
@@ -630,7 +594,6 @@ const clearForm = () => {
                     loading="lazy"
                   />
 
-                  <!-- Remove button -->
                   <button
                     @click.stop="removeImage(index)"
                     class="bg-danger hover:bg-danger/90 focus:ring-danger/50 pointer-events-auto absolute top-1 right-1 z-10 cursor-pointer rounded-full p-1.5 text-white opacity-100 shadow-md transition-all duration-200 hover:scale-110 focus:opacity-100 focus:ring-2 focus:outline-none xl:opacity-0 xl:group-hover:opacity-100"
@@ -641,21 +604,16 @@ const clearForm = () => {
                   </button>
                 </div>
 
-                <!-- File Info -->
-                <div class="flex flex-col justify-between gap-1 justify-self-end">
+                <div class="flex flex-col justify-between gap-1 justify-self-end px-1 pb-2">
                   <span
-                    class="text-fg line-clamp-2 px-1 text-center text-xs font-medium"
+                    class="text-fg text-tiny line-clamp-2 text-center font-medium"
                     :title="image.name"
                   >
                     {{ image.name }}
                   </span>
-                  <span class="text-fg-subtle text-center text-xs">
-                    {{ formatFileSize(image.size) }}
-                  </span>
                 </div>
               </div>
 
-              <!-- Add More Card (if under limit) -->
               <div
                 v-if="uploadedImages.length < 5"
                 class="bg-acc/5 border-acc/30 hover:bg-acc/10 hover:border-acc/50 pointer-events-auto flex min-h-32 cursor-pointer flex-col items-center justify-center rounded-lg border-2 border-dashed transition-all duration-200 hover:scale-[1.02]"
@@ -681,11 +639,14 @@ const clearForm = () => {
             <div v-else class="flex flex-col items-center">
               <IconGallery class="text-acc mb-3 size-12" />
               <p class="text-fg mb-2 font-medium">Drag & drop images here</p>
-              <p class="text-fg-subtle mb-3 text-sm">or click to browse files</p>
+              <p class="text-fg-subtle mb-3 text-sm">
+                or <span class="hidden md:inline">click</span>
+                <span class="inline md:hidden">touch</span> to browse
+              </p>
               <div class="bg-acc/10 text-acc rounded-lg px-4 py-2 text-sm font-medium">
                 Choose up to 5 images
               </div>
-              <p class="text-fg-subtle mt-2 text-xs">JPEG, PNG, WebP • Max 7MB each</p>
+              <p class="text-fg-subtle mt-2 text-xs">JPEG, PNG, WebP • Max 20MB each</p>
             </div>
           </div>
         </div>
@@ -730,7 +691,6 @@ const clearForm = () => {
           </div>
         </div>
       </div>
-
       <!-- Message -->
       <div>
         <div class="mb-2 flex items-baseline">
@@ -760,7 +720,6 @@ const clearForm = () => {
         </div>
       </div>
     </div>
-
     <!-- Form Footer -->
     <div class="border-brdr/10 mt-8 border-t pt-6">
       <div class="flex flex-col items-center justify-between gap-4 sm:flex-row">
