@@ -2,7 +2,7 @@
 import { computed, onMounted, onUnmounted } from 'vue'
 import { XMarkIcon, ClipboardIcon, EnvelopeIcon } from '@heroicons/vue/24/outline'
 import { useToastStore } from '@/stores/toast'
-
+import IconMessenger from '../icons/IconMessenger.vue'
 const props = defineProps({
   show: {
     type: Boolean,
@@ -43,6 +43,10 @@ const whatsappMessage = computed(() => {
   return `Check out this amazing workshop piece: "${shareTitle.value}"`
 })
 
+const messengerMessage = computed(() => {
+  return `Check out my latest workshop piece: "${shareTitle.value}"`
+})
+
 const emailSubject = computed(() => {
   return `Amazing Workshop Piece: ${shareTitle.value}`
 })
@@ -53,6 +57,10 @@ const emailBody = computed(() => {
 
 const facebookUrl = computed(() => {
   return `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(postUrl.value)}&quote=${encodeURIComponent(shareTitle.value)}`
+})
+
+const messengerUrl = computed(() => {
+  return `https://www.messenger.com/t/?link=${encodeURIComponent(postUrl.value)}&text=${encodeURIComponent(messengerMessage.value)}`
 })
 
 const twitterUrl = computed(() => {
@@ -191,6 +199,17 @@ const copyLink = async () => {
                   />
                 </svg>
                 <span class="text-fg text-sm font-medium">WhatsApp</span>
+              </a>
+
+              <a
+                :href="messengerUrl"
+                target="_blank"
+                rel="noopener"
+                @click="handleShare('Messenger')"
+                class="border-brdr/20 bg-primary/50 dark:border-sec-mute/30 dark:bg-sec/50 flex flex-col items-center gap-2 rounded-xl border p-4 transition-all hover:border-blue-500 hover:bg-blue-50"
+              >
+                <IconMessenger class="size-6 text-blue-500" />
+                <span class="text-fg text-sm font-medium">Messenger</span>
               </a>
 
               <a
