@@ -20,7 +20,10 @@ const form = reactive({
   message: '',
   images: [],
 })
+
 const uploadedImages = ref([])
+const processingFiles = ref([])
+const emailLoading = ref(false)
 
 const fieldStates = reactive({
   firstName: { touched: false, focused: false },
@@ -37,6 +40,9 @@ const displayErrors = reactive({
   message: '',
   phone: '',
 })
+
+// Size formatter
+const { toMB } = useFileSize()
 
 // Validate individual field
 const validateField = (fieldName, value) => {
@@ -78,8 +84,7 @@ const debounceValidation = (fieldName, value, delay = 300) => {
     }
   }, delay)
 }
-// Size formatter
-const { toMB } = useFileSize()
+
 // Watch form fields for changes
 Object.keys(displayErrors).forEach((fieldName) => {
   watch(
@@ -87,7 +92,99 @@ Object.keys(displayErrors).forEach((fieldName) => {
     (newVal) => debounceValidation(fieldName, newVal),
   )
 })
+
 // Processes images
+const processSingleFile = async (file) => {
+  try {
+    // Creates thumbnail version for UI
+    const thumbnailBlob = await compressImage(file, 200, 0.6, {
+      preserveFormat: false,
+      aggressiveResize: true,
+      outputFormat: 'image/jpeg',
+    })
+
+    // Create email version
+    const sendBlob = await compressImage(file, 1920, 0.85, {
+      preserveFormat: false,
+      aggressiveResize: true,
+    })
+
+    // Create File objects
+    const thumbnailFile = new File([thumbnailBlob], `thumb_${file.name}`, {
+      type: 'image/jpeg',
+      lastModified: Date.now(),
+    })
+
+    const sendFile = new File([sendBlob], file.name, {
+      type: sendBlob.type || file.type,
+      lastModified: Date.now(),
+    })
+
+    // Creates preview data with thumbnail
+    const previewData = {
+      name: file.name,
+      type: file.type,
+      size: sendFile.size,
+      originalSize: file.size,
+      thumbnailData: await fileToBase64(thumbnailFile),
+      thumbnailSize: thumbnailFile.size,
+    }
+
+    return { sendFile, preview: previewData, success: true }
+  } catch (compressionError) {
+    console.warn(`Failed to compress ${file.name}, trying fallback:`, compressionError)
+
+    try {
+      // Fallback - basic thumbnail if compression fails
+      const fallbackThumbnail = await compressImage(file, 150, 0.5, {
+        outputFormat: 'image/jpeg',
+      })
+
+      const previewData = {
+        name: file.name,
+        type: file.type,
+        size: file.size,
+        originalSize: file.size,
+        thumbnailData: await fileToBase64(
+          new File([fallbackThumbnail], file.name, { type: 'image/jpeg' }),
+        ),
+        thumbnailSize: fallbackThumbnail.size,
+      }
+
+      return { sendFile: file, preview: previewData, success: true }
+    } catch (fallbackError) {
+      console.warn(`Fallback failed for ${file.name}, using original:`, fallbackError)
+
+      try {
+        // Final fallback - use original file
+        const previewData = {
+          name: file.name,
+          type: file.type,
+          size: file.size,
+          originalSize: file.size,
+          thumbnailData: await fileToBase64(file),
+          thumbnailSize: file.size,
+        }
+
+        return { sendFile: file, preview: previewData, success: true }
+      } catch (finalError) {
+        console.error(`Complete failure processing ${file.name}:`, finalError)
+        return { success: false, error: finalError.message, fileName: file.name }
+      }
+    }
+  }
+}
+
+// Add file to UI immediately
+const addFileToUI = (sendFile, previewData) => {
+  form.images.push(sendFile)
+  uploadedImages.value.push(previewData)
+
+  // Remove from processing queue
+  processingFiles.value.shift()
+}
+
+// Main process files function - much cleaner now!
 const processFiles = async (files) => {
   if (!files?.length) {
     console.error('No files selected.')
@@ -105,101 +202,40 @@ const processFiles = async (files) => {
     return false
   }
 
-  // Validates before compression
+  // Validate before compression
   const errors = validateFiles(files)
   if (errors.length) {
     toast.showToast(errors.join('; '), 'error')
     return false
   }
 
-  try {
-    // Process each file individually to handle errors gracefully
-    const processedFiles = []
-    const failedFiles = []
+  // Add files to processing queue (for loading UI)
+  processingFiles.value = Array.from(files).map((file) => ({
+    name: file.name,
+    size: file.size,
+  }))
 
+  const failedFiles = []
+  let successCount = 0
+
+  try {
+    // Process each file individually
     for (let i = 0; i < files.length; i++) {
       const file = files[i]
+      const result = await processSingleFile(file)
 
-      try {
-        // Creates thumbnail version for UI
-        const thumbnailBlob = await compressImage(file, 200, 0.6, {
-          preserveFormat: false, // Converts to JPEG
-          aggressiveResize: true,
-          outputFormat: 'image/jpeg', // for thumbnails
-        })
-
-        // Create email version
-        const sendBlob = await compressImage(file, 1920, 0.85, {
-          preserveFormat: false,
-          aggressiveResize: true,
-        })
-
-        // Create File objects
-        const thumbnailFile = new File([thumbnailBlob], `thumb_${file.name}`, {
-          type: 'image/jpeg',
-          lastModified: Date.now(),
-        })
-
-        const sendFile = new File([sendBlob], file.name, {
-          type: sendBlob.type || file.type,
-          lastModified: Date.now(),
-        })
-
-        // Creates preview data with thumbnail
-        const previewData = {
-          name: file.name,
-          type: file.type,
-          size: sendFile.size, // Show the send file size in UI
-          originalSize: file.size,
-          thumbnailData: await fileToBase64(thumbnailFile), // Small base64 for preview
-          thumbnailSize: thumbnailFile.size,
-        }
-
-        processedFiles.push({ sendFile, preview: previewData })
-      } catch (compressionError) {
-        console.warn(`Failed to compress ${file.name}, using fallback:`, compressionError)
-
-        try {
-          // Fallback - basic thumbnail if compression fails
-          const fallbackThumbnail = await compressImage(file, 150, 0.5, {
-            outputFormat: 'image/jpeg',
-          })
-
-          const previewData = {
-            name: file.name,
-            type: file.type,
-            size: file.size,
-            originalSize: file.size,
-            thumbnailData: await fileToBase64(
-              new File([fallbackThumbnail], file.name, { type: 'image/jpeg' }),
-            ),
-            thumbnailSize: fallbackThumbnail.size,
-          }
-
-          processedFiles.push({ sendFile: file, preview: previewData })
-        } catch (fallbackError) {
-          console.error(`All compression methods failed for ${file.name}:`, fallbackError)
-          try {
-            // Final fallback - uses original file with smaller preview
-            const previewData = {
-              name: file.name,
-              type: file.type,
-              size: file.size,
-              originalSize: file.size,
-              thumbnailData: await fileToBase64(file), // Uses original as fallback
-              thumbnailSize: file.size,
-            }
-
-            processedFiles.push({ sendFile: file, preview: previewData })
-          } catch (finalError) {
-            console.error(`Complete failure processing ${file.name}:`, finalError)
-            failedFiles.push({ name: file.name, error: finalError.message })
-          }
-        }
+      if (result.success) {
+        // Add to UI immediately
+        addFileToUI(result.sendFile, result.preview)
+        successCount++
+      } else {
+        // Remove from processing queue even if failed
+        processingFiles.value.shift()
+        failedFiles.push({ name: result.fileName, error: result.error })
       }
     }
 
-    // Show warning if some files failed
+    // Show results
     if (failedFiles.length > 0) {
       const failedNames = failedFiles.map((f) => f.name).join(', ')
       toast.showToast(
@@ -208,37 +244,28 @@ const processFiles = async (files) => {
       )
     }
 
-    // Continue with successfully processed files
-    if (processedFiles.length === 0) {
+    if (successCount === 0) {
       toast.showToast('No images could be processed', 'error')
       return false
     }
 
-    // Adds compressed files to form data
-    const sendFiles = processedFiles.map((item) => item.sendFile)
-    form.images.push(...sendFiles)
-
-    // Adds preview data using small thumbnails
-    const previewData = processedFiles.map((item) => item.preview)
-    uploadedImages.value.push(...previewData)
-
-    toast.showToast(
-      `Added ${processedFiles.length} image${processedFiles.length !== 1 ? 's' : ''} `,
-      'success',
-    )
+    toast.showToast(`Added ${successCount} image${successCount !== 1 ? 's' : ''}`, 'success')
 
     return true
   } catch (error) {
     console.error('Error processing images:', error)
     toast.showToast('Error processing images. Please try again.', 'error')
     return false
+  } finally {
+    // Clear any remaining processing files (in case of errors)
+    processingFiles.value = []
   }
 }
 // Sends to backend
 const postData = async (formData) => {
   try {
     const form = new FormData()
-
+    // FORM NEVER GETS VALIDATED
     form.append('firstName', formData.firstName)
     form.append('lastName', formData.lastName)
     form.append('email', formData.email)
@@ -300,10 +327,11 @@ const onSubmit = async () => {
   }
   result.data = { ...result.data, images }
   console.log('Form submitted:', result.data)
-
+  // Emailing load state
+  emailLoading.value = true
   // send validated form and images
   const success = await postData(result.data)
-
+  emailLoading.value = false
   // If server responded successfully
   if (success) {
     clearForm()
@@ -559,7 +587,7 @@ const clearForm = () => {
         <div
           ref="dropZoneRef"
           :class="[
-            'group relative rounded-lg border-2 border-dashed transition-all duration-200',
+            'relative rounded-lg border-2 border-dashed transition-all duration-200',
             isOverDropZone
               ? 'border-acc bg-acc/10 scale-[1.02]'
               : uploadedImages.length < 5
@@ -578,14 +606,14 @@ const clearForm = () => {
             @change="handleFileChange"
           />
 
-          <div v-if="uploadedImages.length > 0" class="p-4">
+          <div v-if="uploadedImages.length > 0 || processingFiles.length > 0" class="p-4">
             <div class="grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5">
+              <!-- Existing Image Cards -->
               <div
                 v-for="(image, index) in uploadedImages"
-                :key="index"
+                :key="`uploaded-${index}`"
                 class="bg-sec/80 border-acc/20 group hover:border-acc/40 relative flex flex-col overflow-hidden rounded-lg border transition-all duration-200 hover:shadow-md"
               >
-                <!-- Image Preview -->
                 <div class="relative mb-2 overflow-hidden">
                   <img
                     :src="image.thumbnailData"
@@ -593,7 +621,6 @@ const clearForm = () => {
                     class="h-20 w-full object-cover transition-transform duration-200 group-hover:scale-105 sm:h-24"
                     loading="lazy"
                   />
-
                   <button
                     @click.stop="removeImage(index)"
                     class="bg-danger hover:bg-danger/90 focus:ring-danger/50 pointer-events-auto absolute top-1 right-1 z-10 cursor-pointer rounded-full p-1.5 text-white opacity-100 shadow-md transition-all duration-200 hover:scale-110 focus:opacity-100 focus:ring-2 focus:outline-none xl:opacity-0 xl:group-hover:opacity-100"
@@ -603,7 +630,6 @@ const clearForm = () => {
                     <XMarkIcon class="size-3" />
                   </button>
                 </div>
-
                 <div class="flex flex-col justify-between gap-1 justify-self-end px-1 pb-2">
                   <span
                     class="text-fg text-tiny line-clamp-2 text-center font-medium"
@@ -614,14 +640,49 @@ const clearForm = () => {
                 </div>
               </div>
 
+              <!-- Loading Cards for each file being processed -->
               <div
-                v-if="uploadedImages.length < 5"
+                v-for="(file, index) in processingFiles"
+                :key="`processing-${index}`"
+                class="bg-sec/60 border-brdr/40 relative flex flex-col overflow-hidden rounded-lg border"
+              >
+                <div class="relative mb-2 overflow-hidden">
+                  <!-- Static muted background -->
+                  <div class="bg-sec-light dark:bg-sec-mute h-20 w-full sm:h-24"></div>
+
+                  <!-- Processing indicator with muted colors -->
+                  <div
+                    class="bg-primary/20 absolute inset-0 flex flex-col items-center justify-center gap-2"
+                  >
+                    <div
+                      class="border-acc/60 h-6 w-6 animate-spin rounded-full border-2 border-t-transparent"
+                    ></div>
+                    <span class="text-acc/80 animate-pulse text-center text-xs font-medium"
+                      >Processing...</span
+                    >
+                  </div>
+                </div>
+
+                <div
+                  class="flex animate-pulse flex-col justify-between gap-1 justify-self-end px-1 pb-2"
+                >
+                  <!-- Static placeholder bar -->
+                  <div class="bg-sec-mute/80 mx-auto h-3 w-3/4 rounded"></div>
+                </div>
+              </div>
+
+              <!-- Add More Button -->
+              <div
+                v-if="uploadedImages.length + processingFiles.length < 5"
                 class="bg-acc/5 border-acc/30 hover:bg-acc/10 hover:border-acc/50 pointer-events-auto flex min-h-32 cursor-pointer flex-col items-center justify-center rounded-lg border-2 border-dashed transition-all duration-200 hover:scale-[1.02]"
-                @click.stop="$refs.fileInput?.click()"
+                :class="{ 'pointer-events-none opacity-50': processingFiles.length > 0 }"
+                @click.stop="processingFiles.length === 0 && $refs.fileInput?.click()"
               >
                 <PlusIcon class="text-acc mb-1 size-6" />
                 <span class="text-acc text-xs font-medium">Add More</span>
-                <span class="text-fg-subtle text-xs">{{ 5 - uploadedImages.length }} left</span>
+                <span class="text-fg-subtle text-xs"
+                  >{{ 5 - uploadedImages.length - processingFiles.length }} left</span
+                >
               </div>
             </div>
           </div>
@@ -691,6 +752,7 @@ const clearForm = () => {
           </div>
         </div>
       </div>
+
       <!-- Message -->
       <div>
         <div class="mb-2 flex items-baseline">
@@ -701,7 +763,7 @@ const clearForm = () => {
           <textarea
             name="message"
             id="message"
-            maxlength="1000"
+            maxlength="5000"
             rows="8"
             class="text-fg placeholder-fg/50 focus:ring-acc/50 focus:border-acc input custom-scrollbar w-full resize-none rounded-xl"
             placeholder="Tell me about your watch, what issues you're experiencing, or any specific requirements..."
@@ -729,10 +791,22 @@ const clearForm = () => {
         <button
           type="submit"
           @click.prevent="onSubmit()"
-          class="from-acc to-acc/80 hover:from-acc/90 hover:to-acc/70 focus:ring-acc/50 inline-flex transform cursor-pointer items-center rounded-xl bg-gradient-to-r px-8 py-3 font-semibold text-white shadow-lg transition-all duration-200 hover:scale-[1.02] focus:ring-2 focus:outline-none"
+          class="from-acc to-acc/80 hover:from-acc/90 hover:to-acc/70 focus:ring-acc/50 transform cursor-pointer rounded-xl bg-gradient-to-r px-4 py-3 font-semibold text-white shadow-lg transition-all duration-200 hover:scale-[1.02] focus:ring-2 focus:outline-none"
         >
-          <PaperAirplaneIcon class="mr-2 size-5 -rotate-90 transform"></PaperAirplaneIcon>
-          Send Message
+          <div v-if="!emailLoading" class="flex items-center">
+            <PaperAirplaneIcon class="mr-2 size-5 -rotate-90 transform"></PaperAirplaneIcon>
+            Send Message
+          </div>
+          <div
+            v-else
+            class="flex cursor-pointer items-center px-2"
+            :class="emailLoading ? 'cursor-not-allowed' : 'cursor-pointer'"
+          >
+            <div
+              class="mr-2 size-5 animate-spin rounded-full border-2 border-white border-t-transparent"
+            ></div>
+            Emailing...
+          </div>
         </button>
       </div>
     </div>

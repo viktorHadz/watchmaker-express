@@ -8,6 +8,8 @@ import { useAuth } from '../../composables/useAuth.js'
 import { usePostsStore } from '@/stores/usePostsStore'
 import { storeToRefs } from 'pinia'
 
+// TODO: When deleting the last post from a page ensure to refethc and send user to the first page
+
 const { isAuthenticated } = useAuth()
 const postsRef = useTemplateRef('postsRef')
 

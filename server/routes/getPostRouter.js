@@ -111,69 +111,6 @@ router.get('/get-all', (req, res) => {
   }
 })
 
-// Alternative: Keep a simpler endpoint without pagination for backward compatibility
-router.get('/get-all-simple', (req, res) => {
-  try {
-    const posts = db.prepare(`SELECT * FROM posts ORDER BY id DESC`).all()
-    const images = db.prepare('SELECT * FROM images ORDER BY post_id, order_index, id').all()
-
-    // Group images by post and type
-    const imgsByPost = {}
-    images.forEach((image) => {
-      if (!imgsByPost[image.post_id]) {
-        imgsByPost[image.post_id] = {
-          title: null,
-          extras: [],
-          thumbnails: [],
-        }
-      }
-
-      if (image.image_type === 'title') {
-        imgsByPost[image.post_id].title = image
-      } else if (image.image_type === 'extra') {
-        imgsByPost[image.post_id].extras.push(image)
-      } else if (image.image_type === 'thumbnail') {
-        imgsByPost[image.post_id].thumbnails.push(image)
-      }
-    })
-
-    const result = posts.map((post) => {
-      const postImages = imgsByPost[post.id] || { title: null, extras: [], thumbnails: [] }
-      return {
-        postId: post.id,
-        postTitle: post.post_title,
-        postBody: post.post_body,
-        date: post.date,
-        postType: post.post_type,
-        postFolder: postImages.title?.folder_url || null,
-        titleImage: postImages.title
-          ? {
-              id: postImages.title.id,
-              titlePath: postImages.title.image_path,
-              type: postImages.title.image_type,
-            }
-          : null,
-        extraImages: postImages.extras.map((img) => ({
-          id: img.id,
-          path: img.image_path,
-          type: img.image_type,
-          order: img.order_index,
-        })),
-        thumbImages: postImages.thumbnails.map((img) => ({
-          id: img.id,
-          path: img.image_path,
-          type: img.image_type,
-          order: img.order_index,
-        })),
-      }
-    })
-    return res.json(result)
-  } catch (error) {
-    console.log(`V-Error: ${error}`)
-    return res.status(500).json({ error: 'Database error' })
-  }
-})
-
 // Bonus: Add a search endpoint with pagination
 router.get('/search', (req, res) => {
   try {
