@@ -2,35 +2,38 @@
 import { ShareIcon, TrashIcon, PencilSquareIcon, CalendarIcon } from '@heroicons/vue/24/outline'
 import { onMounted, useTemplateRef } from 'vue'
 import PostModal from './FullPost.vue'
+import ShareModal from './ShareModal.vue' // Import ShareModal
 import IconGallery from '../icons/IconGallery.vue'
 import PaginationMain from '../PaginationMain.vue'
 import { useAuth } from '../../composables/useAuth.js'
 import { usePostsStore } from '@/stores/usePostsStore'
 import { storeToRefs } from 'pinia'
-
-// TODO: When deleting the last post from a page ensure to refethc and send user to the first page
+import { useRouter } from 'vue-router'
 
 const { isAuthenticated } = useAuth()
 const postsRef = useTemplateRef('postsRef')
 
 // Use the posts store
 const postsStore = usePostsStore()
+const router = useRouter()
 
-//  Store Posts
-const { allPosts, loading, pageNumbers, showPostModal, selectedPost } = storeToRefs(postsStore)
+// Get reactive state from store
+const { allPosts, loading, pageNumbers, showPostModal, selectedPost, showShareModal, postToShare } =
+  storeToRefs(postsStore)
 
 // Get actions from store (these don't need storeToRefs)
 const {
   openPost,
   closePostModal,
+  openShareModal,
+  closeShareModal,
   handlePageChange,
-  handlePostShare,
   deletePost,
   initialize,
   initEdit,
 } = postsStore
 
-// Handle page change with a smooth scroll
+// Handle page change with smooth scroll
 const handlePageChangeWithScroll = async (page) => {
   await handlePageChange(page)
   if (postsRef.value) {
@@ -39,6 +42,29 @@ const handlePageChangeWithScroll = async (page) => {
       block: 'start',
     })
   }
+}
+
+// Handle opening a post
+const handleOpenPost = (post) => {
+  openPost(post)
+  router.push(`/my-work/${post.postId}`)
+}
+
+const handleClosePost = () => {
+  closePostModal()
+  router.push('/my-work')
+}
+
+// Handle share button click opens share modal
+const handlePostShare = (post) => {
+  console.log('Gallery: Opening share modal for post', post.postId)
+  openShareModal(post) // Store handles opening share modal
+}
+
+// Handle closing share modal
+const handleCloseShareModal = () => {
+  console.log('Gallery: Closing share modal')
+  closeShareModal() // Store handles closing
 }
 
 onMounted(() => {
@@ -97,7 +123,7 @@ onMounted(() => {
         v-for="(post, i) in allPosts.posts"
         :key="post.postId || i"
         class="group dark:bg-sec/80 bg-primary border-acc/20 hover:border-acc/40 dark:hover:border-acc/40 dark:border-sec-mute/50 cursor-pointer overflow-hidden rounded-2xl border shadow-lg backdrop-blur-sm transition-all duration-200 hover:shadow-xl"
-        @click="openPost(post)"
+        @click="handleOpenPost(post)"
       >
         <!-- Image -->
         <div class="relative aspect-[4/3] overflow-hidden">
@@ -194,9 +220,10 @@ onMounted(() => {
           </button>
         </div>
 
+        <!-- Share Button (for non-authenticated users) -->
         <div
           v-else
-          class="absolute bottom-2.5 left-[60%] flex space-x-2 opacity-100 transition-opacity duration-200 sm:top-3 sm:left-3 md:opacity-0 md:group-hover:opacity-100"
+          class="absolute bottom-2.5 left-[60%] space-x-2 opacity-100 transition-opacity duration-200 sm:top-3 sm:left-3 md:opacity-0 md:group-hover:opacity-100"
         >
           <button
             @click.stop="handlePostShare(post)"
@@ -219,9 +246,12 @@ onMounted(() => {
     <PostModal
       :show="showPostModal"
       :post="selectedPost"
-      @close="closePostModal"
+      @close="handleClosePost"
       @share="handlePostShare"
     />
+
+    <!-- Share Modal -->
+    <ShareModal :show="showShareModal" :post="postToShare || {}" @close="handleCloseShareModal" />
   </section>
 </template>
 

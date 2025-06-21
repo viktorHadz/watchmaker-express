@@ -1,3 +1,4 @@
+<!-- Update your FullPost.vue script section -->
 <script setup>
 import { ref, computed, watch } from 'vue'
 import { usePostsStore } from '@/stores/usePostsStore'
@@ -29,11 +30,15 @@ const props = defineProps({
 
 const emit = defineEmits(['close', 'share'])
 
-// Passed State
-const { isAuthenticated } = useAuth()
+// Get store instance and actions
 const postsStore = usePostsStore()
+const { isAuthenticated } = useAuth()
+
+// Get reactive state from store
 const { isEditing, editForm } = storeToRefs(postsStore)
-const { saveEdit } = postsStore
+
+// Get actions from store
+const { saveEdit, openShareModal } = postsStore
 
 const currentImageIndex = ref(0)
 const showImageGallery = ref(true)
@@ -76,10 +81,10 @@ const closeModal = () => {
   emit('close')
 }
 
+// Updated handleShare to use store function
 const handleShare = () => {
-  if (navigator.clipboard) {
-    navigator.clipboard.writeText(`Check out this post: ${props.post.postTitle}`)
-  }
+  console.log('FullPost: Opening share modal for post:', props.post.postId)
+  openShareModal(props.post)
   emit('share', props.post)
 }
 
@@ -172,7 +177,7 @@ watch(
                   <button
                     v-if="allImages.length > 0"
                     @click="toggleImageGallery"
-                    class="group relative size-9 sm:size-10"
+                    class="group relative size-9 cursor-pointer sm:size-10"
                     :title="showImageGallery ? 'Hide images' : 'Show images'"
                   >
                     <div
@@ -205,7 +210,7 @@ watch(
                   <!-- Save/Share Button -->
                   <button
                     v-if="isAuthenticated && isEditing"
-                    class="group relative size-9 sm:size-10"
+                    class="group relative size-9 cursor-pointer sm:size-10"
                     @click="saveEdit(post.postId)"
                   >
                     <div
@@ -220,7 +225,11 @@ watch(
                     </div>
                   </button>
 
-                  <button v-else @click="handleShare" class="group relative size-9 sm:size-10">
+                  <button
+                    v-else
+                    @click="handleShare"
+                    class="group relative size-9 cursor-pointer sm:size-10"
+                  >
                     <div
                       class="from-acc/20 to-acc/10 group-hover:from-acc/30 group-hover:to-acc/20 absolute inset-0 rounded-xl bg-gradient-to-br transition-all duration-300"
                     ></div>
@@ -234,7 +243,10 @@ watch(
                   </button>
 
                   <!-- Close Button -->
-                  <button @click="closeModal" class="group relative size-9 sm:size-10">
+                  <button
+                    @click="closeModal"
+                    class="group relative size-9 cursor-pointer sm:size-10"
+                  >
                     <div
                       class="absolute inset-0 rounded-xl bg-gradient-to-br from-red-500/20 to-red-500/10 transition-all duration-300 group-hover:from-red-500/30 group-hover:to-red-500/20"
                     ></div>
@@ -251,7 +263,7 @@ watch(
             </div>
           </div>
 
-          <!-- Collapsible Image Gallery Section -->
+          <!-- Gallery Section -->
           <Transition name="gallery" mode="out-in">
             <div
               v-if="allImages.length > 0 && showImageGallery"

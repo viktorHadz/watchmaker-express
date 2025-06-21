@@ -12,7 +12,6 @@ router.delete('/delete/:postid', verifyUserIdentity, async (req, res) => {
   try {
     const postId = req.params.postid
 
-    // Validation
     if (!postId || isNaN(postId)) {
       return res.status(400).json({ success: false, error: 'Invalid post ID' })
     }
@@ -20,7 +19,7 @@ router.delete('/delete/:postid', verifyUserIdentity, async (req, res) => {
     // Delete files first - non-blocking!
     await deletePostFiles(postId)
 
-    // Delete from database
+    // Then delete from db
     const result = db.prepare(`DELETE FROM posts WHERE id = ?`).run(postId)
     if (result.changes === 0) {
       return res.status(404).json({ success: false, error: 'Post not found' })
@@ -38,7 +37,6 @@ router.delete('/delete/:postid', verifyUserIdentity, async (req, res) => {
 })
 
 async function deletePostFiles(postId) {
-  // This is synchronous - no await needed
   const stmtImageData = db.prepare(`SELECT folder_url FROM images WHERE post_id=?`).get(postId)
 
   if (!stmtImageData?.folder_url) {

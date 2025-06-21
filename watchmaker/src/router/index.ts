@@ -23,12 +23,28 @@ const router = createRouter({
       component: MyWorkView,
     },
     {
+      path: '/my-work/:postId',
+      name: 'postDetail',
+      component: MyWorkView,
+      props: true,
+      // Add meta for sharing
+      meta: {
+        requiresPost: true,
+      },
+    },
+    {
       path: '/admin',
       name: 'admin',
       component: LoginPanel,
     },
   ],
   scrollBehavior(to, from, savedPosition) {
+    if (savedPosition) {
+      return savedPosition
+    }
+    if (to.hash) {
+      return { el: to.hash, behavior: 'smooth' }
+    }
     return { top: 0 }
   },
 })

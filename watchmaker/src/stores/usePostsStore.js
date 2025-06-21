@@ -25,9 +25,20 @@ export const usePostsStore = defineStore('posts', () => {
   const currentPage = ref(1)
   const totalPagesCount = ref(1)
 
-  // For modal
+  // For post modal
   const showPostModal = ref(false)
   const selectedPost = ref({})
+
+  // For share modal
+  const showShareModal = ref(false)
+  const postToShare = ref(null)
+
+  // For editing
+  const editing = ref(false)
+  const editForm = ref({
+    postTitle: '',
+    postBody: '',
+  })
 
   // Computed
   const pageNumbers = computed(() => {
@@ -43,7 +54,68 @@ export const usePostsStore = defineStore('posts', () => {
     pagination: pagination.value,
   }))
 
-  // Actions
+  const isEditing = computed(() => editing.value)
+
+  // SHARING FUNCTIONS
+  function generatePostUrl(postId) {
+    return `${window.location.origin}/my-work/${postId}`
+  }
+
+  function openShareModal(post) {
+    postToShare.value = post
+    showShareModal.value = true
+  }
+
+  function closeShareModal() {
+    console.log('Closing share modal')
+    showShareModal.value = false
+    postToShare.value = null
+  }
+
+  async function copyPostLink(post) {
+    const url = generatePostUrl(post.postId)
+    try {
+      await navigator.clipboard.writeText(url)
+      toast('Link copied to clipboard!', 'success')
+      return { success: true }
+    } catch (error) {
+      console.error('Failed to copy link:', error)
+      toast('Failed to copy link', 'error')
+      return { success: false, error }
+    }
+  }
+
+  // POST MODAL FUNCTIONS
+  function openPost(post) {
+    selectedPost.value = post
+    showPostModal.value = true
+  }
+
+  function closePostModal() {
+    console.log('Closing post modal')
+    showPostModal.value = false
+    selectedPost.value = {}
+    cancelEdit()
+  }
+
+  // Find and open post by ID (for direct URL access)
+  function openPostById(postId) {
+    console.log('Looking for post with ID:', postId)
+    const post = posts.value.find((p) => p.postId == postId)
+
+    if (post) {
+      console.log('Found post, opening modal:', post.postTitle)
+      selectedPost.value = post
+      showPostModal.value = true
+      return post
+    } else {
+      console.log('Post not found with ID:', postId)
+      toast('Post not found', 'error')
+      return null
+    }
+  }
+
+  // EXISTING FUNCTIONS
   async function fetchPosts(page = 1) {
     try {
       loading.value = true
@@ -59,7 +131,6 @@ export const usePostsStore = defineStore('posts', () => {
       return data
     } catch (error) {
       console.error('Error fetching posts:', error)
-
       toast('Failed to load posts', 'error')
       throw error
     } finally {
@@ -88,7 +159,6 @@ export const usePostsStore = defineStore('posts', () => {
         throw new Error(result.error || `Server error: ${response.status}`)
       }
 
-      // Refresh posts if successful creation
       await fetchPosts(currentPage.value)
       toast('Post created successfully!', 'success')
 
@@ -120,15 +190,12 @@ export const usePostsStore = defineStore('posts', () => {
         throw new Error(result.error || `Error in response: ${response.status}`)
       }
 
-      // Remove from local state immediately for better UX
       const updateUi = posts.value.findIndex((p) => p.postId === postId)
       if (updateUi > -1) {
         posts.value.splice(updateUi, 1)
       }
 
-      // Refresh posts
       await fetchPosts(currentPage.value)
-
       toast('Post deleted successfully', 'success')
       return true
     } catch (error) {
@@ -138,17 +205,6 @@ export const usePostsStore = defineStore('posts', () => {
     }
   }
 
-  function openPost(post) {
-    selectedPost.value = post
-    showPostModal.value = true
-  }
-
-  function closePostModal() {
-    showPostModal.value = false
-    selectedPost.value = {}
-    cancelEdit()
-  }
-
   async function handlePageChange(page) {
     if (page === currentPage.value || page < 1 || page > totalPagesCount.value) {
       return
@@ -156,32 +212,13 @@ export const usePostsStore = defineStore('posts', () => {
     await fetchPosts(page)
   }
 
-  function handlePostShare(post) {
-    // Implement sharing logic
-    console.log('Sharing post:', post)
+  async function initialize() {
+    await fetchPosts()
   }
 
-  // Initialize posts on store creation
-  function initialize() {
-    fetchPosts()
-  }
-  const editing = ref(false)
-  const isEditing = computed(() => {
-    if (editing.value) {
-      return true
-    } else {
-      return false
-    }
-  })
-  const editForm = ref({
-    postTitle: '',
-    postBody: '',
-    // Other editable fields in future
-  })
   function initEdit(post) {
     editing.value = true
-    selectedPost.value = post // For display reference
-    // Copy values to edit form
+    selectedPost.value = post
     editForm.value = {
       postTitle: post.postTitle,
       postBody: post.postBody,
@@ -195,10 +232,6 @@ export const usePostsStore = defineStore('posts', () => {
     try {
       const token = getAuthToken()
 
-      console.log('Edit form title: ', editForm.value.postTitle)
-      console.log('Edit form body: ', editForm.value.postBody)
-
-      // Then API call
       const response = await fetch(`/api/posts/edit/${postId}`, {
         method: 'PATCH',
         headers: {
@@ -216,8 +249,7 @@ export const usePostsStore = defineStore('posts', () => {
       if (!response.ok) {
         throw new Error(result.error || `Error in response: ${response.status}`)
       }
-      console.log('Resultata: ', result)
-      // If success update UI
+
       selectedPost.value.postTitle = editForm.value.postTitle
       selectedPost.value.postBody = editForm.value.postBody
       editing.value = false
@@ -230,8 +262,8 @@ export const usePostsStore = defineStore('posts', () => {
 
   function cancelEdit() {
     editing.value = false
-    // editForm automatically gets reset on next initEdit
   }
+
   return {
     // State
     posts,
@@ -240,26 +272,40 @@ export const usePostsStore = defineStore('posts', () => {
     isUploading,
     currentPage,
     totalPagesCount,
-    showPostModal,
     selectedPost,
-    isEditing,
     editForm,
+
+    // Modal states
+    showPostModal,
+    showShareModal,
+    postToShare,
 
     // Computed
     pageNumbers,
     allPosts,
+    isEditing,
 
-    // Actions
+    // Post actions
     fetchPosts,
     createPost,
     deletePost,
-    initEdit,
+    handlePageChange,
+    initialize,
+
+    // Post modal actions
     openPost,
     closePostModal,
-    handlePageChange,
-    handlePostShare,
-    initialize,
-    cancelEdit,
+    openPostById,
+
+    // Share modal actions
+    openShareModal,
+    closeShareModal,
+    generatePostUrl,
+    copyPostLink,
+
+    // Edit actions
+    initEdit,
     saveEdit,
+    cancelEdit,
   }
 })
