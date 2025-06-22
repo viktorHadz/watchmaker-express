@@ -262,6 +262,7 @@ onUnmounted(() => {
             <div class="space-y-1 p-3">
               <button
                 class="font-sec active:bg-acc/10 flex w-full items-center gap-3 rounded-lg px-3 py-3 text-left text-sm font-medium transition duration-200 active:scale-95"
+                @click="toolNewPostNav()"
               >
                 <div
                   class="bg-acc/15 flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-md"

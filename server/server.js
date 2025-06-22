@@ -14,6 +14,14 @@ import editPostRouter from './routes/editPostRouter.js'
 const app = express()
 const __filename = fileURLToPath(import.meta.url) // get the resolved path to the file
 const __dirname = path.dirname(__filename) // get the name of the directory
+
+const cacheMiddleware = (duration) => {
+  return (req, res, next) => {
+    res.set('Cache-Control', `public, max-age=${duration}`)
+    next()
+  }
+}
+
 // Trust the proxy if behind one (important for correct IP detection)
 app.set('trust proxy', 1 /*this needs to be the proxy's ip here not 1 when i implement nginx */)
 
@@ -33,12 +41,31 @@ app.use(express.json())
 // Registering routes
 app.use('/api/form/', formRouter)
 app.use('/api/posts/', insertPostRouter)
-app.use('/api/posts/', getPostRouter)
+app.use('/api/posts/', cacheMiddleware(180), getPostRouter) // 3 minutes cache
 app.use('/api/posts/', deletePostRouter)
 app.use('/api/posts/', editPostRouter)
 
-app.use('/public/uploads', express.static(path.join(__dirname, 'public', 'uploads')))
-
+app.use(
+  '/public/uploads',
+  express.static(path.join(__dirname, 'public', 'uploads'), {
+    maxAge: '1y', // Cache for 1 year
+    etag: true,
+    lastModified: true,
+    setHeaders: (res, path) => {
+      // Different cache times for different file types
+      if (
+        path.endsWith('.jpg') ||
+        path.endsWith('.jpeg') ||
+        path.endsWith('.png') ||
+        path.endsWith('.webp')
+      ) {
+        res.setHeader('Cache-Control', 'public, max-age=31536000, immutable') // 1 year for images
+      } else {
+        res.setHeader('Cache-Control', 'public, max-age=86400') // 1 day for other files
+      }
+    },
+  }),
+)
 // GET homepage
 app.get('/home-baby', (req, res) => {
   const htmlString = `

@@ -1,5 +1,5 @@
 <script setup>
-import { ref } from 'vue'
+import { computed, ref } from 'vue'
 import { useDropZone } from '@vueuse/core'
 import placeHolder from '../icons/placeHolder.vue'
 import pocketWatch from '../icons/pocketWatch.vue'
@@ -12,8 +12,33 @@ import { storeToRefs } from 'pinia'
 import { useImageCompression } from '@/composables/useImageCompression'
 
 const MAX_EXTRA_IMAGES = 5
-const MAX_FILE_SIZE = 25 * 1024 * 1024 // 20MB
+const MAX_FILE_SIZE = 15 * 1024 * 1024 // 15MB
+const MAX_COMPRESSED_SIZE_KB = 800 // max 800KB per image
+const MAX_THUMBNAIL_SIZE_KB = 50 // 50KB per thumbnail
 const ALLOWED_TYPES = ['image/jpeg', 'image/png', 'image/webp']
+
+// Enhanced compression with size targets
+const { compressImage, compressToSize } = useImageCompression()
+
+// Thumbnail generation aggressive compress
+const generateThumbnail = async (file) => {
+  try {
+    // compressToSize for strict size control
+    return await compressToSize(file, MAX_THUMBNAIL_SIZE_KB, {
+      maxWidth: 150,
+      initialQuality: 0.6,
+      preserveFormat: false, // Convert PNGs to JPEG for thumbnails
+      aggressiveResize: true,
+    })
+  } catch (error) {
+    console.warn('Thumbnail generation failed, using fallback:', error)
+    // Fallback to regular compression if compressToSize fails
+    return await compressImage(file, 150, 0.5, {
+      preserveFormat: false,
+      aggressiveResize: true,
+    })
+  }
+}
 
 const postsStore = usePostsStore()
 const { isUploading } = storeToRefs(postsStore)
@@ -37,9 +62,14 @@ const postType = usePostType(newPost)
 const titleFileInputRef = ref(null)
 const extraFileInputRef = ref(null)
 
-const { compressImage } = useImageCompression()
-const generateThumbnail = (file) => compressImage(file, 150, 0.5)
-
+// For UI feedback when compressing images
+const isProcessing = ref(false)
+// Update the template to show processing state
+const computedButtonState = computed(() => {
+  if (isProcessing.value) return { text: 'Processing Images...', disabled: true }
+  if (isUploading.value) return { text: 'Creating Post...', disabled: true }
+  return { text: 'Publish Post', disabled: false }
+})
 // Helpers with error handling
 const createPreview = (file) =>
   new Promise((resolve, reject) => {
@@ -50,15 +80,32 @@ const createPreview = (file) =>
   })
 
 const validateImageFile = (file) => {
-  if (!file?.type?.startsWith('image/')) return false
+  if (!file?.type?.startsWith('image/')) {
+    toast('Please select a valid image file', 'error')
+    return false
+  }
+
   if (!ALLOWED_TYPES.includes(file.type)) {
     toast('Only JPEG, PNG, and WebP images are allowed', 'warning')
     return false
   }
+
   if (file.size > MAX_FILE_SIZE) {
-    toast(`File size must be less than ${MAX_FILE_SIZE / 1024 / 1024}MB`, 'error')
+    toast(
+      `File size must be less than ${MAX_FILE_SIZE / 1024 / 1024}MB. Current size: ${(file.size / 1024 / 1024).toFixed(1)}MB`,
+      'error',
+    )
     return false
   }
+
+  // Warn about very large files
+  if (file.size > 10 * 1024 * 1024) {
+    toast(
+      `Large file detected (${(file.size / 1024 / 1024).toFixed(1)}MB). Compression may take a moment...`,
+      'info',
+    )
+  }
+
   return true
 }
 
@@ -76,10 +123,19 @@ async function processImage(file, isExtra = false) {
   if (isExtra && !canAddExtraImages()) return false
 
   try {
-    const compressed = await compressImage(file)
+    let compressed
 
     if (isExtra) {
+      // Size targeting for consistent file sizes
+      compressed = await compressToSize(file, MAX_COMPRESSED_SIZE_KB, {
+        maxWidth: 1920,
+        initialQuality: 0.8,
+        preserveFormat: false, // Converts large png to jpeg
+        aggressiveResize: true,
+      })
+
       const thumbnail = await generateThumbnail(file)
+
       const [preview, thumbPreview] = await Promise.all([
         createPreview(compressed),
         createPreview(thumbnail),
@@ -89,10 +145,33 @@ async function processImage(file, isExtra = false) {
       thumbnailFiles.value.push(thumbnail)
       newPost.value.extraImages.push(preview)
       newPost.value.thumbnails.push(thumbPreview)
+
+      // Log
+      console.log(
+        `[Extra Image] ${file.name}: ${(file.size / 1024).toFixed(0)}KB → ${(compressed.size / 1024).toFixed(0)}KB`,
+      )
+      console.log(
+        `[Thumbnail] ${file.name}: ${(file.size / 1024).toFixed(0)}KB → ${(thumbnail.size / 1024).toFixed(0)}KB`,
+      )
     } else {
+      // For title images, be less aggressive but still apply size limits
+      const targetSize = file.size > 10 * 1024 * 1024 ? 1000 : MAX_COMPRESSED_SIZE_KB // 1MB for very large files
+
+      compressed = await compressToSize(file, targetSize, {
+        maxWidth: 1920,
+        initialQuality: 0.85,
+        preserveFormat: file.type !== 'image/png' || file.size < 5 * 1024 * 1024, // Keep PNG if small
+        aggressiveResize: true,
+      })
+
       titleFile.value = compressed
       newPost.value.titleImage = [await createPreview(compressed)]
+
+      console.log(
+        `[Title Image] ${file.name}: ${(file.size / 1024).toFixed(0)}KB → ${(compressed.size / 1024).toFixed(0)}KB`,
+      )
     }
+
     return true
   } catch (error) {
     console.error('Error processing image:', error)
@@ -106,10 +185,28 @@ async function processFiles(files, isExtra = false) {
   const toProcess = isExtra
     ? files.slice(0, MAX_EXTRA_IMAGES - extraFiles.value.length)
     : [files[0]]
+
+  if (toProcess.length === 0) return 0
+
+  isProcessing.value = true
   let processed = 0
 
-  for (const file of toProcess) {
-    if (await processImage(file, isExtra)) processed++
+  try {
+    for (const [index, file] of toProcess.entries()) {
+      if (toProcess.length > 1) {
+        toast(`Processing image ${index + 1} of ${toProcess.length}...`, 'info')
+      }
+
+      if (await processImage(file, isExtra)) {
+        processed++
+      }
+    }
+
+    if (processed > 0) {
+      toast(`Successfully processed ${processed} image${processed > 1 ? 's' : ''}`, 'success')
+    }
+  } finally {
+    isProcessing.value = false
   }
 
   return processed
@@ -237,6 +334,7 @@ const removeExtraImage = (index) => {
           Share your latest watch restorations and horological achievements
         </p>
       </div>
+
       <!-- CREATE NEW POST SECTION -->
       <div class="mx-auto max-w-6xl">
         <div
@@ -260,6 +358,21 @@ const removeExtraImage = (index) => {
           </div>
 
           <div class="p-8">
+            <!-- Processing Status Banner -->
+            <div
+              v-if="isProcessing"
+              class="mb-6 flex items-center justify-center space-x-3 rounded-lg bg-blue-50 p-4 dark:bg-blue-900/20"
+            >
+              <div class="flex h-5 w-5 animate-spin items-center justify-center">
+                <div
+                  class="h-4 w-4 rounded-full border-2 border-blue-600 border-t-transparent"
+                ></div>
+              </div>
+              <span class="font-medium text-blue-800 dark:text-blue-200">
+                Compressing images... This may take a moment for large files.
+              </span>
+            </div>
+
             <!-- Image Upload Section -->
             <div class="mb-8 grid grid-cols-1 gap-8 lg:grid-cols-2">
               <!-- Title Image Section -->
@@ -274,6 +387,7 @@ const removeExtraImage = (index) => {
                   ref="titleDropZoneRef"
                   :class="[
                     'group relative flex min-h-[280px] cursor-pointer flex-col items-center justify-center rounded-xl border-2 border-dashed transition-all duration-300',
+                    isProcessing ? 'pointer-events-none opacity-50' : '',
                     isOverDropZone
                       ? 'border-acc bg-acc/10 scale-[1.02]'
                       : 'hover:border-acc/50 hover:bg-acc/5 border-brdr dark:border-sec-light',
@@ -289,7 +403,10 @@ const removeExtraImage = (index) => {
                     <div class="space-y-2">
                       <p class="text-fg font-medium">Drop your featured image here</p>
                       <p class="text-fg/60 text-sm">or click to browse files</p>
-                      <p class="text-fg/40 text-xs">JPEG, PNG, WebP up to 20MB</p>
+                      <!-- Enhanced file size info -->
+                      <p class="text-fg/40 text-xs">
+                        JPEG, PNG, WebP up to 15MB • Compressed to ~800KB automatically
+                      </p>
                     </div>
                   </div>
 
@@ -301,7 +418,7 @@ const removeExtraImage = (index) => {
                   </div>
                 </div>
 
-                <!-- Title Image Preview -->
+                <!-- Title Image Preview with compression info -->
                 <div v-else class="group relative">
                   <div class="relative overflow-hidden rounded-xl">
                     <img
@@ -315,9 +432,20 @@ const removeExtraImage = (index) => {
                       <div
                         class="absolute right-4 bottom-4 left-4 flex items-center justify-between"
                       >
-                        <span class="rounded bg-black/30 px-2 py-1 text-sm font-medium text-white"
-                          >Featured Image</span
-                        >
+                        <div class="flex flex-col space-y-1">
+                          <span
+                            class="rounded bg-black/30 px-2 py-1 text-sm font-medium text-white"
+                          >
+                            Featured Image
+                          </span>
+                          <!-- Show compression info if available -->
+                          <span
+                            v-if="titleFile"
+                            class="rounded bg-green-600/80 px-2 py-1 text-xs text-white"
+                          >
+                            {{ (titleFile.size / 1024).toFixed(0) }}KB optimized
+                          </span>
+                        </div>
                         <button
                           type="button"
                           @click="removeTitleImage"
@@ -344,6 +472,7 @@ const removeExtraImage = (index) => {
                   name="title_image_file"
                   accept="image/jpeg,image/png,image/webp"
                   class="hidden"
+                  :disabled="isProcessing"
                   @change="handleFileInput($event, false)"
                 />
               </div>
@@ -352,15 +481,24 @@ const removeExtraImage = (index) => {
               <div class="space-y-4">
                 <div class="flex items-center justify-between">
                   <h3 class="input-lbl">Additional Images</h3>
-                  <span class="text-fg bg-sec-light dark:bg-sec-mute rounded-full px-2 py-1 text-sm"
-                    >Optional</span
-                  >
+                  <div class="flex items-center space-x-2">
+                    <span
+                      class="text-fg bg-sec-light dark:bg-sec-mute rounded-full px-2 py-1 text-sm"
+                    >
+                      Optional
+                    </span>
+                    <!-- Counter -->
+                    <span class="text-fg/60 text-sm">
+                      {{ extraFiles.length }}/{{ MAX_EXTRA_IMAGES }}
+                    </span>
+                  </div>
                 </div>
 
                 <div
                   ref="extraImageDropZoneRef"
                   :class="[
                     'group relative flex min-h-[280px] cursor-pointer items-center justify-center rounded-xl border-2 border-dashed transition-all duration-300',
+                    isProcessing ? 'pointer-events-none opacity-50' : '',
                     isOverExtraDropZone
                       ? 'border-acc bg-acc/10 scale-[1.02]'
                       : 'hover:border-acc/50 border-brdr dark:border-sec-light',
@@ -380,11 +518,15 @@ const removeExtraImage = (index) => {
                       <div class="space-y-2">
                         <p class="text-fg font-medium">Add more photos</p>
                         <p class="text-fg/60 text-sm">Drop multiple images or click to browse</p>
+                        <!-- Enhanced file size info -->
+                        <p class="text-fg/40 text-xs">
+                          Up to {{ MAX_EXTRA_IMAGES }} images • Auto-compressed to ~800KB each
+                        </p>
                       </div>
                     </div>
                   </div>
 
-                  <!-- Extra Images Grid -->
+                  <!-- Extra Images Grid with enhanced info -->
                   <div v-else class="p-4">
                     <div class="grid grid-cols-2 gap-4">
                       <div
@@ -405,6 +547,17 @@ const removeExtraImage = (index) => {
                               <TrashIcon class="mx-auto size-4"></TrashIcon>
                             </button>
                           </div>
+
+                          <!-- File size indicator -->
+                          <div class="absolute bottom-1 left-1">
+                            <span
+                              v-if="extraFiles[index]"
+                              class="rounded bg-green-600/80 px-1.5 py-0.5 text-xs text-white"
+                            >
+                              {{ (extraFiles[index].size / 1024).toFixed(0) }}KB
+                            </span>
+                          </div>
+
                           <!-- Mobile remove button - always visible -->
                           <button
                             type="button"
@@ -420,6 +573,7 @@ const removeExtraImage = (index) => {
                       <div
                         v-if="extraFiles.length < MAX_EXTRA_IMAGES"
                         class="border-acc/30 hover:bg-acc/5 flex aspect-square items-center justify-center rounded-lg border-2 border-dashed transition-colors"
+                        :class="{ 'pointer-events-none opacity-50': isProcessing }"
                       >
                         <PlusIcon class="text-acc/60 size-8"></PlusIcon>
                       </div>
@@ -434,6 +588,7 @@ const removeExtraImage = (index) => {
                   accept="image/jpeg,image/png,image/webp"
                   multiple
                   class="hidden"
+                  :disabled="isProcessing"
                   @change="handleFileInput($event, true)"
                 />
               </div>
@@ -454,6 +609,7 @@ const removeExtraImage = (index) => {
                     id="new-title-input"
                     class="input"
                     placeholder="Give your post a compelling title..."
+                    :disabled="isProcessing"
                   />
                 </div>
               </div>
@@ -461,9 +617,9 @@ const removeExtraImage = (index) => {
               <div class="space-y-2">
                 <div class="flex justify-between">
                   <label for="new-post-body" class="input-lbl">Description</label>
-                  <span class="text-fg bg-sec-light dark:bg-sec-mute rounded-full px-2 text-sm"
-                    >Optional</span
-                  >
+                  <span class="text-fg bg-sec-light dark:bg-sec-mute rounded-full px-2 text-sm">
+                    Optional
+                  </span>
                 </div>
 
                 <textarea
@@ -472,22 +628,50 @@ const removeExtraImage = (index) => {
                   id="new-post-body"
                   class="text-fg placeholder-fg/50 focus:ring-acc/50 focus:border-acc input w-full resize-none rounded-xl"
                   placeholder="Describe the work done, techniques used, or story behind this watch piece..."
+                  :disabled="isProcessing"
                 ></textarea>
               </div>
             </div>
 
-            <!-- Action Button -->
+            <!-- Action Button with enhanced states -->
             <div class="flex justify-center pt-8">
               <button
                 @click="saveNewPost($event)"
-                :disabled="isUploading"
+                :disabled="computedButtonState.disabled"
                 class="from-acc to-acc/80 hover:from-acc/90 hover:to-acc/70 focus:ring-acc/50 inline-flex transform cursor-pointer items-center rounded-xl bg-gradient-to-r px-8 py-3 font-semibold text-white shadow-lg transition-all duration-200 hover:scale-[1.02] focus:ring-2 focus:outline-none"
-                :class="{ 'cursor-not-allowed opacity-50': isUploading }"
+                :class="{ 'cursor-not-allowed opacity-50': computedButtonState.disabled }"
               >
-                <PaperAirplaneIcon class="mr-2 size-5 -rotate-90 transform"></PaperAirplaneIcon>
+                <PaperAirplaneIcon
+                  v-if="!isProcessing && !isUploading"
+                  class="mr-2 size-5 -rotate-90 transform"
+                ></PaperAirplaneIcon>
 
-                {{ isUploading ? 'Creating Post...' : 'Publish Post' }}
+                <!-- Loading spinner for processing/uploading -->
+                <div
+                  v-if="isProcessing || isUploading"
+                  class="mr-2 flex h-5 w-5 animate-spin items-center justify-center"
+                >
+                  <div
+                    class="h-4 w-4 rounded-full border-2 border-white border-t-transparent"
+                  ></div>
+                </div>
+
+                {{ computedButtonState.text }}
               </button>
+            </div>
+
+            <!-- Upload Progress Summary -->
+            <div v-if="titleFile || extraFiles.length > 0" class="mt-4 text-center">
+              <p class="text-fg/60 text-sm">
+                Ready to upload:
+                <span v-if="titleFile" class="text-green-600 dark:text-green-400">
+                  1 featured image
+                </span>
+                <span v-if="titleFile && extraFiles.length > 0"> + </span>
+                <span v-if="extraFiles.length > 0" class="text-green-600 dark:text-green-400">
+                  {{ extraFiles.length }} additional image{{ extraFiles.length > 1 ? 's' : '' }}
+                </span>
+              </p>
             </div>
           </div>
         </div>
