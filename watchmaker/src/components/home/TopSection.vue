@@ -6,10 +6,10 @@ import TheLogo from '../logo/TheLogo.vue'
 <template>
   <section class="relative min-h-[85vh] w-full">
     <!-- Background with subtle texture -->
-    <div class="from-primary via-sec-light to-sec absolute inset-0 bg-gradient-to-b">
+    <div class="from-primary/50 via-sec-light to-sec absolute inset-0 bg-gradient-to-b">
       <!-- Watch dial texture overlay -->
       <div
-        class="absolute inset-0 opacity-40"
+        class="absolute inset-0"
         style="
           background-image: radial-gradient(
             circle at center,
@@ -81,7 +81,7 @@ import TheLogo from '../logo/TheLogo.vue'
         >
           <RouterLink to="/repairs">
             <button
-              class="group border-acc bg-acc text-fg2 relative overflow-hidden border-2 px-8 py-4 transition-all duration-300 hover:shadow-xl"
+              class="group border-acc bg-acc text-fg2 relative cursor-pointer overflow-hidden border-2 px-8 py-4 transition-all duration-300 hover:shadow-xl"
             >
               <span class="relative font-medium tracking-wide">Schedule Consultation</span>
               <div
@@ -92,7 +92,7 @@ import TheLogo from '../logo/TheLogo.vue'
 
           <RouterLink to="/my-work">
             <button
-              class="group border-brdr text-fg hover:border-acc border-2 bg-transparent px-8 py-4 transition-all duration-300 hover:shadow-lg"
+              class="group border-brdr text-fg hover:border-acc cursor-pointer border-2 bg-transparent px-8 py-4 transition-all duration-300 hover:shadow-lg"
             >
               <span class="font-medium tracking-wide">View Portfolio</span>
             </button>

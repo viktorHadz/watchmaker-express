@@ -223,7 +223,7 @@ onMounted(() => {
         <!-- Share Button (for non-authenticated users) -->
         <div
           v-else
-          class="absolute bottom-2.5 left-[60%] space-x-2 opacity-100 transition-opacity duration-200 sm:top-3 sm:left-3 md:opacity-0 md:group-hover:opacity-100"
+          class="absolute top-3 left-3 space-x-2 opacity-100 transition-opacity duration-200 md:opacity-0 md:group-hover:opacity-100"
         >
           <button
             @click.stop="handlePostShare(post)"

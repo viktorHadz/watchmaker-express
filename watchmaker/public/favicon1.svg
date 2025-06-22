@@ -1,0 +1,12 @@
+<svg width="53" height="51" viewBox="0 0 53 51" fill="none" xmlns="http://www.w3.org/2000/svg">
+<path d="M52.7822 28.3496C52.7822 40.7329 41.0206 50.7715 26.5119 50.7715C12.0033 50.7715 0.241699 40.7329 0.241699 28.3496C0.241699 15.9663 12.0033 5.92773 26.5119 5.92773C41.0206 5.92773 52.7822 15.9663 52.7822 28.3496ZM2.04211 28.3496C2.04211 39.8842 12.9976 49.2348 26.5119 49.2348C40.0262 49.2348 50.9817 39.8842 50.9817 28.3496C50.9817 16.815 40.0262 7.4644 26.5119 7.4644C12.9976 7.4644 2.04211 16.815 2.04211 28.3496Z" fill="white" style="fill:white;fill-opacity:1;"/>
+<ellipse cx="26.5118" cy="28.3496" rx="23.1764" ry="19.7813" fill="#080A0E" style="fill:#080A0E;fill:color(display-p3 0.0314 0.0392 0.0549);fill-opacity:1;"/>
+<path d="M18.1128 16.209H25.3002V24.8142H27.9052V16.209H35.0926V40.1309H27.9052V33.2359H25.3002V40.1309H18.1128V16.209Z" fill="white" style="fill:white;fill-opacity:1;"/>
+<rect x="26.1011" y="9.50391" width="1.00342" height="5.3418" fill="#E4982D" style="fill:#E4982D;fill:color(display-p3 0.8942 0.5951 0.1763);fill-opacity:1;"/>
+<rect x="3.91113" y="28.6719" width="1.00342" height="5.3418" transform="rotate(-90 3.91113 28.6719)" fill="#E4982D" style="fill:#E4982D;fill:color(display-p3 0.8942 0.5951 0.1763);fill-opacity:1;"/>
+<rect x="43.5283" y="28.6719" width="1.00342" height="5.3418" transform="rotate(-90 43.5283 28.6719)" fill="#E4982D" style="fill:#E4982D;fill:color(display-p3 0.8942 0.5951 0.1763);fill-opacity:1;"/>
+<rect x="26.1011" y="41.4941" width="1.00342" height="5.3418" fill="#E4982D" style="fill:#E4982D;fill:color(display-p3 0.8942 0.5951 0.1763);fill-opacity:1;"/>
+<path d="M5.39088 3.06641L26.3725 27.0295H26.7345L40.2372 10.5527H40.5191L28.4845 31.2013H24.6225L5.00879 3.06641H5.39088Z" fill="#E4982D" style="fill:#E4982D;fill:color(display-p3 0.8942 0.5951 0.1763);fill-opacity:1;"/>
+<path d="M3.71832 1.37462L15.036 11.6234C15.036 11.6234 12.6064 10.7348 11.6288 11.2484C10.6512 11.7619 10.9656 14.1656 10.9656 14.1656L3.71832 1.37462Z" fill="#E4982D" style="fill:#E4982D;fill:color(display-p3 0.8942 0.5951 0.1763);fill-opacity:1;"/>
+<path d="M43.5433 5.96011L38.604 16.7698C38.604 16.7698 38.5207 14.9124 37.7276 14.4729C36.9344 14.0333 34.9494 15.082 34.9494 15.082L43.5433 5.96011Z" fill="#E4982D" style="fill:#E4982D;fill:color(display-p3 0.8942 0.5951 0.1763);fill-opacity:1;"/>
+</svg>

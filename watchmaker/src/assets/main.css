@@ -46,7 +46,7 @@
 
 [data-theme='dark'] {
   /* Backgrounds - Deep midnight blues with subtle warmth */
-  --color-primary: oklch(12% 0.015 250); /* Deep midnight blue */
+  --color-primary: oklch(13% 0.015 250); /* Deep midnight blue */
   --color-sec: oklch(16% 0.018 245); /* Rich navy - cards/sections */
   --color-sec-mute: oklch(21% 0.015 240); /* Lighter navy - hover states */
   --color-sec-light: oklch(26% 0.012 235); /* Light midnight */

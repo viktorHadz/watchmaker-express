@@ -133,24 +133,24 @@ const copyLink = async () => {
         <div
           class="bg-primary/95 dark:border-sec-mute dark:bg-sec/95 pointer-events-auto relative w-full max-w-md overflow-hidden rounded-2xl border border-white/20 shadow-2xl backdrop-blur-xl"
         >
-          <div class="border-brdr/20 dark:border-sec-mute/30 border-b px-6 py-4">
+          <div class="border-brdr/30 dark:border-sec-mute/30 border-b px-6 py-4">
             <div class="flex items-center justify-between">
               <h3 class="text-fg dark:text-fg2 text-lg font-semibold">Share Post</h3>
               <button
                 @click="$emit('close')"
-                class="text-fg/60 hover:bg-brdr/10 hover:text-fg rounded-lg p-1"
+                class="text-fg/50 hover:text-fg hover:bg-brdr/20 cursor-pointer rounded p-1"
               >
                 <XMarkIcon class="size-5" />
               </button>
             </div>
-            <p class="text-fg/60 mt-1 text-sm">{{ post.postTitle || 'Untitled Post' }}</p>
+            <p class="text-fg/60 mt-1">{{ post.postTitle || 'Untitled Post' }}</p>
           </div>
 
           <div class="p-6">
             <div class="grid grid-cols-2 gap-3">
               <button
                 @click="copyLink"
-                class="border-brdr/20 bg-primary/50 hover:border-acc/30 hover:bg-acc/5 dark:border-sec-mute/30 dark:bg-sec/50 flex flex-col items-center gap-2 rounded-xl border p-4 transition-all"
+                class="border-brdr/30 bg-primary hover:border-acc/30 hover:bg-acc/5 dark:border-sec-mute/30 dark:bg-sec/50 flex cursor-pointer flex-col items-center gap-2 rounded-xl border p-4 transition-all"
               >
                 <ClipboardIcon class="text-acc size-6" />
                 <span class="text-fg text-sm font-medium">Copy Link</span>
@@ -161,7 +161,7 @@ const copyLink = async () => {
                 target="_blank"
                 rel="noopener"
                 @click="handleShare('Facebook')"
-                class="border-brdr/20 bg-primary/50 dark:border-sec-mute/30 dark:bg-sec/50 flex flex-col items-center gap-2 rounded-xl border p-4 transition-all hover:border-blue-600 hover:bg-blue-50"
+                class="border-brdr/30 bg-primary dark:border-sec-mute/30 dark:bg-sec/50 flex flex-col items-center gap-2 rounded-xl border p-4 transition-all hover:border-blue-600 hover:bg-blue-50 dark:hover:border-blue-500/30 dark:hover:bg-blue-500/10"
               >
                 <svg class="size-6 text-blue-600" fill="currentColor" viewBox="0 0 24 24">
                   <path
@@ -176,14 +176,14 @@ const copyLink = async () => {
                 target="_blank"
                 rel="noopener"
                 @click="handleShare('Twitter')"
-                class="border-brdr/20 bg-primary/50 dark:border-sec-mute/30 dark:bg-sec/50 flex flex-col items-center gap-2 rounded-xl border p-4 transition-all hover:border-blue-300 hover:bg-blue-50"
+                class="border-brdr/30 bg-primary dark:border-sec-mute/30 dark:bg-sec/50 flex flex-col items-center gap-2 rounded-xl border p-4 transition-all hover:border-blue-300 hover:bg-blue-50 dark:hover:border-blue-500/30 dark:hover:bg-blue-500/10"
               >
                 <svg class="size-6 text-blue-500" fill="currentColor" viewBox="0 0 24 24">
                   <path
                     d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"
                   />
                 </svg>
-                <span class="text-fg text-sm font-medium">Twitter</span>
+                <span class="text-fg text-sm font-medium">X</span>
               </a>
 
               <a
@@ -191,7 +191,7 @@ const copyLink = async () => {
                 target="_blank"
                 rel="noopener"
                 @click="handleShare('WhatsApp')"
-                class="border-brdr/20 bg-primary/50 dark:border-sec-mute/30 dark:bg-sec/50 flex flex-col items-center gap-2 rounded-xl border p-4 transition-all hover:border-green-500 hover:bg-green-50"
+                class="border-brdr/30 bg-primary dark:border-sec-mute/30 dark:bg-sec/50 flex flex-col items-center gap-2 rounded-xl border p-4 transition-all hover:border-green-500 hover:bg-green-50 dark:hover:border-green-500/30 dark:hover:bg-green-500/10"
               >
                 <svg class="size-6 text-green-500" fill="currentColor" viewBox="0 0 24 24">
                   <path
@@ -206,7 +206,7 @@ const copyLink = async () => {
                 target="_blank"
                 rel="noopener"
                 @click="handleShare('Messenger')"
-                class="border-brdr/20 bg-primary/50 dark:border-sec-mute/30 dark:bg-sec/50 flex flex-col items-center gap-2 rounded-xl border p-4 transition-all hover:border-blue-500 hover:bg-blue-50"
+                class="border-brdr/30 bg-primary dark:border-sec-mute/30 dark:bg-sec/50 flex flex-col items-center gap-2 rounded-xl border p-4 transition-all hover:border-blue-500 hover:bg-blue-50 dark:hover:border-blue-500/30 dark:hover:bg-blue-500/10"
               >
                 <IconMessenger class="size-6 text-blue-500" />
                 <span class="text-fg text-sm font-medium">Messenger</span>
@@ -215,7 +215,7 @@ const copyLink = async () => {
               <a
                 :href="emailUrl"
                 @click="handleShare('Email')"
-                class="border-brdr/20 bg-primary/50 dark:border-sec-mute/30 dark:bg-sec/50 flex flex-col items-center gap-2 rounded-xl border p-4 transition-all hover:border-gray-400 hover:bg-gray-50"
+                class="border-brdr/30 bg-primary dark:border-sec-mute/30 dark:bg-sec/50 hover:border-brdr flex flex-col items-center gap-2 rounded-xl border p-4 transition-all hover:bg-gray-50 dark:hover:border-gray-500/30 dark:hover:bg-gray-500/10"
               >
                 <EnvelopeIcon class="size-6 text-gray-600" />
                 <span class="text-fg text-sm font-medium">Email</span>
@@ -223,13 +223,13 @@ const copyLink = async () => {
             </div>
 
             <div
-              class="border-brdr/20 bg-brdr/5 dark:border-sec-mute/30 dark:bg-sec-mute/10 mt-4 rounded-lg border p-3"
+              class="border-brdr/30 bg-primary dark:border-sec-mute/30 dark:bg-sec/50 mt-4 rounded-lg border p-3"
             >
               <div class="flex items-center justify-between gap-2">
-                <span class="text-fg/60 truncate text-sm">{{ postUrl }}</span>
+                <span class="text-fg truncate text-sm">{{ postUrl }}</span>
                 <button
                   @click="copyLink"
-                  class="text-fg/60 hover:bg-brdr/10 hover:text-fg rounded p-1"
+                  class="text-fg/50 hover:text-fg hover:bg-brdr/20 cursor-pointer rounded p-1"
                 >
                   <ClipboardIcon class="size-4" />
                 </button>

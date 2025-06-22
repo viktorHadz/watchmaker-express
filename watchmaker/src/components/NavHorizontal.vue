@@ -103,11 +103,11 @@ onUnmounted(() => {
   <!-- Desktop Navigation -->
   <nav
     :class="[
-      'border-brdr/20 bg-primary/80 fixed top-5 left-1/2 z-[99] hidden w-lg -translate-x-1/2 items-center justify-between rounded-xl border p-2 shadow-lg backdrop-blur-md transition-all duration-300 ease-in-out sm:flex',
+      'border-brdr/20 bg-primary/80 fixed top-5 left-1/2 z-[99] hidden w-xl -translate-x-1/2 items-center justify-between rounded-xl border p-2 shadow-lg backdrop-blur-md transition-all duration-300 ease-in-out sm:flex 2xl:max-w-[80vw]',
       isVisible ? 'translate-y-0 opacity-95' : '-translate-y-20 opacity-0',
     ]"
   >
-    <div class="flex gap-8">
+    <div class="ml-4 flex gap-8">
       <RouterLink to="/" class="group relative">
         <button
           class="group group-hover:text-acc text-fg hover:bg-sec/60 dark:hover:bg-sec cursor-pointer rounded-lg transition-colors duration-200"
