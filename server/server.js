@@ -14,6 +14,7 @@ import editPostRouter from './routes/editPostRouter.js'
 const app = express()
 const __filename = fileURLToPath(import.meta.url) // get the resolved path to the file
 const __dirname = path.dirname(__filename) // get the name of the directory
+const distURL = path.join(__dirname, '..', 'watchmaker', 'dist')
 
 const cacheMiddleware = (duration) => {
   return (req, res, next) => {
@@ -29,6 +30,12 @@ app.set('trust proxy', 1 /*this needs to be the proxy's ip here not 1 when i imp
 // Security headers
 app.use(
   helmet({
+    contentSecurityPolicy: {
+      useDefaults: true,
+      directives: {
+        'img-src': ["'self'", 'data:', 'blob:'],
+      },
+    },
     referrerPolicy: {
       policy: 'strict-origin-when-cross-origin',
     },
@@ -66,6 +73,9 @@ app.use(
     },
   }),
 )
+
+app.use(express.static(distURL))
+
 // GET homepage
 app.get('/home-baby', (req, res) => {
   const htmlString = `
@@ -84,6 +94,15 @@ app.get('/home-baby', (req, res) => {
   </div>
   `
   res.send(htmlString)
+})
+
+app.use((req, res, next) => {
+  // Skip if it's an API route
+  if (req.path.startsWith('/api/') || req.path.startsWith('/public/')) {
+    return next()
+  }
+  // Serve index.html for all other routes
+  res.sendFile(path.join(__dirname, '..', 'watchmaker', 'dist', 'index.html'))
 })
 
 initializeDatabase()

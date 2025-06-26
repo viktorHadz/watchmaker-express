@@ -362,7 +362,7 @@ const handleFileChange = async (ev) => {
 
 /* HELPERS  */
 const validateFiles = (files) => {
-  const maxSize = 20 * 1000 * 1000 // 20MB max
+  const maxSize = 7 * 1000 * 1000 // 7MB max
   const errors = []
   const validTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp']
 
@@ -372,7 +372,7 @@ const validateFiles = (files) => {
     }
     if (file.size > maxSize) {
       const fileSizeMB = toMB(file.size)
-      errors.push(`File too large (${fileSizeMB}MB). Maximum size is 20MB per image.`)
+      errors.push(`File too large (${fileSizeMB}MB). Maximum size is 7MB per image.`)
     }
     if (file.size === 0) {
       errors.push(`${file.name} appears to be empty`)
@@ -707,7 +707,7 @@ const clearForm = () => {
               <div class="bg-acc/10 text-acc rounded-lg px-4 py-2 text-sm font-medium">
                 Choose up to 5 images
               </div>
-              <p class="text-fg-subtle mt-2 text-xs">JPEG, PNG, WebP • Max 20MB each</p>
+              <p class="text-fg-subtle mt-2 text-xs">JPEG, PNG, WebP • Max 7MB each</p>
             </div>
           </div>
         </div>

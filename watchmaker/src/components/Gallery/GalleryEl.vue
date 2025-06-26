@@ -155,21 +155,32 @@ onMounted(() => {
             >
               {{ post.postTitle }}
             </h3>
+
             <p class="text-fg/70 line-clamp-1 text-sm leading-relaxed sm:line-clamp-2">
               {{ post.postBody }}
             </p>
           </div>
-          <div v-else class="flex items-center justify-center py-4">
-            <div>
-              <h3
-                class="font-sec text-fg group-hover:text-acc line-clamp-2 text-lg font-semibold transition-colors"
-              >
-                {{ post.postTitle }}
-              </h3>
-              <p class="text-fg/70 line-clamp-3 text-sm leading-relaxed">
-                {{ post.postBody }}
-              </p>
+          <div v-else class="space-y-3">
+            <h3
+              class="font-sec text-fg group-hover:text-acc line-clamp-2 text-lg font-semibold transition-colors"
+            >
+              {{ post.postTitle }}
+            </h3>
+
+            <!-- Decorative divider -->
+            <div class="flex items-center justify-center">
+              <div
+                class="via-acc/30 h-px w-12 bg-gradient-to-r from-transparent to-transparent"
+              ></div>
+              <div class="bg-acc/50 mx-2 h-1 w-1 rounded-full"></div>
+              <div
+                class="via-acc/30 h-px w-12 bg-gradient-to-l from-transparent to-transparent"
+              ></div>
             </div>
+
+            <p class="text-fg/70 line-clamp-3 text-sm leading-relaxed">
+              {{ post.postBody }}
+            </p>
           </div>
 
           <!-- Additional Images Indicator -->

@@ -28,7 +28,7 @@ import { ChatBubbleLeftEllipsisIcon, CameraIcon } from '@heroicons/vue/24/outlin
           </div>
 
           <!-- Content -->
-          <div class="relative flex h-full flex-col justify-between p-8">
+          <div class="relative flex h-full flex-col justify-between p-4 sm:p-8">
             <!-- Top icon -->
             <div class="flex items-start justify-between">
               <div class="rounded-full border border-white/20 bg-white/10 p-3 backdrop-blur-sm">
@@ -96,7 +96,7 @@ import { ChatBubbleLeftEllipsisIcon, CameraIcon } from '@heroicons/vue/24/outlin
           </div>
 
           <!-- Content -->
-          <div class="relative flex h-full flex-col justify-between p-8">
+          <div class="relative flex h-full flex-col justify-between p-4 sm:p-8">
             <!-- Top icon -->
             <div class="flex items-start justify-between">
               <div class="rounded-full border border-white/20 bg-white/10 p-3 backdrop-blur-sm">
