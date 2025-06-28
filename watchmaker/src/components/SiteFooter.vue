@@ -26,7 +26,7 @@
           <component :is="item.icon" class="size-6" aria-hidden="true" />
         </a>
       </div>
-      <p class="text-fg font-sec mt-10 text-center text-sm/6">Est. {{ dateNow }} The Watchmaker</p>
+      <p class="text-fg font-sec mt-10 text-center text-sm/6">est. {{ dateNow }} The Watchmaker</p>
     </div>
   </footer>
 </template>
