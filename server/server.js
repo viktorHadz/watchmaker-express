@@ -5,6 +5,8 @@ import { db, initializeDatabase } from './database.js'
 import process from 'process'
 import path from 'node:path'
 import { fileURLToPath } from 'url'
+import { apiLimiter } from './middleware/rateLimiter.js'
+
 import insertPostRouter from './routes/insertPostRouter.js'
 import formRouter from './routes/formRouter.js'
 import getPostRouter from './routes/getPostRouter.js'
@@ -24,7 +26,7 @@ const cacheMiddleware = (duration) => {
 }
 
 // Trust the proxy if behind one (important for correct IP detection)
-app.set('trust proxy', 1 /*this needs to be the proxy's ip here not 1 when i implement nginx */)
+app.set('trust proxy', 1)
 
 // Registering Middleware
 // Security headers
@@ -44,6 +46,9 @@ app.use(
 
 app.use(cors())
 app.use(express.json())
+
+// Using rate limiter
+app.use('/api/', apiLimiter)
 
 // Registering routes
 app.use('/api/form/', formRouter)

@@ -71,7 +71,7 @@ import TheLogo from '../logo/TheLogo.vue'
           </h2>
 
           <p class="text-fg/70 mx-auto max-w-2xl text-lg leading-relaxed">
-            Specializing in the restoration and repair of fine mechanical timepieces since 1985
+            Specializing in the restoration and repair of fine mechanical timepieces
           </p>
         </div>
 

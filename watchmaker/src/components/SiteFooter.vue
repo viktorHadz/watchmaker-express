@@ -2,7 +2,7 @@
   <footer class="border-brdr bg-sec border-t">
     <div class="mx-auto max-w-7xl overflow-hidden px-6 py-20 sm:py-24 lg:px-8">
       <nav
-        class="-mb-6 flex flex-wrap justify-center gap-x-12 gap-y-3 text-sm/6"
+        class="font-sec -mb-6 flex flex-wrap justify-center gap-x-12 gap-y-3 text-sm/6"
         aria-label="Footer"
       >
         <router-link

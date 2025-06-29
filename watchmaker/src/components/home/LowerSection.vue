@@ -140,24 +140,23 @@ import { ChatBubbleLeftEllipsisIcon, CameraIcon } from '@heroicons/vue/24/outlin
       </RouterLink>
     </div>
 
-    <!-- Trust indicators -->
     <div class="border-brdr/20 mt-16 border-t pt-16">
       <div class="grid grid-cols-2 gap-8 text-center md:grid-cols-4">
         <div>
-          <p class="font-sec text-acc text-3xl font-light">35+</p>
+          <p class="font-sec text-acc text-3xl font-light">7+</p>
           <p class="text-fg-subtle text-sm tracking-wider uppercase">Years Experience</p>
         </div>
         <div>
-          <p class="font-sec text-acc text-3xl font-light">2,500+</p>
+          <p class="font-sec text-acc text-3xl font-light">200+</p>
           <p class="text-fg-subtle text-sm tracking-wider uppercase">Watches Restored</p>
         </div>
         <div>
-          <p class="font-sec text-acc text-3xl font-light">24</p>
-          <p class="text-fg-subtle text-sm tracking-wider uppercase">Month Warranty</p>
+          <p class="font-sec text-acc text-3xl font-light">20+</p>
+          <p class="text-fg-subtle text-sm tracking-wider uppercase">Brands Serviced</p>
         </div>
         <div>
-          <p class="font-sec text-acc text-3xl font-light">5★</p>
-          <p class="text-fg-subtle text-sm tracking-wider uppercase">Average Rating</p>
+          <p class="font-sec text-acc text-3xl font-light">24/7</p>
+          <p class="text-fg-subtle text-sm tracking-wider uppercase">Precision Care</p>
         </div>
       </div>
     </div>

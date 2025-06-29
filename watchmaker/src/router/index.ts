@@ -39,13 +39,16 @@ const router = createRouter({
     },
   ],
   scrollBehavior(to, from, savedPosition) {
-    if (savedPosition) {
-      return savedPosition
-    }
-    if (to.hash) {
-      return { el: to.hash, behavior: 'smooth' }
-    }
-    return { top: 0 }
+    // Target the scrollable container instead of window
+    return new Promise((resolve) => {
+      setTimeout(() => {
+        const scrollContainer = document.querySelector('#app-scroll-container')
+        if (scrollContainer) {
+          scrollContainer.scrollTop = 0
+        }
+        resolve({ top: 0 })
+      }, 50)
+    })
   },
 })
 

@@ -184,6 +184,7 @@ watch(
                 <button
                   v-if="isAuthenticated && isEditing"
                   class="text-fg/60 hover:text-success hover:bg-sec-mute/30 dark:hover:bg-sec-light/20 flex size-9 cursor-pointer items-center justify-center rounded-lg transition-all sm:size-10"
+                  title="Save edit"
                   @click="saveEdit(post.postId)"
                 >
                   <CheckBadgeIcon class="text-success size-4 sm:size-5" />

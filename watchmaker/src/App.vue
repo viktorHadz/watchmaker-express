@@ -55,7 +55,7 @@ const toast = useToastStore()
     <NavHorizontal />
 
     <div class="relative z-10 flex flex-1 flex-col overflow-hidden">
-      <div class="flex-1 overflow-y-auto">
+      <div class="flex-1 overflow-y-auto" id="app-scroll-container">
         <div class="pt-8 pb-20 sm:pt-20 sm:pb-4">
           <RouterView v-slot="{ Component, route }">
             <Transition name="page" mode="out-in" appear>

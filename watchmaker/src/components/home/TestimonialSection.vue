@@ -52,8 +52,8 @@ import { StarIcon } from '@heroicons/vue/24/solid'
 
             <!-- Author -->
             <div class="border-brdr/20 border-t pt-4">
-              <p class="text-fg font-medium">Michael Rodriguez</p>
-              <p class="text-fg-subtle text-sm">Vintage Watch Collector</p>
+              <p class="text-fg font-medium">Mihail R.</p>
+              <p class="text-fg-subtle text-sm">Collector</p>
             </div>
           </div>
         </div>
@@ -76,14 +76,13 @@ import { StarIcon } from '@heroicons/vue/24/solid'
             </div>
 
             <p class="text-fg/80 mb-6 leading-relaxed italic">
-              "Professional expertise combined with fair pricing. My vintage Seiko required
-              extensive work, and Veselin explained every step. The results exceeded my
-              expectations."
+              "Professional craftsman and fair pricing. My vintage Seiko required extensive work.
+              Results exceeded my expectations."
             </p>
 
             <div class="border-brdr/20 border-t pt-4">
-              <p class="text-fg font-medium">Sarah Liu</p>
-              <p class="text-fg-subtle text-sm">Estate Jewelry Specialist</p>
+              <p class="text-fg font-medium">Grigor I.</p>
+              <p class="text-fg-subtle text-sm">Watch Enthusiast</p>
             </div>
           </div>
         </div>
@@ -106,13 +105,13 @@ import { StarIcon } from '@heroicons/vue/24/solid'
             </div>
 
             <p class="text-fg/80 mb-6 leading-relaxed italic">
-              "Outstanding restoration of my 1960s Rolex Datejust. Veselin's knowledge of vintage
-              movements is encyclopedic, and his craftsmanship is truly masterful."
+              "Great restoration of my 1947 Molnija Pocket Watch! Veselin's knowledge of vintage
+              movements is encyclopedic, and his craftsmanship masterful."
             </p>
 
             <div class="border-brdr/20 border-t pt-4">
-              <p class="text-fg font-medium">David Johnson</p>
-              <p class="text-fg-subtle text-sm">Private Collector</p>
+              <p class="text-fg font-medium">David J.</p>
+              <p class="text-fg-subtle text-sm">Collector</p>
             </div>
           </div>
         </div>
