@@ -15,7 +15,12 @@ export default defineConfig((env) => {
     define: {
       __API_PATH__: JSON.stringify(serverAPIPath),
     },
-    plugins: [vue(), vueDevTools(), tailwindcss()],
+    plugins: [
+      vue(),
+      // Only include dev tools in development
+      ...(env.mode === 'development' ? [vueDevTools()] : []),
+      tailwindcss(),
+    ],
     resolve: {
       alias: {
         '@': fileURLToPath(new URL('./src', import.meta.url)),
@@ -25,9 +30,18 @@ export default defineConfig((env) => {
       port: 5173,
       proxy: {
         // proxy requests with the API path to the server
-        // <http://localhost:5173/api> -> <http://localhost:3001/api>
         [serverAPIPath]: serverURL.origin,
         [serverStaticAssets]: serverURL.origin, // Serve static from the server
+      },
+    },
+    build: {
+      sourcemap: env.mode === 'development',
+      rollupOptions: {
+        output: {
+          manualChunks: {
+            vendor: ['vue', 'vue-router', 'pinia'],
+          },
+        },
       },
     },
   }
