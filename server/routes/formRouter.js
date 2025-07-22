@@ -39,17 +39,7 @@ function getExtensionFromMimetype(mimetype) {
 }
 const emailContent = generateEmailTemplate(req.body)
 const sendToMail = process.env.WATCHMAKER_EMAIL
-// html: generateEmailTemplate(req.body),
-// Usage resend call:
-// 
-// const { data, error } = await resend.emails.send({
-//   from: 'Viktor <contact@yourdomain.com>', // Use your subdomain
-//   to: ['watchmaker.ves@gmail.com'],
-//   subject: `New Contact Form Submission - ${req.body.firstName} ${req.body.lastName}`,
-//   html: emailContent.html,
-//   text: emailContent.text,
-//   attachments: attachments.length > 0 ? attachments : undefined,
-// })
+
 
 // POST form submission with rate limiting
 router.post(
