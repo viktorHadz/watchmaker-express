@@ -3,6 +3,7 @@ import { limiter } from '../middleware/rateLimiter.js'
 import { validateAndSanitize, formSchema } from '../middleware/validationMiddleware.js'
 import { Resend } from 'resend'
 import multer from 'multer'
+import { generateEmailTemplate } from '../utils/generateEmailTemplate.js'
 
 const router = express.Router()
 const resend = new Resend(process.env.RESEND_KEY_TOKEN)
@@ -14,7 +15,7 @@ const upload = multer({
   storage,
   limits: {
     fileSize: 7 * 1024 * 1024, // 7MB each
-    files: 5, // 5 user uploaded images
+    files: 5,
   },
   fileFilter: (req, file, cb) => {
     const allowedTypes = ['image/jpeg', 'image/png', 'image/webp']
@@ -36,9 +37,21 @@ function getExtensionFromMimetype(mimetype) {
       return '.jpg'
   }
 }
+const emailContent = generateEmailTemplate(req.body)
+const sendToMail = process.env.WATCHMAKER_EMAIL
+// html: generateEmailTemplate(req.body),
+// Usage resend call:
+// 
+// const { data, error } = await resend.emails.send({
+//   from: 'Viktor <contact@yourdomain.com>', // Use your subdomain
+//   to: ['watchmaker.ves@gmail.com'],
+//   subject: `New Contact Form Submission - ${req.body.firstName} ${req.body.lastName}`,
+//   html: emailContent.html,
+//   text: emailContent.text,
+//   attachments: attachments.length > 0 ? attachments : undefined,
+// })
 
 // POST form submission with rate limiting
-// Note: upload.array('images') must come BEFORE validateAndSanitize
 router.post(
   '/data',
   limiter,
@@ -61,18 +74,11 @@ router.post(
 
       console.log('Emailing...')
       const { data, error } = await resend.emails.send({
-        from: 'Viktor <onboarding@resend.dev>',
-        to: ['watchmaker.ves@gmail.com'],
-        subject: 'New Contact Form Submission',
-        html: `
-          <strong>New Contact Form Submission</strong><br/>
-          <strong>Name:</strong> ${req.body.firstName} ${req.body.lastName}<br/>
-          <strong>Email:</strong> ${req.body.email}<br/>
-          <strong>Phone:</strong> ${req.body.phone || 'No phone provided'}<br/>
-          <strong>Images:</strong> ${req.body.images?.length || 0} attached<br/>
-          <strong>Message:</strong><br/>
-          <pre>${req.body.message}</pre>
-        `,
+        from: 'Viktor <mailer@mail.thewatchmaker.uk>',
+        to: [sendToMail],
+        subject: `New Email From - ${req.body.firstName} ${req.body.lastName}`,
+        html: emailContent.html,
+        text: emailContent.text,
         attachments: attachments.length > 0 ? attachments : undefined,
       })
 

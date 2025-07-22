@@ -1,10 +1,19 @@
 <script setup>
+import { useHead } from '@vueuse/head'
 import { onMounted, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { usePostsStore } from '@/stores/usePostsStore'
 import NewGalleryElement from '@/components/Gallery/AdminNewPost.vue'
 import GalleryEl from '@/components/Gallery/GalleryEl.vue'
 import { useAuth } from '@/composables/useAuth'
+
+useHead({
+  title: 'Watch Repair Gallery | The Watchmaker',
+  meta: [
+    { name: 'description', content: 'View our gallery of expertly restored watches and timepieces. See examples of our professional watch repair craftsmanship.' },
+    { name: 'keywords', content: 'watch repair gallery, restored watches, timepiece examples, watch restoration portfolio' }
+  ]
+})
 
 const { isAuthenticated } = useAuth()
 const route = useRoute()

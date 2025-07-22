@@ -36,6 +36,7 @@ app.use(
       useDefaults: true,
       directives: {
         'img-src': ["'self'", 'data:', 'blob:'],
+        'connect-src': ["'self'", 'https://dtdtklhtdxytgcjxhmsu.supabase.co'],
       },
     },
     referrerPolicy: {
@@ -82,24 +83,24 @@ app.use(
 app.use(express.static(distURL))
 
 // GET homepage
-app.get('/home-baby', (req, res) => {
-  const htmlString = `
-  <style>
-  h1 {color: white;}
-  html {
-    height: 100%;
-    width: 100%;
-    background-color: #161515;
-    color:white;
-  }
-  </style>
-  <h1>Mama ti deba</h1>
-  <div>
-    На кака ти хуя
-  </div>
-  `
-  res.send(htmlString)
-})
+// app.get('/home-baby', (req, res) => {
+//   const htmlString = `
+//   <style>
+//   h1 {color: white;}
+//   html {
+//     height: 100%;
+//     width: 100%;
+//     background-color: #161515;
+//     color:white;
+//   }
+//   </style>
+//   <h1>Mama ti deba</h1>
+//   <div>
+//     На кака ти хуя
+//   </div>
+//   `
+//   res.send(htmlString)
+// })
 
 app.use((req, res, next) => {
   // Skip if it's an API route

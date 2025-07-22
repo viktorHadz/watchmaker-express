@@ -53,8 +53,17 @@
 </template>
 
 <script setup>
+import { useHead } from '@vueuse/head'
 import GetInTouch from '@/components/GetInTouch.vue'
 import ContactForm from '@/components/ContactForm.vue'
+
+useHead({
+  title: 'Watch Repair Services & Contact | The Watchmaker',
+  meta: [
+    { name: 'description', content: 'Contact us for professional watch repair services. Expert restoration of luxury and vintage timepieces with free estimates.' },
+    { name: 'keywords', content: 'watch repair contact, timepiece restoration quote, luxury watch service UK' }
+  ]
+})
 </script>
 
 <style scoped>
