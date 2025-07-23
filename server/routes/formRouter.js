@@ -37,7 +37,6 @@ function getExtensionFromMimetype(mimetype) {
       return '.jpg'
   }
 }
-const emailContent = generateEmailTemplate(req.body)
 const sendToMail = process.env.WATCHMAKER_EMAIL
 
 
@@ -61,11 +60,11 @@ router.post(
           type: file.mimetype,
         }))
       }
-
-      console.log('Emailing...')
+      const emailContent = generateEmailTemplate(req.body)
+        
       const { data, error } = await resend.emails.send({
         from: 'Viktor <mailer@mail.thewatchmaker.uk>',
-        to: [sendToMail],
+        to: sendToMail,
         subject: `New Email From - ${req.body.firstName} ${req.body.lastName}`,
         html: emailContent.html,
         text: emailContent.text,
