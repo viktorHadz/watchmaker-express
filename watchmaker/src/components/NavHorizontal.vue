@@ -48,7 +48,7 @@ const handleScroll = () => {
 
 const router = useRouter()
 const { user, isAuthenticated, signOut } = useAuth()
-const avatarUrl = computed(() => `${user.value?.avatar}` || '/default-avatar.png')
+const avatarUrl = computed(() => user.value?.avatar || '/default-avatar.png')
 
 const DropdownRef = useTemplateRef('tooltip-ref')
 const tooltipButtonRef = useTemplateRef('tooltip-button-ref')
