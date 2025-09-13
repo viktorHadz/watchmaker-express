@@ -11,7 +11,7 @@ import { usePostsStore } from '@/stores/usePostsStore.js'
 import { storeToRefs } from 'pinia'
 import { useImageCompression } from '@/composables/useImageCompression'
 
-const MAX_EXTRA_IMAGES = 5
+const MAX_EXTRA_IMAGES = 100
 const MAX_FILE_SIZE = 15 * 1024 * 1024 // 15MB
 const MAX_COMPRESSED_SIZE_KB = 800 // max 800KB per image
 const MAX_THUMBNAIL_SIZE_KB = 50 // 50KB per thumbnail

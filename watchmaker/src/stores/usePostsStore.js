@@ -1,4 +1,3 @@
-// stores/posts.js
 import { defineStore } from 'pinia'
 import { ref, computed } from 'vue'
 import { useToastStore } from './toast'

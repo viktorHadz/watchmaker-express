@@ -18,13 +18,6 @@ const __filename = fileURLToPath(import.meta.url) // get the resolved path to th
 const __dirname = path.dirname(__filename) // get the name of the directory
 const distURL = path.join(__dirname, '..', 'watchmaker', 'dist')
 
-const cacheMiddleware = (duration) => {
-  return (req, res, next) => {
-    res.set('Cache-Control', `public, max-age=${duration}`)
-    next()
-  }
-}
-
 // Trust the proxy if behind one (important for correct IP detection)
 app.set('trust proxy', 1)
 
@@ -54,7 +47,7 @@ app.use('/api/', apiLimiter)
 // Registering routes
 app.use('/api/form/', formRouter)
 app.use('/api/posts/', insertPostRouter)
-app.use('/api/posts/', cacheMiddleware(180), getPostRouter) // 3 minutes cache
+app.use('/api/posts/', getPostRouter)
 app.use('/api/posts/', deletePostRouter)
 app.use('/api/posts/', editPostRouter)
 

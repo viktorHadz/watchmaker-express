@@ -37,7 +37,7 @@ const upload = multer({
   storage,
   limits: {
     fileSize: 20 * 1024 * 1024,
-    files: 11, // 1 title + 5 extra + 5 thumbnails
+    files: 100, // 1 title + 5 extra + 5 thumbnails
   },
   fileFilter: (req, file, cb) => {
     const allowedTypes = ['image/jpeg', 'image/png', 'image/webp']
@@ -168,8 +168,8 @@ function cleanupTempFiles(tempPostDir) {
 router.post('/new-post', verifyUserIdentity, (req, res) => {
   const uploadFields = upload.fields([
     { name: 'titleImage', maxCount: 1 },
-    { name: 'extraImages', maxCount: 5 },
-    { name: 'thumbnails', maxCount: 5 },
+    { name: 'extraImages', maxCount: 100 },
+    { name: 'thumbnails', maxCount: 101 },
   ])
 
   uploadFields(req, res, async (err) => {
