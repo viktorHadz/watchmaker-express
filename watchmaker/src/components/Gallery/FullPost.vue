@@ -160,8 +160,9 @@ watch(
           class="bg-primary/95 dark:bg-sec/95 dark:border-sec-mute pointer-events-auto relative flex h-full w-full max-w-4xl flex-col overflow-hidden border-0 border-white/20 shadow-2xl backdrop-blur-xl sm:max-h-[95vh] sm:rounded-2xl sm:border">
           <!-- Header -->
           <div class="border-brdr/30 dark:border-sec-mute/30 border-b px-4 py-4 sm:px-6">
-            <div class="flex items-center justify-between">
-              <div class="min-w-0 flex-1">
+            <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between">
+              <!-- Title / Input -->
+              <div class="min-w-0 flex-1 mb-2 sm:mb-0">
                 <div v-if="isAuthenticated && isEditing">
                   <input type="text" id="editing-post-id"
                     class="text-fg dark:text-fg2 font-sec focus:ring-acc/30 border-brdr/30 dark:border-sec-mute/30 dark:bg-sec/50 w-full rounded-lg border bg-transparent px-3 py-2 text-lg font-light tracking-wide focus:ring-2 focus:outline-none sm:text-xl"
@@ -175,35 +176,35 @@ watch(
               </div>
 
               <!-- Action Buttons -->
-              <div class="ml-3 flex items-center gap-1 sm:ml-4 sm:gap-2">
-                <!-- Toggle Gallery Button -->
+              <div class="flex items-center justify-around gap-2 sm:ml-4 sm:gap-2">
+                <!-- Toggle Gallery -->
                 <button v-if="allImages.length > 0" @click="toggleImageGallery"
-                  class="text-fg/60 hover:text-fg hover:bg-sec-mute/30 dark:hover:bg-sec-light/20 flex size-9 cursor-pointer items-center justify-center rounded-lg transition-all sm:size-10"
+                  class="text-fg/60 hover:text-fg hover:bg-sec-mute/30 dark:hover:bg-sec-light/20 flex size-9 sm:size-10 cursor-pointer items-center justify-center rounded-lg transition-all"
                   :title="showImageGallery ? 'Hide images' : 'Show images'">
                   <EyeIcon v-if="showImageGallery" class="text-acc size-4 sm:size-5" />
                   <EyeSlashIcon v-else class="size-4 sm:size-5" />
                 </button>
 
-                <!-- Save/Share Button -->
+                <!-- Save/Share -->
                 <button v-if="isAuthenticated && isEditing"
-                  class="text-fg/60 hover:text-success hover:bg-sec-mute/30 dark:hover:bg-sec-light/20 flex size-9 cursor-pointer items-center justify-center rounded-lg transition-all sm:size-10"
+                  class="text-fg/60 hover:text-success hover:bg-sec-mute/30 dark:hover:bg-sec-light/20 flex size-9 sm:size-10 cursor-pointer items-center justify-center rounded-lg transition-all"
                   title="Save edit" @click="saveEdit(post.postId)">
                   <CheckBadgeIcon class="text-success size-4 sm:size-5" />
                 </button>
-
                 <button v-else @click="handleShare"
-                  class="text-fg/60 hover:text-acc hover:bg-sec-mute/30 dark:hover:bg-sec-light/20 flex size-9 cursor-pointer items-center justify-center rounded-lg transition-all sm:size-10">
+                  class="text-fg/60 hover:text-acc hover:bg-sec-mute/30 dark:hover:bg-sec-light/20 flex size-9 sm:size-10 cursor-pointer items-center justify-center rounded-lg transition-all">
                   <ShareIcon class="text-acc size-4 sm:size-5" />
                 </button>
 
-                <!-- Close Button -->
+                <!-- Close -->
                 <button @click="closeModal"
-                  class="text-fg/40 hover:text-fg/80 hover:bg-sec-mute/30 dark:hover:bg-sec-light/20 flex size-9 cursor-pointer items-center justify-center rounded-lg transition-all sm:size-10">
+                  class="text-fg/40 hover:text-fg/80 hover:bg-sec-mute/30 dark:hover:bg-sec-light/20 flex size-9 sm:size-10 cursor-pointer items-center justify-center rounded-lg transition-all">
                   <XMarkIcon class="size-4 sm:size-5" />
                 </button>
               </div>
             </div>
           </div>
+
 
           <!-- Gallery Section -->
           <Transition name="gallery" mode="out-in">
@@ -297,9 +298,7 @@ watch(
               <div v-else>
                 <div v-if="post.postBody"
                   class="border-brdr/30 dark:border-sec-mute/30 dark:bg-sec/50 rounded-xl border bg-transparent">
-                  <div class="border-brdr/30 dark:border-sec-mute/30 flex items-center gap-2 border-b px-4 py-3">
-                    <span class="text-fg text-sm font-medium">Post Content</span>
-                  </div>
+
                   <div class="p-4">
                     <div class="text-fg space-y-4 text-sm leading-relaxed break-words whitespace-pre-line sm:text-base">
                       {{ post.postBody }}
