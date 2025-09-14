@@ -18,16 +18,10 @@ const router = createRouter({
       component: RepairsView,
     },
     {
-      path: '/my-work',
+      path: '/my-work/:postId?',
       name: 'myWork',
       component: MyWorkView,
-    },
-    {
-      path: '/my-work/:postId',
-      name: 'postDetail',
-      component: MyWorkView,
       props: true,
-      // Add meta for sharing
       meta: {
         requiresPost: true,
       },
@@ -38,18 +32,17 @@ const router = createRouter({
       component: LoginPanel,
     },
   ],
-  scrollBehavior(to, from, savedPosition) {
-    // Target the scrollable container instead of window
-    return new Promise((resolve) => {
-      setTimeout(() => {
-        const scrollContainer = document.querySelector('#app-scroll-container')
-        if (scrollContainer) {
-          scrollContainer.scrollTop = 0
-        }
-        resolve({ top: 0 })
-      }, 50)
-    })
-  },
+  // scrollBehavior(to, from, savedPosition) {
+  //   return new Promise((resolve) => {
+  //     setTimeout(() => {
+  //       const scrollContainer = document.querySelector('#app-scroll-container')
+  //       if (scrollContainer) {
+  //         scrollContainer.scrollTop = 0
+  //       }
+  //       resolve({ top: 0 })
+  //     }, 50)
+  //   })
+  // },
 })
 
 export default router

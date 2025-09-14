@@ -10,8 +10,8 @@ import { useAuth } from '@/composables/useAuth'
 useHead({
   title: 'Watch Repair Gallery | The Watchmaker',
   meta: [
-    { name: 'description', content: 'View our gallery of expertly restored watches and timepieces. See examples of our professional watch repair craftsmanship.' },
-    { name: 'keywords', content: 'watch repair gallery, restored watches, timepiece examples, watch restoration portfolio' }
+    { name: 'description', content: 'View our gallery of expertly restored watches. See examples of our watch repair craftsmanship.' },
+    { name: 'keywords', content: 'watch repair, restored watches, timepieces, watch restoration, old watches, USSR watches, horology, craftsmanship  ' }
   ]
 })
 
@@ -58,7 +58,7 @@ const updateMetaTags = (post) => {
       `<meta name="twitter:image" content="${imageUrl}">`,
     )
 
-  console.log('✅ Meta tags updated for:', title)
+  console.log('Meta tags updated for:', title)
 }
 
 // Reset to default meta tags
@@ -71,28 +71,25 @@ const resetMetaTags = () => {
     '/assets/pictures/hoz-pocket-watch.webp'
   document.querySelector('meta[property="og:url"]').content = `${window.location.origin}/my-work`
 
-  console.log('✅ Meta tags reset to default')
+  console.log('Meta tags reset to default')
 }
 
 onMounted(async () => {
-  console.log('MyWorkView mounted, route params:', route.params)
+  // console.log('MyWorkView mounted, route params:', route.params)
 
   await postsStore.initialize()
   console.log('Posts loaded:', postsStore.posts.length)
 
   if (route.params.postId) {
-    const postId = route.params.postId
-    console.log('Looking for post with ID:', postId)
-
-    const post = postsStore.openPostById(postId)
-
+    const post = postsStore.openPostById(route.params.postId)
     if (!post) {
       console.log('Post not found, redirecting to gallery')
       router.replace('/my-work')
     } else {
-      console.log('Post found:', post.postTitle)
       updateMetaTags(post)
     }
+  } else {
+    resetMetaTags()
   }
 })
 
@@ -100,15 +97,15 @@ watch(
   () => route.params.postId,
   (postId) => {
     if (postId) {
-      const post = postsStore.posts.find((p) => p.postId == postId)
+      const post = postsStore.openPostById(postId)
       if (post) {
-        console.log('Route changed, updating meta for:', post.postTitle)
         updateMetaTags(post)
       }
     } else {
+      postsStore.closePostModal()
       resetMetaTags()
     }
-  },
+  }
 )
 </script>
 

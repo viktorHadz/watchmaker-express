@@ -39,9 +39,7 @@ useHead({
       <div class="from-primary via-sec-light to-sec absolute inset-0 bg-gradient-to-br"></div>
 
       <!-- Subtle metal texture overlay -->
-      <div
-        class="absolute inset-0 opacity-30"
-        style="
+      <div class="absolute inset-0 opacity-30" style="
           background-image:
             radial-gradient(circle at 25% 25%, rgba(0, 0, 0, 0.02) 1px, transparent 1px),
             radial-gradient(circle at 75% 75%, rgba(0, 0, 0, 0.02) 1px, transparent 1px);
@@ -49,13 +47,10 @@ useHead({
           background-position:
             0 0,
             12px 12px;
-        "
-      ></div>
+        "></div>
 
       <!-- watch dial like texture -->
-      <div
-        class="absolute inset-0 opacity-10"
-        style="
+      <div class="absolute inset-0 opacity-10" style="
           background-image:
             linear-gradient(
               45deg,
@@ -72,8 +67,7 @@ useHead({
               transparent 51%
             );
           background-size: 20px 20px;
-        "
-      ></div>
+        "></div>
     </div>
 
     <NavHorizontal />
@@ -83,9 +77,11 @@ useHead({
         <div class="pt-8 pb-20 sm:pt-20 sm:pb-4">
           <RouterView v-slot="{ Component, route }">
             <Transition name="page" mode="out-in" appear>
-              <component :is="Component" :key="route.path" />
+              <component :is="Component"
+                :key="['home', 'repairs', 'admin'].includes(route.name) ? route.name : 'myWork'" />
             </Transition>
           </RouterView>
+
         </div>
         <SiteFooter />
       </div>

@@ -1,4 +1,3 @@
-<!-- Update your FullPost.vue script section -->
 <script setup>
 import { ref, computed, watch } from 'vue'
 import { usePostsStore } from '@/stores/usePostsStore'
@@ -81,14 +80,12 @@ const closeModal = () => {
   emit('close')
 }
 
-// Updated handleShare to use store function
 const handleShare = () => {
   console.log('FullPost: Opening share modal for post:', props.post.postId)
   openShareModal(props.post)
   emit('share', props.post)
 }
 
-// Reset image index when post changes
 watch(
   () => props.post.postId,
   () => {
@@ -235,7 +232,7 @@ watch(
                   <button
                     @click="prevImage"
                     :disabled="currentImageIndex === 0"
-                    class="hover:text-acc ml-2 flex size-8 items-center justify-center rounded-full bg-black/50 text-white backdrop-blur-sm transition-all hover:bg-black/70 disabled:cursor-not-allowed disabled:opacity-50 sm:ml-4 sm:size-10"
+                    class="hover:text-acc ml-2 flex size-8 items-center justify-center rounded-full bg-black/50 text-white backdrop-blur-sm transition-all hover:bg-black/70 disabled:cursor-not-allowed disabled:opacity-50 sm:ml-4 sm:size-10 cursor-pointer"
                   >
                     <ChevronLeftIcon class="size-4 sm:size-5" />
                   </button>
@@ -248,7 +245,7 @@ watch(
                   <button
                     @click="nextImage"
                     :disabled="currentImageIndex === allImages.length - 1"
-                    class="hover:text-acc mr-2 flex size-8 items-center justify-center rounded-full bg-black/50 text-white backdrop-blur-sm transition-all hover:bg-black/70 disabled:cursor-not-allowed disabled:opacity-50 sm:mr-4 sm:size-10"
+                    class="hover:text-acc mr-2 flex size-8 items-center justify-center rounded-full bg-black/50 text-white backdrop-blur-sm transition-all hover:bg-black/70 disabled:cursor-not-allowed disabled:opacity-50 sm:mr-4 sm:size-10 cursor-pointer"
                   >
                     <ChevronRightIcon class="size-4 sm:size-5" />
                   </button>
