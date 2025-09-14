@@ -93,17 +93,43 @@ watch(
     showImageGallery.value = true
   },
 )
+const thumbsRef = ref(null)
+
+const scrollThumbs = (dir) => {
+  if (!thumbsRef.value) return
+  const scrollAmount = 150
+  thumbsRef.value.scrollBy({
+    left: dir * scrollAmount,
+    behavior: 'smooth',
+  })
+}
+
+
+// fullscreen implementation 
+const fullscreen = ref(false)
+const openFullscreen = () => {
+  fullscreen.value = true
+  document.body.style.overflow = 'hidden'
+}
+
+const closeFullscreen = () => {
+  fullscreen.value = false
+  document.body.style.overflow = ''
+}
 
 // Handle escape key
 const handleKeydown = (event) => {
-  if (event.key === 'Escape' && props.show) {
-    closeModal()
+  if (fullscreen.value) {
+    if (event.key === 'Escape') closeFullscreen()
+    if (event.key === 'ArrowLeft') prevImage()
+    if (event.key === 'ArrowRight') nextImage()
+    return
   }
-  if (event.key === 'ArrowLeft' && props.show) {
-    prevImage()
-  }
-  if (event.key === 'ArrowRight' && props.show) {
-    nextImage()
+
+  if (props.show) {
+    if (event.key === 'Escape') closeModal()
+    if (event.key === 'ArrowLeft') prevImage()
+    if (event.key === 'ArrowRight') nextImage()
   }
 }
 
@@ -113,10 +139,8 @@ watch(
   (newShow) => {
     if (newShow) {
       document.addEventListener('keydown', handleKeydown)
-      document.body.style.overflow = 'hidden'
     } else {
       document.removeEventListener('keydown', handleKeydown)
-      document.body.style.overflow = ''
     }
   },
 )
@@ -126,39 +150,25 @@ watch(
   <Teleport to="body">
     <!-- Backdrop -->
     <Transition name="backdrop" appear>
-      <div
-        v-if="show"
-        class="fixed inset-0 z-[100] bg-black/60 backdrop-blur-sm"
-        @click="closeModal"
-      ></div>
+      <div v-if="show" class="fixed inset-0 z-[100] bg-black/60 backdrop-blur-sm" @click="closeModal"></div>
     </Transition>
 
     <!-- Modal Content -->
     <Transition name="modal" appear>
-      <div
-        v-if="show"
-        class="pointer-events-none fixed inset-0 z-[101] flex items-center justify-center p-0 sm:p-4"
-      >
+      <div v-if="show" class="pointer-events-none fixed inset-0 z-[101] flex items-center justify-center p-0 sm:p-4">
         <div
-          class="bg-primary/95 dark:bg-sec/95 dark:border-sec-mute pointer-events-auto relative flex h-full w-full max-w-4xl flex-col overflow-hidden border-0 border-white/20 shadow-2xl backdrop-blur-xl sm:max-h-[95vh] sm:rounded-2xl sm:border"
-        >
+          class="bg-primary/95 dark:bg-sec/95 dark:border-sec-mute pointer-events-auto relative flex h-full w-full max-w-4xl flex-col overflow-hidden border-0 border-white/20 shadow-2xl backdrop-blur-xl sm:max-h-[95vh] sm:rounded-2xl sm:border">
           <!-- Header -->
           <div class="border-brdr/30 dark:border-sec-mute/30 border-b px-4 py-4 sm:px-6">
             <div class="flex items-center justify-between">
               <div class="min-w-0 flex-1">
                 <div v-if="isAuthenticated && isEditing">
-                  <input
-                    type="text"
-                    id="editing-post-id"
+                  <input type="text" id="editing-post-id"
                     class="text-fg dark:text-fg2 font-sec focus:ring-acc/30 border-brdr/30 dark:border-sec-mute/30 dark:bg-sec/50 w-full rounded-lg border bg-transparent px-3 py-2 text-lg font-light tracking-wide focus:ring-2 focus:outline-none sm:text-xl"
-                    placeholder="Post Title"
-                    v-model="editForm.postTitle"
-                  />
+                    placeholder="Post Title" v-model="editForm.postTitle" />
                 </div>
                 <div v-else>
-                  <h2
-                    class="text-fg dark:text-fg2 font-sec text-lg font-light tracking-wide sm:text-xl"
-                  >
+                  <h2 class="text-fg dark:text-fg2 font-sec text-lg font-light tracking-wide sm:text-xl">
                     {{ post.postTitle || 'Untitled Post' }}
                   </h2>
                 </div>
@@ -167,39 +177,28 @@ watch(
               <!-- Action Buttons -->
               <div class="ml-3 flex items-center gap-1 sm:ml-4 sm:gap-2">
                 <!-- Toggle Gallery Button -->
-                <button
-                  v-if="allImages.length > 0"
-                  @click="toggleImageGallery"
+                <button v-if="allImages.length > 0" @click="toggleImageGallery"
                   class="text-fg/60 hover:text-fg hover:bg-sec-mute/30 dark:hover:bg-sec-light/20 flex size-9 cursor-pointer items-center justify-center rounded-lg transition-all sm:size-10"
-                  :title="showImageGallery ? 'Hide images' : 'Show images'"
-                >
+                  :title="showImageGallery ? 'Hide images' : 'Show images'">
                   <EyeIcon v-if="showImageGallery" class="text-acc size-4 sm:size-5" />
                   <EyeSlashIcon v-else class="size-4 sm:size-5" />
                 </button>
 
                 <!-- Save/Share Button -->
-                <button
-                  v-if="isAuthenticated && isEditing"
+                <button v-if="isAuthenticated && isEditing"
                   class="text-fg/60 hover:text-success hover:bg-sec-mute/30 dark:hover:bg-sec-light/20 flex size-9 cursor-pointer items-center justify-center rounded-lg transition-all sm:size-10"
-                  title="Save edit"
-                  @click="saveEdit(post.postId)"
-                >
+                  title="Save edit" @click="saveEdit(post.postId)">
                   <CheckBadgeIcon class="text-success size-4 sm:size-5" />
                 </button>
 
-                <button
-                  v-else
-                  @click="handleShare"
-                  class="text-fg/60 hover:text-acc hover:bg-sec-mute/30 dark:hover:bg-sec-light/20 flex size-9 cursor-pointer items-center justify-center rounded-lg transition-all sm:size-10"
-                >
+                <button v-else @click="handleShare"
+                  class="text-fg/60 hover:text-acc hover:bg-sec-mute/30 dark:hover:bg-sec-light/20 flex size-9 cursor-pointer items-center justify-center rounded-lg transition-all sm:size-10">
                   <ShareIcon class="text-acc size-4 sm:size-5" />
                 </button>
 
                 <!-- Close Button -->
-                <button
-                  @click="closeModal"
-                  class="text-fg/40 hover:text-fg/80 hover:bg-sec-mute/30 dark:hover:bg-sec-light/20 flex size-9 cursor-pointer items-center justify-center rounded-lg transition-all sm:size-10"
-                >
+                <button @click="closeModal"
+                  class="text-fg/40 hover:text-fg/80 hover:bg-sec-mute/30 dark:hover:bg-sec-light/20 flex size-9 cursor-pointer items-center justify-center rounded-lg transition-all sm:size-10">
                   <XMarkIcon class="size-4 sm:size-5" />
                 </button>
               </div>
@@ -208,94 +207,71 @@ watch(
 
           <!-- Gallery Section -->
           <Transition name="gallery" mode="out-in">
-            <div
-              v-if="allImages.length > 0 && showImageGallery"
-              class="border-brdr/30 dark:border-sec-mute/30 border-b"
-            >
+            <div v-if="allImages.length > 0 && showImageGallery"
+              class="border-brdr/30 dark:border-sec-mute/30 border-b">
               <!-- Main Image Display -->
               <div class="relative bg-black/5">
-                <img
-                  v-if="allImages[currentImageIndex]"
-                  :src="allImages[currentImageIndex]"
+                <img v-if="allImages[currentImageIndex]" :src="allImages[currentImageIndex]"
                   :alt="`${post.postTitle || 'Post'} image ${currentImageIndex + 1}`"
-                  class="h-64 w-full object-contain sm:h-96"
-                />
+                  class="h-64 w-full object-contain sm:h-96 cursor-zoom-in" @click="openFullscreen" />
                 <div v-else class="flex h-64 items-center justify-center sm:h-80">
                   <PhotoIcon class="text-fg/30 size-16" />
                 </div>
 
                 <!-- Navigation Arrows -->
-                <div
-                  v-if="allImages.length > 1"
-                  class="absolute inset-y-0 left-0 flex items-center"
-                >
-                  <button
-                    @click="prevImage"
-                    :disabled="currentImageIndex === 0"
-                    class="hover:text-acc ml-2 flex size-8 items-center justify-center rounded-full bg-black/50 text-white backdrop-blur-sm transition-all hover:bg-black/70 disabled:cursor-not-allowed disabled:opacity-50 sm:ml-4 sm:size-10 cursor-pointer"
-                  >
+                <div v-if="allImages.length > 1" class="absolute inset-y-0 left-0 flex items-center">
+                  <button @click="prevImage" :disabled="currentImageIndex === 0"
+                    class="hover:text-acc ml-2 flex size-8 items-center justify-center rounded-full bg-black/50 text-white backdrop-blur-sm transition-all hover:bg-black/70 disabled:cursor-not-allowed disabled:opacity-50 sm:ml-4 sm:size-10 cursor-pointer">
                     <ChevronLeftIcon class="size-4 sm:size-5" />
                   </button>
                 </div>
 
-                <div
-                  v-if="allImages.length > 1"
-                  class="absolute inset-y-0 right-0 flex items-center"
-                >
-                  <button
-                    @click="nextImage"
-                    :disabled="currentImageIndex === allImages.length - 1"
-                    class="hover:text-acc mr-2 flex size-8 items-center justify-center rounded-full bg-black/50 text-white backdrop-blur-sm transition-all hover:bg-black/70 disabled:cursor-not-allowed disabled:opacity-50 sm:mr-4 sm:size-10 cursor-pointer"
-                  >
+                <div v-if="allImages.length > 1" class="absolute inset-y-0 right-0 flex items-center">
+                  <button @click="nextImage" :disabled="currentImageIndex === allImages.length - 1"
+                    class="hover:text-acc mr-2 flex size-8 items-center justify-center rounded-full bg-black/50 text-white backdrop-blur-sm transition-all hover:bg-black/70 disabled:cursor-not-allowed disabled:opacity-50 sm:mr-4 sm:size-10 cursor-pointer">
                     <ChevronRightIcon class="size-4 sm:size-5" />
                   </button>
                 </div>
 
                 <!-- Image Counter -->
-                <div
-                  v-if="allImages.length > 1"
-                  class="absolute right-2 bottom-2 sm:right-4 sm:bottom-4"
-                >
+                <div v-if="allImages.length > 1" class="absolute right-2 bottom-2 sm:right-4 sm:bottom-4">
                   <span
-                    class="rounded-full bg-black/60 px-2 py-1 text-xs text-white backdrop-blur-sm sm:px-3 sm:text-sm"
-                  >
+                    class="rounded-full bg-black/60 px-2 py-1 text-xs text-white backdrop-blur-sm sm:px-3 sm:text-sm">
                     {{ currentImageIndex + 1 }} / {{ allImages.length }}
                   </span>
                 </div>
               </div>
 
               <!-- Thumbnail Navigation -->
-              <div
-                v-if="allImages.length > 1"
-                class="border-brdr/30 dark:border-sec-mute/30 border-t"
-              >
-                <div
-                  class="scrollbar-hide flex space-x-2 overflow-x-auto p-4"
-                  style="scroll-behavior: smooth"
-                >
-                  <button
-                    v-for="(image, index) in allImages"
-                    :key="index"
-                    @click="setCurrentImage(index)"
-                    :class="[
-                      'relative size-12 flex-shrink-0 rounded-lg border-2 transition-all duration-200 ease-out sm:size-14',
-                      currentImageIndex === index
-                        ? 'border-acc scale-105 shadow-lg'
-                        : 'border-brdr/30 dark:border-sec-mute/30 hover:border-acc/50',
-                    ]"
-                  >
-                    <img
-                      :src="image"
-                      :alt="`Thumbnail ${index + 1}`"
-                      class="h-full w-full rounded-md object-cover"
-                    />
-                    <div
-                      v-if="currentImageIndex === index"
-                      class="bg-acc/20 absolute inset-0 rounded-md"
-                    ></div>
+              <div v-if="allImages.length > 1" class="relative border-brdr/30 dark:border-sec-mute/30 border-t">
+                <!-- Left Arrow -->
+                <button @click="scrollThumbs(-1)"
+                  class="absolute left-2 top-1/2 z-10 -translate-y-1/2 rounded-full bg-black/50 p-1 text-white backdrop-blur-sm hover:bg-black/70 sm:p-2">
+                  <ChevronLeftIcon class="size-4 sm:size-5" />
+                </button>
+
+                <!-- Thumbnails Scroll -->
+                <div ref="thumbsRef" class="scrollbar-hide flex space-x-2 overflow-x-auto p-4"
+                  style="scroll-behavior: smooth">
+                  <button v-for="(image, index) in allImages" :key="index" @click="setCurrentImage(index)" :class="[
+                    'relative size-12 flex-shrink-0 rounded-lg border-2 transition-all duration-200 ease-out sm:size-14',
+                    currentImageIndex === index
+                      ? 'border-acc scale-105 shadow-lg'
+                      : 'border-brdr/30 dark:border-sec-mute/30 hover:border-acc/50',
+                  ]">
+                    <img :src="image" :alt="`Thumbnail ${index + 1}`"
+                      class="h-full w-full rounded-md object-cover cursor-pointer" />
+                    <div v-if="currentImageIndex === index" class="bg-acc/20 absolute inset-0 rounded-md"></div>
                   </button>
                 </div>
+
+                <!-- Right Arrow -->
+                <button @click="scrollThumbs(1)"
+                  class="absolute right-2 top-1/2 z-10 -translate-y-1/2 rounded-full bg-black/50 p-1 text-white backdrop-blur-sm hover:bg-black/70 sm:p-2">
+                  <ChevronRightIcon class="size-4 sm:size-5" />
+                </button>
               </div>
+
             </div>
           </Transition>
 
@@ -304,51 +280,35 @@ watch(
             <div class="p-4 sm:p-6">
               <!-- Editing Mode -->
               <div v-if="isAuthenticated && isEditing" class="relative">
-                <div
-                  class="border-brdr/30 dark:border-sec-mute/30 dark:bg-sec/50 rounded-xl border bg-transparent"
-                >
-                  <div
-                    class="border-brdr/30 dark:border-sec-mute/30 flex items-center gap-2 border-b px-4 py-3"
-                  >
+                <div class="border-brdr/30 dark:border-sec-mute/30 dark:bg-sec/50 rounded-xl border bg-transparent">
+                  <div class="border-brdr/30 dark:border-sec-mute/30 flex items-center gap-2 border-b px-4 py-3">
                     <PencilIcon class="text-acc size-4" />
                     <span class="text-fg text-sm font-medium">Editing Content</span>
                   </div>
-                  <textarea
-                    name="message"
-                    id="editing-message"
+                  <textarea name="message" id="editing-message"
                     class="text-fg placeholder-fg/50 focus:ring-acc/30 w-full resize-none border-0 bg-transparent p-4 text-sm leading-relaxed focus:ring-2 focus:outline-none sm:text-base"
                     rows="12"
                     placeholder="Share your story, describe the craftsmanship, or explain what makes this piece special. The more details you provide, the better others can appreciate your work."
-                    v-model="editForm.postBody"
-                  />
+                    v-model="editForm.postBody" />
                 </div>
               </div>
 
               <!-- Reading Mode -->
               <div v-else>
-                <div
-                  v-if="post.postBody"
-                  class="border-brdr/30 dark:border-sec-mute/30 dark:bg-sec/50 rounded-xl border bg-transparent"
-                >
-                  <div
-                    class="border-brdr/30 dark:border-sec-mute/30 flex items-center gap-2 border-b px-4 py-3"
-                  >
+                <div v-if="post.postBody"
+                  class="border-brdr/30 dark:border-sec-mute/30 dark:bg-sec/50 rounded-xl border bg-transparent">
+                  <div class="border-brdr/30 dark:border-sec-mute/30 flex items-center gap-2 border-b px-4 py-3">
                     <span class="text-fg text-sm font-medium">Post Content</span>
                   </div>
                   <div class="p-4">
-                    <div
-                      class="text-fg space-y-4 text-sm leading-relaxed break-words whitespace-pre-line sm:text-base"
-                    >
+                    <div class="text-fg space-y-4 text-sm leading-relaxed break-words whitespace-pre-line sm:text-base">
                       {{ post.postBody }}
                     </div>
                   </div>
                 </div>
 
                 <!-- Empty State -->
-                <div
-                  v-else
-                  class="border-brdr/30 dark:border-sec-mute/30 rounded-xl border border-dashed"
-                >
+                <div v-else class="border-brdr/30 dark:border-sec-mute/30 rounded-xl border border-dashed">
                   <div class="flex flex-col items-center justify-center px-6 py-12 text-center">
                     <div class="bg-acc/10 text-acc mb-4 rounded-full p-4">
                       <PencilIcon class="size-8" />
@@ -365,14 +325,9 @@ watch(
           <div class="border-brdr/30 dark:border-sec-mute/30 border-t px-4 py-3 sm:px-6 sm:py-4">
             <div class="flex items-center justify-between">
               <div class="flex items-center gap-4">
-                <span
-                  v-if="allImages.length > 0"
-                  class="text-fg-mute flex items-center gap-2 text-sm"
-                >
+                <span v-if="allImages.length > 0" class="text-fg-mute flex items-center gap-2 text-sm">
                   <PhotoIcon class="size-4" />
-                  <span
-                    >{{ allImages.length }} {{ allImages.length === 1 ? 'image' : 'images' }}</span
-                  >
+                  <span>{{ allImages.length }} {{ allImages.length === 1 ? 'image' : 'images' }}</span>
                 </span>
               </div>
               <span v-if="post.date" class="text-fg-mute flex items-center gap-2 text-sm">
@@ -384,6 +339,30 @@ watch(
         </div>
       </div>
     </Transition>
+    <!-- Fullscreen Image Viewer -->
+    <Transition name="modal">
+      <div v-if="fullscreen" class="fixed inset-0 z-[200] flex items-center justify-center bg-black/90">
+        <button @click="closeFullscreen"
+          class="absolute top-4 right-4 rounded-full bg-black/60 p-2 text-white hover:bg-black/80 cursor-pointer">
+          <XMarkIcon class="size-6" />
+        </button>
+
+        <!-- Navigation Arrows -->
+        <button v-if="allImages.length > 1" @click="prevImage" :disabled="currentImageIndex === 0"
+          class="absolute left-4 rounded-full bg-black/60 p-3 text-white hover:bg-black/80 disabled:opacity-40 cursor-pointer sm:hover:bg-white/10 disabled:cursor-not-allowed disabled:hover:bg-transparent">
+          <ChevronLeftIcon class="size-6" />
+        </button>
+
+        <img :src="allImages[currentImageIndex]" :alt="`${post.postTitle || 'Post'} image fullscreen`"
+          class="max-h-[90vh] max-w-[90vw] object-contain" />
+
+        <button v-if="allImages.length > 1" @click="nextImage" :disabled="currentImageIndex === allImages.length - 1"
+          class="absolute right-4 rounded-full bg-black/60 p-3 text-white hover:bg-black/80 disabled:opacity-40 cursor-pointer sm:hover:bg-white/10 disabled:cursor-not-allowed disabled:hover:bg-transparent ">
+          <ChevronRightIcon class="size-6" />
+        </button>
+      </div>
+    </Transition>
+
   </Teleport>
 </template>
 <style scoped>
@@ -391,6 +370,7 @@ watch(
   -ms-overflow-style: none;
   scrollbar-width: none;
 }
+
 .scrollbar-hide::-webkit-scrollbar {
   display: none;
 }

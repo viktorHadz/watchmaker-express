@@ -2,7 +2,7 @@
 import { ShareIcon, TrashIcon, PencilSquareIcon, CalendarIcon } from '@heroicons/vue/24/outline'
 import { onMounted, useTemplateRef } from 'vue'
 import PostModal from './FullPost.vue'
-import ShareModal from './ShareModal.vue' // Import ShareModal
+import ShareModal from './ShareModal.vue'
 import IconGallery from '../icons/IconGallery.vue'
 import PaginationMain from '../PaginationMain.vue'
 import { useAuth } from '../../composables/useAuth.js'
