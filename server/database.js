@@ -14,10 +14,11 @@ export function initializeDatabase() {
   // SCHEMA
   const stmtPostsTable = db.prepare(`CREATE TABLE IF NOT EXISTS posts (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
-    post_title TEXT,
+    post_title TEXT NOT NULL CHECK (post_title <> ''),
     post_body TEXT,
     date TEXT,
-    post_type TEXT)`)
+    post_type TEXT
+  )`)
   stmtPostsTable.run()
 
   const stmtImagesTable = db.prepare(`CREATE TABLE IF NOT EXISTS images (

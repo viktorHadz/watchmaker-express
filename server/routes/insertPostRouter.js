@@ -16,12 +16,12 @@ const router = express.Router()
 const tempUploadDir = './temp/uploads'
 const finalUploadDir = './public/uploads'
 
-// Ensure directories exist
-;[tempUploadDir, finalUploadDir].forEach((dir) => {
-  if (!fs.existsSync(dir)) {
-    fs.mkdirSync(dir, { recursive: true })
-  }
-})
+  // Ensure directories exist
+  ;[tempUploadDir, finalUploadDir].forEach((dir) => {
+    if (!fs.existsSync(dir)) {
+      fs.mkdirSync(dir, { recursive: true })
+    }
+  })
 
 // Generate unique post folder name
 function generatePostFolderName() {
@@ -239,7 +239,13 @@ router.post('/new-post', verifyUserIdentity, (req, res) => {
         extraCount: savedFiles.extraImages.length,
         thumbCount: savedFiles.thumbnails.length,
       })
-
+      if (!savedFiles.titleImage) {
+        cleanupTempFiles(tempPostDir)
+        return res.status(400).json({
+          success: false,
+          error: 'Featured image (title image) is required.',
+        })
+      }
       // Database transaction - only if this succeeds do we move files
       const insertPost = database.prepare(
         `INSERT INTO posts (post_title, post_body, date, post_type) VALUES (?, ?, ?, ?)`,
