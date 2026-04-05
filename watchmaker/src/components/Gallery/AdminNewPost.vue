@@ -17,6 +17,13 @@ const MAX_COMPRESSED_SIZE_KB = 800 // max 800KB per image
 const MAX_THUMBNAIL_SIZE_KB = 50 // 50KB per thumbnail
 const ALLOWED_TYPES = ['image/jpeg', 'image/png', 'image/webp']
 
+const props = defineProps({
+  embedded: {
+    type: Boolean,
+    default: false,
+  },
+})
+
 // Enhanced compression with size targets
 const { compressImage, compressToSize } = useImageCompression()
 
@@ -325,10 +332,10 @@ const removeExtraImage = (index) => {
 </script>
 
 <template>
-  <div class="min-h-screen">
-    <div class="relative z-[98] px-4 py-12 sm:px-6 lg:px-8">
+  <div :class="props.embedded ? '' : 'min-h-screen'">
+    <div :class="props.embedded ? 'relative z-[98]' : 'relative z-[98] px-4 py-12 sm:px-6 lg:px-8'">
       <!-- Header -->
-      <div class="mb-12 text-center">
+      <div v-if="!props.embedded" class="mb-12 text-center">
         <h1 class="font-sec text-fg mb-4 text-4xl font-semibold lg:text-5xl">Post Management</h1>
         <p class="text-fg/70 mx-auto max-w-3xl text-xl">
           Share your latest watch restorations and horological achievements
@@ -338,7 +345,7 @@ const removeExtraImage = (index) => {
       <!-- CREATE NEW POST SECTION -->
       <div class="mx-auto max-w-6xl">
         <div
-          class="bg-primary/90 dark:border-sec-mute/50 dark:bg-sec/90 overflow-hidden rounded-2xl border border-white/20 shadow-2xl backdrop-blur-sm"
+          class="bg-primary/90 dark:border-sec-mute/50 dark:bg-sec/90 overflow-hidden rounded-lg border border-white/20 shadow-2xl backdrop-blur-sm"
         >
           <!-- Form Header -->
           <div
@@ -346,7 +353,7 @@ const removeExtraImage = (index) => {
           >
             <div class="flex items-center space-x-4">
               <div
-                class="bg-acc/20 flex size-10 items-center justify-center rounded-lg sm:size-12 sm:rounded-xl"
+                class="bg-acc/20 flex size-10 items-center justify-center rounded-lg sm:size-12 sm:rounded-lg"
               >
                 <PlusIcon class="text-acc size-6"></PlusIcon>
               </div>
@@ -365,7 +372,7 @@ const removeExtraImage = (index) => {
             >
               <div class="flex h-5 w-5 animate-spin items-center justify-center">
                 <div
-                  class="h-4 w-4 rounded-full border-2 border-blue-600 border-t-transparent"
+                  class="h-4 w-4 rounded-lg border-2 border-blue-600 border-t-transparent"
                 ></div>
               </div>
               <span class="font-medium text-blue-800 dark:text-blue-200">
@@ -379,14 +386,14 @@ const removeExtraImage = (index) => {
               <div class="space-y-4">
                 <div class="flex items-center justify-between">
                   <h3 class="input-lbl">Featured Image</h3>
-                  <span class="text-acc bg-acc/10 rounded-full px-2 py-1 text-sm">Required</span>
+                  <span class="text-acc bg-acc/10 rounded-lg px-2 py-1 text-sm">Required</span>
                 </div>
 
                 <div
                   v-if="newPost.titleImage.length === 0"
                   ref="titleDropZoneRef"
                   :class="[
-                    'group relative flex min-h-[280px] cursor-pointer flex-col items-center justify-center rounded-xl border-2 border-dashed transition-all duration-300',
+                    'group relative flex min-h-[280px] cursor-pointer flex-col items-center justify-center rounded-lg border-2 border-dashed transition-all duration-300',
                     isProcessing ? 'pointer-events-none opacity-50' : '',
                     isOverDropZone
                       ? 'border-acc bg-acc/10 scale-[1.02]'
@@ -420,7 +427,7 @@ const removeExtraImage = (index) => {
 
                 <!-- Title Image Preview with compression info -->
                 <div v-else class="group relative">
-                  <div class="relative overflow-hidden rounded-xl">
+                  <div class="relative overflow-hidden rounded-lg">
                     <img
                       :src="newPost.titleImage[0]"
                       alt="Featured Image"
@@ -449,7 +456,7 @@ const removeExtraImage = (index) => {
                         <button
                           type="button"
                           @click="removeTitleImage"
-                          class="flex h-8 w-8 items-center justify-center rounded-full bg-red-500 text-white transition-colors hover:bg-red-600"
+                          class="flex h-8 w-8 items-center justify-center rounded-lg bg-red-500 text-white transition-colors hover:bg-red-600"
                         >
                           <TrashIcon class="size-4"></TrashIcon>
                         </button>
@@ -459,7 +466,7 @@ const removeExtraImage = (index) => {
                     <button
                       type="button"
                       @click="removeTitleImage"
-                      class="absolute top-2 right-2 flex h-8 w-8 items-center justify-center rounded-full bg-red-500 text-white shadow-lg md:hidden"
+                      class="absolute top-2 right-2 flex h-8 w-8 items-center justify-center rounded-lg bg-red-500 text-white shadow-lg md:hidden"
                     >
                       <TrashIcon class="size-4"></TrashIcon>
                     </button>
@@ -483,7 +490,7 @@ const removeExtraImage = (index) => {
                   <h3 class="input-lbl">Additional Images</h3>
                   <div class="flex items-center space-x-2">
                     <span
-                      class="text-fg bg-sec-light dark:bg-sec-mute rounded-full px-2 py-1 text-sm"
+                      class="text-fg bg-sec-light dark:bg-sec-mute rounded-lg px-2 py-1 text-sm"
                     >
                       Optional
                     </span>
@@ -497,7 +504,7 @@ const removeExtraImage = (index) => {
                 <div
                   ref="extraImageDropZoneRef"
                   :class="[
-                    'group relative flex min-h-[280px] cursor-pointer items-center justify-center rounded-xl border-2 border-dashed transition-all duration-300',
+                    'group relative flex min-h-[280px] cursor-pointer items-center justify-center rounded-lg border-2 border-dashed transition-all duration-300',
                     isProcessing ? 'pointer-events-none opacity-50' : '',
                     isOverExtraDropZone
                       ? 'border-acc bg-acc/10 scale-[1.02]'
@@ -542,7 +549,7 @@ const removeExtraImage = (index) => {
                             <button
                               type="button"
                               @click.stop="removeExtraImage(index)"
-                              class="h-8 w-8 rounded-full bg-red-500 text-white opacity-100 transition-opacity hover:bg-red-600 md:opacity-0 md:group-hover:opacity-100"
+                              class="h-8 w-8 rounded-lg bg-red-500 text-white opacity-100 transition-opacity hover:bg-red-600 md:opacity-0 md:group-hover:opacity-100"
                             >
                               <TrashIcon class="mx-auto size-4"></TrashIcon>
                             </button>
@@ -562,7 +569,7 @@ const removeExtraImage = (index) => {
                           <button
                             type="button"
                             @click.stop="removeExtraImage(index)"
-                            class="absolute top-1 right-1 flex h-6 w-6 items-center justify-center rounded-full bg-red-500 text-white shadow-md md:hidden"
+                            class="absolute top-1 right-1 flex h-6 w-6 items-center justify-center rounded-lg bg-red-500 text-white shadow-md md:hidden"
                           >
                             <TrashIcon class="size-3"></TrashIcon>
                           </button>
@@ -600,7 +607,7 @@ const removeExtraImage = (index) => {
                 <div class="space-y-2">
                   <div class="flex justify-between">
                     <label for="new-title-input" class="input-lbl">Post Title</label>
-                    <span class="text-acc bg-acc/10 rounded-full px-2 py-1 text-sm">Required</span>
+                    <span class="text-acc bg-acc/10 rounded-lg px-2 py-1 text-sm">Required</span>
                   </div>
 
                   <input
@@ -617,7 +624,7 @@ const removeExtraImage = (index) => {
               <div class="space-y-2">
                 <div class="flex justify-between">
                   <label for="new-post-body" class="input-lbl">Description</label>
-                  <span class="text-fg bg-sec-light dark:bg-sec-mute rounded-full px-2 text-sm">
+                  <span class="text-fg bg-sec-light dark:bg-sec-mute rounded-lg px-2 text-sm">
                     Optional
                   </span>
                 </div>
@@ -626,7 +633,7 @@ const removeExtraImage = (index) => {
                   v-model="newPost.bodyText"
                   rows="4"
                   id="new-post-body"
-                  class="text-fg placeholder-fg/50 focus:ring-acc/50 focus:border-acc input w-full resize-none rounded-xl"
+                  class="text-fg placeholder-fg/50 focus:ring-acc/50 focus:border-acc input w-full resize-none rounded-lg"
                   placeholder="Describe the work done, techniques used, or story behind this watch piece..."
                   :disabled="isProcessing"
                 ></textarea>
@@ -638,7 +645,7 @@ const removeExtraImage = (index) => {
               <button
                 @click="saveNewPost($event)"
                 :disabled="computedButtonState.disabled"
-                class="from-acc to-acc/80 hover:from-acc/90 hover:to-acc/70 focus:ring-acc/50 inline-flex transform cursor-pointer items-center rounded-xl bg-gradient-to-r px-8 py-3 font-semibold text-white shadow-lg transition-all duration-200 hover:scale-[1.02] focus:ring-2 focus:outline-none"
+                class="from-acc to-acc/80 hover:from-acc/90 hover:to-acc/70 focus:ring-acc/50 inline-flex transform cursor-pointer items-center rounded-lg bg-gradient-to-r px-8 py-3 font-semibold text-white shadow-lg transition-all duration-200 hover:scale-[1.02] focus:ring-2 focus:outline-none"
                 :class="{ 'cursor-not-allowed opacity-50': computedButtonState.disabled }"
               >
                 <PaperAirplaneIcon
@@ -652,7 +659,7 @@ const removeExtraImage = (index) => {
                   class="mr-2 flex h-5 w-5 animate-spin items-center justify-center"
                 >
                   <div
-                    class="h-4 w-4 rounded-full border-2 border-white border-t-transparent"
+                    class="h-4 w-4 rounded-lg border-2 border-white border-t-transparent"
                   ></div>
                 </div>
 

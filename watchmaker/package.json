@@ -15,7 +15,6 @@
     "@fontsource-variable/cormorant": "^5.2.5",
     "@fontsource-variable/eb-garamond": "^5.2.5",
     "@heroicons/vue": "^2.2.0",
-    "@supabase/supabase-js": "^2.49.9",
     "@tailwindcss/vite": "^4.1.8",
     "@vueuse/core": "^13.3.0",
     "@vueuse/head": "^2.0.0",

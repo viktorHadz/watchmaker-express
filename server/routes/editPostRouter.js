@@ -1,6 +1,6 @@
 import express from 'express'
 import { db } from '../database.js'
-import { verifyUserIdentity } from '../middleware/supabaseAuth.js'
+import { verifyUserIdentity } from '../middleware/requireAuth.js'
 import { validateAndSanitize, editPostSchema } from '../middleware/validationMiddleware.js'
 
 const router = express.Router()

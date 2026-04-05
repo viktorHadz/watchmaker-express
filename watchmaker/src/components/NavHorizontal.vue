@@ -58,8 +58,9 @@ function toggleDropdown() {
   showDropdown.value = !showDropdown.value
 }
 function toolNewPostNav() {
-  router.push('/my-work')
-  toggleDropdown()
+  router.push('/admin/editor')
+  isOpenMobile.value = false
+  showDropdown.value = false
 }
 
 // Mobile nav slider
@@ -85,8 +86,7 @@ onClickOutside(isOpenRef, () => {
 })
 
 onMounted(() => {
-  // Finds the actual scrolling container (the div with overflow-y-auto)
-  scrollElement = document.querySelector('.overflow-y-auto')
+  scrollElement = document.getElementById('app-scroll-container')
   if (scrollElement) {
     scrollElement.addEventListener('scroll', handleScroll, { passive: true })
   }
@@ -103,7 +103,7 @@ onUnmounted(() => {
   <!-- Desktop Navigation -->
   <nav
     :class="[
-      'border-brdr/20 bg-primary/80 fixed top-5 left-1/2 z-[99] hidden w-xl -translate-x-1/2 items-center justify-between rounded-xl border p-2 shadow-lg backdrop-blur-md transition-all duration-300 ease-in-out sm:flex 2xl:max-w-[80vw]',
+      'border-brdr/20 bg-primary/80 fixed top-5 left-1/2 z-[99] hidden w-xl -translate-x-1/2 items-center justify-between rounded-lg border p-2 shadow-lg backdrop-blur-md transition-all duration-300 ease-in-out sm:flex 2xl:max-w-[80vw]',
       isVisible ? 'translate-y-0 opacity-95' : '-translate-y-20 opacity-0',
     ]"
   >
@@ -118,7 +118,7 @@ onUnmounted(() => {
           >
             <div
               v-if="$route.path === '/'"
-              class="bg-acc absolute top-0 -right-0.5 h-2 w-2 animate-pulse rounded-full"
+              class="bg-acc absolute top-0 -right-0.5 h-2 w-2 animate-pulse rounded-lg"
             ></div>
             <HomeIcon class="size-6 stroke-1" />
             <p>Home</p>
@@ -135,7 +135,7 @@ onUnmounted(() => {
           >
             <div
               v-if="$route.path === '/repairs'"
-              class="bg-acc absolute top-0 -right-0.5 h-2 w-2 animate-pulse rounded-full"
+              class="bg-acc absolute top-0 -right-0.5 h-2 w-2 animate-pulse rounded-lg"
             ></div>
             <WrenchScrewdriverIcon class="size-6 stroke-1" />
             Contact
@@ -151,8 +151,8 @@ onUnmounted(() => {
             class="relative flex flex-col items-center rounded-md px-2 py-1 text-xs whitespace-nowrap"
           >
             <div
-              v-if="$route.path === '/my-work'"
-              class="bg-acc absolute top-0 -right-0.5 h-2 w-2 animate-pulse rounded-full"
+              v-if="$route.path.startsWith('/my-work')"
+              class="bg-acc absolute top-0 -right-0.5 h-2 w-2 animate-pulse rounded-lg"
             ></div>
             <IconGallery class="size-6 stroke-1"></IconGallery>
             My Work
@@ -166,11 +166,11 @@ onUnmounted(() => {
         <div>
           <div
             ref="tooltip-button-ref"
-            class="hover:bg-acc overflow-hidden rounded-full"
+            class="hover:bg-acc h-9 w-9 overflow-hidden rounded-lg"
             :class="[showDropdown ? 'bg-acc' : 'cursor-pointer']"
             @click="toggleDropdown()"
           >
-            <img :src="avatarUrl" alt="avatar" class="max-h-9 w-full object-cover" />
+            <img :src="avatarUrl" alt="avatar" class="h-full w-full object-cover" />
           </div>
           <div ref="tooltip-ref">
             <Transition>
@@ -219,14 +219,14 @@ onUnmounted(() => {
   <nav class="fixed right-0 bottom-0 left-0 z-[99] sm:hidden">
     <div v-if="isAuthenticated" class="fixed right-4 bottom-16 will-change-transform">
       <div
-        class="card flex transform-gpu flex-col items-stretch overflow-hidden rounded-t-xl rounded-b-none shadow-xl backdrop-blur-md transition-all duration-400 ease-out"
+        class="card flex transform-gpu flex-col items-stretch overflow-hidden rounded-t-lg rounded-b-none shadow-xl backdrop-blur-md transition-all duration-400 ease-out"
         :class="isOpenMobile ? 'w-44' : 'w-20'"
       >
         <!-- Admin Button - Optimized for touch -->
         <button
           ref="mobile-dropdown-button-ref"
           @click="toggleMenu()"
-          class="group relative flex h-14 max-h-10 touch-manipulation flex-col items-center justify-center rounded-t-xl px-4 transition-colors duration-300 ease-out"
+          class="group relative flex h-14 max-h-10 touch-manipulation flex-col items-center justify-center rounded-t-lg px-4 transition-colors duration-300 ease-out"
           :class="isOpenMobile ? 'bg-sec-light/30' : 'active:bg-sec-light/20'"
         >
           <ChevronUpIcon
@@ -249,7 +249,7 @@ onUnmounted(() => {
         </button>
         <!-- Background active admin btn -->
         <div
-          class="bg-acc/15 dark:bg-acc/5 pointer-events-none absolute -inset-px -z-10 h-10.5 rounded-t-xl transition-opacity duration-200 ease-out"
+          class="bg-acc/15 dark:bg-acc/5 pointer-events-none absolute -inset-px -z-10 h-10.5 rounded-t-lg transition-opacity duration-200 ease-out"
           :class="isOpenMobile ? 'opacity-100' : 'opacity-0'"
         ></div>
 
@@ -317,7 +317,7 @@ onUnmounted(() => {
       <RouterLink
         to="/my-work"
         class="flex flex-col items-center gap-2 text-xs transition-all duration-200 ease-out active:scale-95"
-        :class="$route.path === '/my-work' ? 'text-acc' : 'text-fg'"
+        :class="$route.path.startsWith('/my-work') ? 'text-acc' : 'text-fg'"
       >
         <IconGallery class="size-6"></IconGallery>
         <span class="font-sec font-medium tracking-wide">My Work</span>

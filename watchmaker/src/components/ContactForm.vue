@@ -433,61 +433,40 @@ const clearForm = () => {
 
 <template>
   <form action="#" method="POST" enctype="multipart/form-data" class="p-4 md:p-8">
+
     <div class="space-y-8">
-      <!-- Name Row -->
       <div class="grid grid-cols-1 gap-6 md:grid-cols-2">
-        <div class="group">
+        <div class="group mb-4 ">
           <div class="mb-2 flex items-baseline">
-            <label for="first-name" class="font-sec text-fg font-medium">First name</label>
-            <span class="ml-1 text-red-500">*</span>
+            <!-- Name Row -->
+            <label for="first-name" class="font-sec text-fg/90 font-medium">First name</label>
+            <span class="ml-1 text-red-500 dark:text-red-400">*</span>
           </div>
           <div class="relative">
-            <input
-              type="text"
-              name="first-name"
-              id="first-name"
-              maxlength="50"
-              autocomplete="given-name"
-              class="input"
-              placeholder="Enter your first name"
-              v-model="form.firstName"
-              @focus="handleFocus('firstName')"
-              @blur="handleBlur('firstName')"
-            />
+            <input type="text" name="first-name" id="first-name" maxlength="50" autocomplete="given-name" class="input"
+              placeholder="Enter your first name" v-model="form.firstName" @focus="handleFocus('firstName')"
+              @blur="handleBlur('firstName')" />
             <Transition>
-              <div
-                v-if="displayErrors.firstName && fieldStates.firstName.touched"
-                class="absolute mt-1 text-sm text-red-500 dark:text-red-400"
-              >
+              <div v-if="displayErrors.firstName && fieldStates.firstName.touched"
+                class="absolute mt-1 text-sm text-red-500 dark:text-red-400">
                 {{ displayErrors.firstName }}
               </div>
             </Transition>
           </div>
         </div>
 
-        <div class="group">
+        <div class="group mb-4 sm:mb-0">
           <div class="mb-2 flex items-baseline">
-            <label for="last-name" class="font-sec text-fg font-medium">Last name</label>
-            <span class="ml-1 text-red-500">*</span>
+            <label for="last-name" class="font-sec text-fg/90 font-medium">Last name</label>
+            <span class="ml-1 text-red-500 dark:text-red-400">*</span>
           </div>
           <div class="relative">
-            <input
-              type="text"
-              name="last-name"
-              id="last-name"
-              maxlength="50"
-              autocomplete="family-name"
-              class="input"
-              placeholder="Enter your last name"
-              v-model="form.lastName"
-              @focus="handleFocus('lastName')"
-              @blur="handleBlur('lastName')"
-            />
+            <input type="text" name="last-name" id="last-name" maxlength="50" autocomplete="family-name" class="input"
+              placeholder="Enter your last name" v-model="form.lastName" @focus="handleFocus('lastName')"
+              @blur="handleBlur('lastName')" />
             <Transition>
-              <div
-                v-if="displayErrors.lastName && fieldStates.lastName.touched"
-                class="absolute mt-1 text-sm text-red-500 dark:text-red-400"
-              >
+              <div v-if="displayErrors.lastName && fieldStates.lastName.touched"
+                class="absolute mt-1 text-sm text-red-500 dark:text-red-400">
                 {{ displayErrors.lastName }}
               </div>
             </Transition>
@@ -497,27 +476,16 @@ const clearForm = () => {
       <!-- Email -->
       <div class="group">
         <div class="mb-2 flex items-baseline">
-          <label for="email" class="font-sec text-fg font-medium">Email address</label>
-          <span class="ml-1 text-red-500">*</span>
+          <label for="email" class="font-sec text-fg/90 font-medium">Email address</label>
+          <span class="ml-1 text-red-500 dark:text-red-400">*</span>
         </div>
         <div class="relative">
-          <input
-            type="email"
-            name="email"
-            id="email"
-            maxlength="254"
-            autocomplete="email"
-            class="input"
-            placeholder="your.email@example.com"
-            v-model="form.email"
-            @focus="handleFocus('email')"
-            @blur="handleBlur('email')"
-          />
+          <input type="email" name="email" id="email" maxlength="254" autocomplete="email" class="input"
+            placeholder="your.email@example.com" v-model="form.email" @focus="handleFocus('email')"
+            @blur="handleBlur('email')" />
           <Transition>
-            <div
-              v-if="displayErrors.email && fieldStates.email.touched"
-              class="absolute mt-1 text-sm text-red-500 dark:text-red-400"
-            >
+            <div v-if="displayErrors.email && fieldStates.email.touched"
+              class="absolute mt-1 text-sm text-red-500 dark:text-red-400">
               {{ displayErrors.email }}
             </div>
           </Transition>
@@ -525,27 +493,14 @@ const clearForm = () => {
       </div>
       <!-- Phone -->
       <div class="group">
-        <label for="phone-number" class="font-sec text-fg mb-2 block font-medium"
-          >Phone number</label
-        >
+        <label for="phone-number" class="font-sec text-fg/90 mb-2 block font-medium">Phone number</label>
         <div class="relative">
-          <input
-            type="tel"
-            name="phone-number"
-            id="phone-number"
-            maxlength="25"
-            autocomplete="tel"
-            class="input"
-            placeholder="+44 123 456 7890"
-            v-model="form.phone"
-            @focus="handleFocus('phone')"
-            @blur="handleBlur('phone')"
-          />
+          <input type="tel" name="phone-number" id="phone-number" maxlength="25" autocomplete="tel" class="input"
+            placeholder="+44 123 456 7890" v-model="form.phone" @focus="handleFocus('phone')"
+            @blur="handleBlur('phone')" />
           <Transition>
-            <div
-              v-if="displayErrors.phone && fieldStates.phone.touched"
-              class="absolute mt-1 text-sm text-red-500 dark:text-red-400"
-            >
+            <div v-if="displayErrors.phone && fieldStates.phone.touched"
+              class="absolute mt-1 text-sm text-red-500 dark:text-red-400">
               {{ displayErrors.phone }}
             </div>
           </Transition>
@@ -554,135 +509,89 @@ const clearForm = () => {
       <!-- File Upload / Dropzone -->
       <div>
         <div class="mb-4 flex items-center justify-between">
-          <label for="file-upload" class="font-sec text-fg font-medium"> Watch Images </label>
-
+          <div>
+            <label for="file-upload" class="font-sec text-fg/90 font-medium">Upload images </label>
+            <p class="text-acc text-sm"> To better your issue please upload images of your watch. </p>
+          </div>
           <div class="lg flex items-center gap-3">
-            <label
-              for="file-upload"
-              :class="[
-                'inline-flex items-center rounded-lg px-3 py-2 font-medium transition-all duration-200 sm:px-4 sm:py-2',
-                uploadedImages.length < 5
-                  ? 'bg-acc/10 text-acc hover:bg-acc/20 cursor-pointer hover:scale-[1.02]'
-                  : 'bg-success/10 text-fg cursor-not-allowed',
-              ]"
-            >
+            <label for="file-upload" :class="[
+              'inline-flex items-center rounded-lg px-3 py-2 font-medium transition-all duration-200 sm:px-4 sm:py-2',
+              uploadedImages.length < 5
+                ? 'bg-acc/10 text-acc hover:bg-acc/20 cursor-pointer hover:scale-[1.02]'
+                : 'bg-success/10 text-fg cursor-not-allowed',
+            ]">
               <IconPlusGallery class="mr-2 size-4" />
               <span class="font-sec leading-0 font-semibold"> Add</span>
             </label>
           </div>
         </div>
 
-        <input
-          type="file"
-          name="images"
-          accept="image/jpeg,image/jpg,image/png,image/webp"
-          multiple
-          class="hidden"
-          id="file-upload"
-          :disabled="uploadedImages.length >= 5"
-          @change="handleFileChange"
-        />
+        <input type="file" name="images" accept="image/jpeg,image/jpg,image/png,image/webp" multiple class="hidden"
+          id="file-upload" :disabled="uploadedImages.length >= 5" @change="handleFileChange" />
 
         <!-- Dropzone Area -->
-        <div
-          ref="dropZoneRef"
-          :class="[
-            'relative rounded-lg border-2 border-dashed transition-all duration-200',
-            isOverDropZone
-              ? 'border-acc bg-acc/10 scale-[1.02]'
-              : uploadedImages.length < 5
-                ? 'border-acc/30 bg-acc/5 hover:border-acc/50 hover:bg-acc/10 cursor-pointer'
-                : 'border-acc/20 dark:bg-sec bg-sec-light cursor-not-allowed',
-          ]"
-          @click="uploadedImages.length < 5 && $refs.fileInput?.click()"
-        >
-          <input
-            ref="fileInput"
-            type="file"
-            accept="image/jpeg,image/jpg,image/png,image/webp"
-            multiple
-            class="hidden"
-            :disabled="uploadedImages.length >= 5"
-            @change="handleFileChange"
-          />
+        <div ref="dropZoneRef" :class="[
+          'relative rounded-lg border-2 border-dashed transition-all duration-200',
+          isOverDropZone
+            ? 'border-acc bg-acc/10 scale-[1.02]'
+            : uploadedImages.length < 5
+              ? 'border-acc/20 bg-acc/5 hover:border-acc/40 hover:bg-acc/10 cursor-pointer'
+              : 'border-acc/10 dark:bg-sec bg-sec-light cursor-not-allowed',
+        ]" @click="uploadedImages.length < 5 && $refs.fileInput?.click()">
+          <input ref="fileInput" type="file" accept="image/jpeg,image/jpg,image/png,image/webp" multiple class="hidden"
+            :disabled="uploadedImages.length >= 5" @change="handleFileChange" />
 
           <div v-if="uploadedImages.length > 0 || processingFiles.length > 0" class="p-4">
             <div class="grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5">
               <!-- Existing Image Cards -->
-              <div
-                v-for="(image, index) in uploadedImages"
-                :key="`uploaded-${index}`"
-                class="bg-sec/80 border-acc/20 group hover:border-acc/40 relative flex flex-col overflow-hidden rounded-lg border transition-all duration-200 hover:shadow-md"
-              >
+              <div v-for="(image, index) in uploadedImages" :key="`uploaded-${index}`"
+                class="bg-sec/80 border-acc/20 group hover:border-acc/40 relative flex flex-col overflow-hidden rounded-lg border transition-all duration-200 hover:shadow-md">
                 <div class="relative mb-2 overflow-hidden">
-                  <img
-                    :src="image.thumbnailData"
-                    :alt="`Preview of ${image.name}`"
+                  <img :src="image.thumbnailData" :alt="`Preview of ${image.name}`"
                     class="h-20 w-full object-cover transition-transform duration-200 group-hover:scale-105 sm:h-24"
-                    loading="lazy"
-                  />
-                  <button
-                    @click.stop="removeImage(index)"
-                    class="bg-danger hover:bg-danger/90 focus:ring-danger/50 pointer-events-auto absolute top-1 right-1 z-10 cursor-pointer rounded-full p-1.5 text-white opacity-100 shadow-md transition-all duration-200 hover:scale-110 focus:opacity-100 focus:ring-2 focus:outline-none xl:opacity-0 xl:group-hover:opacity-100"
-                    type="button"
-                    :aria-label="`Remove ${image.name}`"
-                  >
+                    loading="lazy" />
+                  <button @click.stop="removeImage(index)"
+                    class="bg-danger hover:bg-danger/90 focus:ring-danger/50 pointer-events-auto absolute top-1 right-1 z-10 cursor-pointer rounded-lg p-1.5 text-white opacity-100 shadow-md transition-all duration-200 hover:scale-110 focus:opacity-100 focus:ring-2 focus:outline-none xl:opacity-0 xl:group-hover:opacity-100"
+                    type="button" :aria-label="`Remove ${image.name}`">
                     <XMarkIcon class="size-3" />
                   </button>
                 </div>
                 <div class="flex flex-col justify-between gap-1 justify-self-end px-1 pb-2">
-                  <span
-                    class="text-fg text-tiny line-clamp-2 text-center font-medium"
-                    :title="image.name"
-                  >
+                  <span class="text-fg text-tiny line-clamp-2 text-center font-medium" :title="image.name">
                     {{ image.name }}
                   </span>
                 </div>
               </div>
 
               <!-- Loading Cards for each file being processed -->
-              <div
-                v-for="(file, index) in processingFiles"
-                :key="`processing-${index}`"
-                class="bg-sec/60 border-brdr/40 relative flex flex-col overflow-hidden rounded-lg border"
-              >
+              <div v-for="(file, index) in processingFiles" :key="`processing-${index}`"
+                class="bg-sec/60 border-brdr/40 relative flex flex-col overflow-hidden rounded-lg border">
                 <div class="relative mb-2 overflow-hidden">
                   <!-- Static muted background -->
                   <div class="bg-sec-light dark:bg-sec-mute h-20 w-full sm:h-24"></div>
 
                   <!-- Processing indicator with muted colors -->
-                  <div
-                    class="bg-primary/20 absolute inset-0 flex flex-col items-center justify-center gap-2"
-                  >
-                    <div
-                      class="border-acc/60 h-6 w-6 animate-spin rounded-full border-2 border-t-transparent"
-                    ></div>
-                    <span class="text-acc/80 animate-pulse text-center text-xs font-medium"
-                      >Processing...</span
-                    >
+                  <div class="bg-primary/20 absolute inset-0 flex flex-col items-center justify-center gap-2">
+                    <div class="border-acc/60 h-6 w-6 animate-spin rounded-lg border-2 border-t-transparent"></div>
+                    <span class="text-acc/80 animate-pulse text-center text-xs font-medium">Processing...</span>
                   </div>
                 </div>
 
-                <div
-                  class="flex animate-pulse flex-col justify-between gap-1 justify-self-end px-1 pb-2"
-                >
+                <div class="flex animate-pulse flex-col justify-between gap-1 justify-self-end px-1 pb-2">
                   <!-- Static placeholder bar -->
                   <div class="bg-sec-mute/80 mx-auto h-3 w-3/4 rounded"></div>
                 </div>
               </div>
 
               <!-- Add More Button -->
-              <div
-                v-if="uploadedImages.length + processingFiles.length < 5"
+              <div v-if="uploadedImages.length + processingFiles.length < 5"
                 class="bg-acc/5 border-acc/30 hover:bg-acc/10 hover:border-acc/50 pointer-events-auto flex min-h-32 cursor-pointer flex-col items-center justify-center rounded-lg border-2 border-dashed transition-all duration-200 hover:scale-[1.02]"
                 :class="{ 'pointer-events-none opacity-50': processingFiles.length > 0 }"
-                @click.stop="processingFiles.length === 0 && $refs.fileInput?.click()"
-              >
+                @click.stop="processingFiles.length === 0 && $refs.fileInput?.click()">
                 <PlusIcon class="text-acc mb-1 size-6" />
                 <span class="text-acc text-xs font-medium">Add More</span>
-                <span class="text-fg-subtle text-xs"
-                  >{{ 5 - uploadedImages.length - processingFiles.length }} left</span
-                >
+                <span class="text-fg-subtle text-xs">{{ 5 - uploadedImages.length - processingFiles.length }}
+                  left</span>
               </div>
             </div>
           </div>
@@ -692,7 +601,7 @@ const clearForm = () => {
             <!-- Drag & Drop Indicator -->
             <div v-if="isOverDropZone" class="text-acc flex flex-col items-center">
               <IconGallery class="mb-3 size-16 animate-bounce" />
-              <p class="text-lg font-semibold">Drop your images here!</p>
+              <p class="text-lg font-semibold">Drop your images here</p>
               <p class="text-sm opacity-80">Release to upload</p>
             </div>
 
@@ -715,37 +624,28 @@ const clearForm = () => {
         <div class="flex w-full justify-end px-2 py-3">
           <!--Progress bar -->
           <div class="flex items-center gap-3" v-if="uploadedImages.length > 0">
-            <div
-              class="bg-sec relative h-4 w-16 overflow-hidden rounded-full border"
-              :class="[
-                uploadedImages.length < 5
-                  ? 'drop-shadow-acc/50 border-acc drop-shadow-sm'
-                  : 'drop-shadow-success/50 border-success drop-shadow-sm',
-              ]"
-            >
-              <div
-                class="h-full transition-all duration-500 ease-out"
+            <div class="bg-sec relative h-4 w-16 overflow-hidden rounded-lg border" :class="[
+              uploadedImages.length < 5
+                ? 'drop-shadow-acc/50 border-acc drop-shadow-sm'
+                : 'drop-shadow-success/50 border-success drop-shadow-sm',
+            ]">
+              <div class="h-full transition-all duration-500 ease-out"
                 :class="[uploadedImages.length < 5 ? 'bg-acc' : 'bg-success']"
-                :style="{ width: `${(uploadedImages.length / 5) * 100}%` }"
-              ></div>
+                :style="{ width: `${(uploadedImages.length / 5) * 100}%` }"></div>
             </div>
 
             <!-- Status indicator -->
             <div class="flex items-center gap-3">
-              <span
-                :class="[
-                  'font-medium',
-                  uploadedImages.length === 5 ? 'text-success' : 'text-fg-subtle',
-                ]"
-              >
+              <span :class="[
+                'font-medium',
+                uploadedImages.length === 5 ? 'text-success' : 'text-fg-subtle',
+              ]">
                 {{ uploadedImages.length }}/5
               </span>
 
               <!-- Full indicator -->
-              <div
-                v-if="uploadedImages.length === 5"
-                class="bg-success text-fg2 drop-shadow-success flex items-center rounded-full px-2.5 py-2 leading-0 font-semibold drop-shadow-sm"
-              >
+              <div v-if="uploadedImages.length === 5"
+                class="bg-success text-fg2 drop-shadow-success flex items-center rounded-lg px-2.5 py-2 leading-0 font-semibold drop-shadow-sm">
                 <span class="text-lg leading-1">✓ </span> Done
               </div>
             </div>
@@ -756,26 +656,17 @@ const clearForm = () => {
       <!-- Message -->
       <div>
         <div class="mb-2 flex items-baseline">
-          <label for="message" class="font-sec text-fg font-medium">Message</label>
-          <span class="ml-1 text-red-500">*</span>
+          <label for="message" class="font-sec text-fg/90 font-medium">Message</label>
+          <span class="ml-1 text-red-500 dark:text-red-400">*</span>
         </div>
         <div class="relative">
-          <textarea
-            name="message"
-            id="message"
-            maxlength="5000"
-            rows="8"
-            class="text-fg placeholder-fg/50 focus:ring-acc/50 focus:border-acc input custom-scrollbar w-full resize-none rounded-xl"
+          <textarea name="message" id="message" maxlength="5000" rows="8"
+            class="text-fg placeholder-fg/50 focus:ring-acc/50 focus:border-acc input custom-scrollbar w-full resize-none rounded-lg"
             placeholder="Tell me about your watch, what issues you're experiencing, or any specific requirements..."
-            v-model="form.message"
-            @focus="handleFocus('message')"
-            @blur="handleBlur('message')"
-          />
+            v-model="form.message" @focus="handleFocus('message')" @blur="handleBlur('message')" />
           <Transition>
-            <div
-              v-if="displayErrors.message && fieldStates.message.touched"
-              class="absolute mt-1 text-sm text-red-500 dark:text-red-400"
-            >
+            <div v-if="displayErrors.message && fieldStates.message.touched"
+              class="absolute mt-1 text-sm text-red-500 dark:text-red-400">
               {{ displayErrors.message }}
             </div>
           </Transition>
@@ -783,28 +674,19 @@ const clearForm = () => {
       </div>
     </div>
     <!-- Form Footer -->
-    <div class="border-brdr/10 mt-8 border-t pt-6">
-      <div class="flex flex-col items-center justify-between gap-4 sm:flex-row">
-        <p class="dark:text-acc/60 text-acc/80 text-sm">
-          Fields marked with <span class="text-lg text-red-500">*</span> are required
-        </p>
-        <button
-          type="submit"
-          @click.prevent="onSubmit()"
-          class="from-acc to-acc/80 hover:from-acc/90 hover:to-acc/70 focus:ring-acc/50 transform cursor-pointer rounded-xl bg-gradient-to-r px-4 py-3 font-semibold text-white shadow-lg transition-all duration-200 hover:scale-[1.02] focus:ring-2 focus:outline-none"
-        >
+    <div class="border-brdr/10 mt-12 border-t pt-6">
+
+      <div class="flex flex-col items-end justify-between gap-4 sm:flex-row">
+
+        <button type="submit" @click.prevent="onSubmit()"
+          class="from-acc to-acc/80 hover:from-acc/90 hover:to-acc/70 focus:ring-acc/50 transform cursor-pointer rounded-lg bg-gradient-to-r px-4 py-3 font-semibold text-white shadow-lg transition-all duration-200 hover:scale-[1.02] focus:ring-2 focus:outline-none">
           <div v-if="!emailLoading" class="flex items-center">
             <PaperAirplaneIcon class="mr-2 size-5 -rotate-90 transform"></PaperAirplaneIcon>
             Send Message
           </div>
-          <div
-            v-else
-            class="flex cursor-pointer items-center px-2"
-            :class="emailLoading ? 'cursor-not-allowed' : 'cursor-pointer'"
-          >
-            <div
-              class="mr-2 size-5 animate-spin rounded-full border-2 border-white border-t-transparent"
-            ></div>
+          <div v-else class="flex cursor-pointer items-center px-2"
+            :class="emailLoading ? 'cursor-not-allowed' : 'cursor-pointer'">
+            <div class="mr-2 size-5 animate-spin rounded-lg border-2 border-white border-t-transparent"></div>
             Emailing...
           </div>
         </button>

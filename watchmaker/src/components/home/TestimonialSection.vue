@@ -1,5 +1,6 @@
 <script setup>
 import { StarIcon } from '@heroicons/vue/24/solid'
+import TheDivider from '../TheDivider.vue'
 </script>
 
 <template>
@@ -10,16 +11,8 @@ import { StarIcon } from '@heroicons/vue/24/solid'
         <h2 class="font-sec text-fg mb-2 text-4xl font-normal tracking-wide">
           Client Testimonials
         </h2>
-        <div class="mb-6 flex items-center justify-center space-x-4">
-          <div class="to-acc/50 h-px w-20 bg-gradient-to-r from-transparent"></div>
-          <div class="flex space-x-1">
-            <div class="bg-acc h-1.5 w-1.5 rounded-full"></div>
-            <div class="bg-acc/60 h-1.5 w-1.5 rounded-full"></div>
-            <div class="bg-acc/30 h-1.5 w-1.5 rounded-full"></div>
-          </div>
-          <div class="to-acc/50 h-px w-20 bg-gradient-to-l from-transparent"></div>
-        </div>
-        <p class="text-fg/70 text-lg">Trusted by collectors and enthusiasts for three decades</p>
+        <TheDivider variant="sm" />
+        <p class="text-fg/90 text-lg">Trusted by collectors and enthusiasts </p>
       </div>
 
       <!-- Testimonials Grid -->
@@ -27,12 +20,12 @@ import { StarIcon } from '@heroicons/vue/24/solid'
         <!-- Testimonial 1 -->
         <div class="group">
           <div
-            class="bg-primary/80 border-brdr/30 hover:border-acc/20 relative h-full rounded-lg border p-8 transition-all duration-500 hover:shadow-xl"
-          >
+            class="bg-primary/80 border-brdr/30 hover:border-acc/20 relative h-full rounded-lg border p-8 transition-all duration-500 hover:shadow-xl">
             <!-- Decorative quote mark -->
-            <div class="text-acc/10 absolute -top-2 -left-2 font-serif text-6xl leading-none">
+            <div class="text-acc/40 absolute -top-2 -left-2 font-serif text-6xl leading-none">
               "
             </div>
+
 
             <!-- Stars -->
             <div class="mb-4 flex space-x-0.5">
@@ -61,8 +54,7 @@ import { StarIcon } from '@heroicons/vue/24/solid'
         <!-- Testimonial 2 -->
         <div class="group">
           <div
-            class="bg-primary/80 border-brdr/30 hover:border-acc/20 relative h-full rounded-lg border p-8 transition-all duration-500 hover:shadow-xl"
-          >
+            class="bg-primary/80 border-brdr/30 hover:border-acc/20 relative h-full rounded-lg border p-8 transition-all duration-500 hover:shadow-xl">
             <div class="text-acc/10 absolute -top-2 -left-2 font-serif text-6xl leading-none">
               "
             </div>
@@ -90,8 +82,7 @@ import { StarIcon } from '@heroicons/vue/24/solid'
         <!-- Testimonial 3 -->
         <div class="group">
           <div
-            class="bg-primary/80 border-brdr/30 hover:border-acc/20 relative h-full rounded-lg border p-8 transition-all duration-500 hover:shadow-xl"
-          >
+            class="bg-primary/80 border-brdr/30 hover:border-acc/20 relative h-full rounded-lg border p-8 transition-all duration-500 hover:shadow-xl">
             <div class="text-acc/10 absolute -top-2 -left-2 font-serif text-6xl leading-none">
               "
             </div>

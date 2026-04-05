@@ -6,7 +6,7 @@ import multer from 'multer'
 import { db } from '../database.js'
 import path from 'path'
 import fs from 'fs'
-import { verifyUserIdentity } from '../middleware/supabaseAuth.js'
+import { verifyUserIdentity } from '../middleware/requireAuth.js'
 import { getNormalDate } from '../utils/security.js'
 
 const database = db

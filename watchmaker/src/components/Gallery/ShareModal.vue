@@ -131,7 +131,7 @@ const copyLink = async () => {
         class="pointer-events-none fixed inset-0 z-[103] flex items-center justify-center p-4"
       >
         <div
-          class="bg-primary/95 dark:border-sec-mute dark:bg-sec/95 pointer-events-auto relative w-full max-w-md overflow-hidden rounded-2xl border border-white/20 shadow-2xl backdrop-blur-xl"
+          class="bg-primary/95 dark:border-sec-mute dark:bg-sec/95 pointer-events-auto relative w-full max-w-md overflow-hidden rounded-lg border border-white/20 shadow-2xl backdrop-blur-xl"
         >
           <div class="border-brdr/30 dark:border-sec-mute/30 border-b px-6 py-4">
             <div class="flex items-center justify-between">
@@ -150,7 +150,7 @@ const copyLink = async () => {
             <div class="grid grid-cols-2 gap-3">
               <button
                 @click="copyLink"
-                class="border-brdr/30 bg-primary hover:border-acc/30 hover:bg-acc/5 dark:border-sec-mute/30 dark:bg-sec/50 flex cursor-pointer flex-col items-center gap-2 rounded-xl border p-4 transition-all"
+                class="border-brdr/30 bg-primary hover:border-acc/30 hover:bg-acc/5 dark:border-sec-mute/30 dark:bg-sec/50 flex cursor-pointer flex-col items-center gap-2 rounded-lg border p-4 transition-all"
               >
                 <ClipboardIcon class="text-acc size-6" />
                 <span class="text-fg text-sm font-medium">Copy Link</span>
@@ -161,7 +161,7 @@ const copyLink = async () => {
                 target="_blank"
                 rel="noopener"
                 @click="handleShare('Facebook')"
-                class="border-brdr/30 bg-primary dark:border-sec-mute/30 dark:bg-sec/50 flex flex-col items-center gap-2 rounded-xl border p-4 transition-all hover:border-blue-600 hover:bg-blue-50 dark:hover:border-blue-500/30 dark:hover:bg-blue-500/10"
+                class="border-brdr/30 bg-primary dark:border-sec-mute/30 dark:bg-sec/50 flex flex-col items-center gap-2 rounded-lg border p-4 transition-all hover:border-blue-600 hover:bg-blue-50 dark:hover:border-blue-500/30 dark:hover:bg-blue-500/10"
               >
                 <svg class="size-6 text-blue-600" fill="currentColor" viewBox="0 0 24 24">
                   <path
@@ -176,7 +176,7 @@ const copyLink = async () => {
                 target="_blank"
                 rel="noopener"
                 @click="handleShare('Twitter')"
-                class="border-brdr/30 bg-primary dark:border-sec-mute/30 dark:bg-sec/50 flex flex-col items-center gap-2 rounded-xl border p-4 transition-all hover:border-blue-300 hover:bg-blue-50 dark:hover:border-blue-500/30 dark:hover:bg-blue-500/10"
+                class="border-brdr/30 bg-primary dark:border-sec-mute/30 dark:bg-sec/50 flex flex-col items-center gap-2 rounded-lg border p-4 transition-all hover:border-blue-300 hover:bg-blue-50 dark:hover:border-blue-500/30 dark:hover:bg-blue-500/10"
               >
                 <svg class="size-6 text-blue-500" fill="currentColor" viewBox="0 0 24 24">
                   <path
@@ -191,7 +191,7 @@ const copyLink = async () => {
                 target="_blank"
                 rel="noopener"
                 @click="handleShare('WhatsApp')"
-                class="border-brdr/30 bg-primary dark:border-sec-mute/30 dark:bg-sec/50 flex flex-col items-center gap-2 rounded-xl border p-4 transition-all hover:border-green-500 hover:bg-green-50 dark:hover:border-green-500/30 dark:hover:bg-green-500/10"
+                class="border-brdr/30 bg-primary dark:border-sec-mute/30 dark:bg-sec/50 flex flex-col items-center gap-2 rounded-lg border p-4 transition-all hover:border-green-500 hover:bg-green-50 dark:hover:border-green-500/30 dark:hover:bg-green-500/10"
               >
                 <svg class="size-6 text-green-500" fill="currentColor" viewBox="0 0 24 24">
                   <path
@@ -206,7 +206,7 @@ const copyLink = async () => {
                 target="_blank"
                 rel="noopener"
                 @click="handleShare('Messenger')"
-                class="border-brdr/30 bg-primary dark:border-sec-mute/30 dark:bg-sec/50 flex flex-col items-center gap-2 rounded-xl border p-4 transition-all hover:border-blue-500 hover:bg-blue-50 dark:hover:border-blue-500/30 dark:hover:bg-blue-500/10"
+                class="border-brdr/30 bg-primary dark:border-sec-mute/30 dark:bg-sec/50 flex flex-col items-center gap-2 rounded-lg border p-4 transition-all hover:border-blue-500 hover:bg-blue-50 dark:hover:border-blue-500/30 dark:hover:bg-blue-500/10"
               >
                 <IconMessenger class="size-6 text-blue-500" />
                 <span class="text-fg text-sm font-medium">Messenger</span>
@@ -215,7 +215,7 @@ const copyLink = async () => {
               <a
                 :href="emailUrl"
                 @click="handleShare('Email')"
-                class="border-brdr/30 bg-primary dark:border-sec-mute/30 dark:bg-sec/50 hover:border-brdr flex flex-col items-center gap-2 rounded-xl border p-4 transition-all hover:bg-gray-50 dark:hover:border-gray-500/30 dark:hover:bg-gray-500/10"
+                class="border-brdr/30 bg-primary dark:border-sec-mute/30 dark:bg-sec/50 hover:border-brdr flex flex-col items-center gap-2 rounded-lg border p-4 transition-all hover:bg-gray-50 dark:hover:border-gray-500/30 dark:hover:bg-gray-500/10"
               >
                 <EnvelopeIcon class="size-6 text-gray-600" />
                 <span class="text-fg text-sm font-medium">Email</span>

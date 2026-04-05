@@ -15,7 +15,7 @@ useHead({
 </script>
 
 <template>
-  <main class="flex flex-col items-center sm:py-12">
+  <main class="flex flex-col items-center">
     <!-- TOP SECTION -->
     <TopSection></TopSection>
 

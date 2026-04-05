@@ -1,7 +1,6 @@
 import { defineStore } from 'pinia'
 import { ref, computed } from 'vue'
 import { useToastStore } from './toast'
-import { useAuth } from '@/composables/useAuth'
 
 export const usePostsStore = defineStore('posts', () => {
   const posts = ref([])
@@ -114,6 +113,15 @@ export const usePostsStore = defineStore('posts', () => {
     }
   }
 
+  function prepareEdit(post) {
+    editing.value = true
+    selectedPost.value = post
+    editForm.value = {
+      postTitle: post.postTitle,
+      postBody: post.postBody,
+    }
+  }
+
   // EXISTING FUNCTIONS
   async function fetchPosts(page = 1) {
     try {
@@ -137,18 +145,38 @@ export const usePostsStore = defineStore('posts', () => {
     }
   }
 
-  async function createPost(formData) {
-    const { getAuthToken } = useAuth()
+  async function fetchPostById(postId) {
+    try {
+      loading.value = true
+      const response = await fetch(`/api/posts/get/${postId}`)
 
+      if (!response.ok) {
+        if (response.status === 404) {
+          throw new Error('POST_NOT_FOUND')
+        }
+
+        throw new Error(`Error getting post: ${response.status}`)
+      }
+
+      const data = await response.json()
+      return data
+    } catch (error) {
+      console.error('Error fetching post:', error)
+      if (error.message !== 'POST_NOT_FOUND') {
+        toast('Failed to load post', 'error')
+      }
+      throw error
+    } finally {
+      loading.value = false
+    }
+  }
+
+  async function createPost(formData) {
     try {
       isUploading.value = true
-      const token = getAuthToken()
 
       const response = await fetch('/api/posts/new-post', {
         method: 'POST',
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
         body: formData,
       })
 
@@ -172,15 +200,9 @@ export const usePostsStore = defineStore('posts', () => {
   }
 
   async function deletePost(postId) {
-    const { getAuthToken } = useAuth()
-
     try {
-      const token = getAuthToken()
       const response = await fetch(`/api/posts/delete/${postId}`, {
         method: 'DELETE',
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
       })
 
       const result = await response.json()
@@ -216,25 +238,15 @@ export const usePostsStore = defineStore('posts', () => {
   }
 
   function initEdit(post) {
-    editing.value = true
-    selectedPost.value = post
-    editForm.value = {
-      postTitle: post.postTitle,
-      postBody: post.postBody,
-    }
+    prepareEdit(post)
     showPostModal.value = true
   }
 
   async function saveEdit(postId) {
-    const { getAuthToken } = useAuth()
-
     try {
-      const token = getAuthToken()
-
       const response = await fetch(`/api/posts/edit/${postId}`, {
         method: 'PATCH',
         headers: {
-          Authorization: `Bearer ${token}`,
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
@@ -249,18 +261,35 @@ export const usePostsStore = defineStore('posts', () => {
         throw new Error(result.error || `Error in response: ${response.status}`)
       }
 
-      selectedPost.value.postTitle = editForm.value.postTitle
-      selectedPost.value.postBody = editForm.value.postBody
+      const postIndex = posts.value.findIndex((post) => post.postId == postId)
+
+      if (postIndex > -1) {
+        posts.value[postIndex].postTitle = editForm.value.postTitle
+        posts.value[postIndex].postBody = editForm.value.postBody
+      }
+
+      if (selectedPost.value?.postId == postId) {
+        selectedPost.value.postTitle = editForm.value.postTitle
+        selectedPost.value.postBody = editForm.value.postBody
+      }
+
       editing.value = false
       toast(result.message)
+      return { success: true, data: result }
     } catch (error) {
       toast(error.message, 'error')
       console.error(error)
+      return { success: false, error }
     }
   }
 
   function cancelEdit() {
     editing.value = false
+    selectedPost.value = {}
+    editForm.value = {
+      postTitle: '',
+      postBody: '',
+    }
   }
 
   return {
@@ -286,6 +315,7 @@ export const usePostsStore = defineStore('posts', () => {
 
     // Post actions
     fetchPosts,
+    fetchPostById,
     createPost,
     deletePost,
     handlePageChange,
@@ -303,6 +333,7 @@ export const usePostsStore = defineStore('posts', () => {
     copyPostLink,
 
     // Edit actions
+    prepareEdit,
     initEdit,
     saveEdit,
     cancelEdit,

@@ -32,7 +32,7 @@ useHead({
 </script>
 
 <template>
-  <main class="text-fg relative flex h-screen overflow-hidden">
+  <main class="text-fg relative flex h-screen min-h-dvh overflow-hidden">
     <!-- Background -->
     <div class="absolute inset-0 z-0">
       <!-- Base gradient background -->
@@ -72,16 +72,14 @@ useHead({
 
     <NavHorizontal />
 
-    <div class="relative z-10 flex flex-1 flex-col overflow-hidden">
-      <div class="flex-1 overflow-y-auto" id="app-scroll-container">
-        <div class="pt-8 pb-20 sm:pt-20 sm:pb-4">
+    <div class="relative z-10 flex min-h-0 min-w-0 flex-1 flex-col overflow-hidden">
+      <div class="min-h-0 min-w-0 flex-1 overflow-x-hidden overflow-y-auto" id="app-scroll-container">
+        <div class="px-0 pt-20 pb-24 sm:pt-24 sm:pb-6">
           <RouterView v-slot="{ Component, route }">
             <Transition name="page" mode="out-in" appear>
-              <component :is="Component"
-                :key="['home', 'repairs', 'admin'].includes(route.name) ? route.name : 'myWork'" />
+              <component :is="Component" :key="route.fullPath" />
             </Transition>
           </RouterView>
-
         </div>
         <SiteFooter />
       </div>

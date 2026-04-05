@@ -18,7 +18,7 @@ onClickOutside(modalRef, () => {
       class="fixed top-0 left-0 z-[100] flex h-full w-full items-center justify-center bg-black/50 transition-all duration-initial sm:items-center"
     >
       <div
-        class="bg-primary dark:bg-sec-mute max-h-[90dvh] w-full overflow-y-auto rounded-xl shadow-xl sm:max-w-lg"
+        class="bg-primary dark:bg-sec-mute max-h-[90dvh] w-full overflow-y-auto rounded-lg shadow-xl sm:max-w-lg"
       >
         <div class="p-4 sm:p-6" ref="pricing-modal">
           <header v-if="$slots.header" class="mb-6">

@@ -1,5 +1,6 @@
 <script setup>
 import { WrenchIcon, Cog6ToothIcon, SparklesIcon } from '@heroicons/vue/24/outline'
+import TheDivider from '../TheDivider.vue'
 </script>
 
 <template>
@@ -7,16 +8,8 @@ import { WrenchIcon, Cog6ToothIcon, SparklesIcon } from '@heroicons/vue/24/outli
     <!-- Section Header -->
     <div class="mb-16 text-center">
       <h2 class="font-sec text-fg mb-2 text-4xl font-normal tracking-wide">Horological Services</h2>
-      <div class="mb-6 flex items-center justify-center space-x-4">
-        <div class="to-acc/50 h-px w-20 bg-gradient-to-r from-transparent"></div>
-        <div class="flex space-x-1">
-          <div class="bg-acc h-1.5 w-1.5 rounded-full"></div>
-          <div class="bg-acc/60 h-1.5 w-1.5 rounded-full"></div>
-          <div class="bg-acc/30 h-1.5 w-1.5 rounded-full"></div>
-        </div>
-        <div class="to-acc/50 h-px w-20 bg-gradient-to-l from-transparent"></div>
-      </div>
-      <p class="text-fg/70 mx-auto max-w-2xl text-lg leading-relaxed">
+      <TheDivider variant="sm" />
+      <p class="text-fg/80 mx-auto max-w-2xl text-lg leading-relaxed">
         Preserving the art of mechanical timekeeping through meticulous restoration and expert
         servicing
       </p>
@@ -27,22 +20,18 @@ import { WrenchIcon, Cog6ToothIcon, SparklesIcon } from '@heroicons/vue/24/outli
       <!-- Service 1: Movement Restoration -->
       <div class="group relative">
         <!-- Card background with subtle gradient -->
-        <div
-          class="from-primary to-sec-light absolute inset-0 rounded-lg bg-gradient-to-br opacity-50"
-        ></div>
+        <div class="from-primary to-sec-light absolute inset-0 rounded-lg bg-gradient-to-br opacity-50"></div>
 
         <div
-          class="bg-primary/90 border-brdr/50 hover:border-acc/30 relative h-full rounded-lg border p-8 transition-all duration-500 hover:shadow-xl"
-        >
+          class="bg-primary/90 border-brdr/50 hover:border-acc/30 relative h-full rounded-lg border p-8 transition-all duration-500 hover:shadow-xl">
           <!-- Icon with brass accent -->
           <div class="mb-6 inline-flex">
             <div class="relative">
               <div
-                class="bg-acc/20 group-hover:bg-acc/30 absolute inset-0 rounded-full blur-xl transition-colors duration-500"
-              ></div>
+                class="bg-acc/20 group-hover:bg-acc/30 absolute inset-0 rounded-lg blur-xl transition-colors duration-500">
+              </div>
               <div
-                class="bg-acc/10 border-acc/20 group-hover:border-acc/40 relative rounded-full border p-4 transition-all duration-300"
-              >
+                class="bg-acc/10 border-acc/20 group-hover:border-acc/40 relative rounded-lg border p-4 transition-all duration-300">
                 <Cog6ToothIcon class="text-acc size-6" />
               </div>
             </div>
@@ -60,21 +49,17 @@ import { WrenchIcon, Cog6ToothIcon, SparklesIcon } from '@heroicons/vue/24/outli
 
       <!-- Service 2: Dial & Hand Refinishing -->
       <div class="group relative">
-        <div
-          class="from-primary to-sec-light absolute inset-0 rounded-lg bg-gradient-to-br opacity-50"
-        ></div>
+        <div class="from-primary to-sec-light absolute inset-0 rounded-lg bg-gradient-to-br opacity-50"></div>
 
         <div
-          class="bg-primary/90 border-brdr/50 hover:border-acc/30 relative h-full rounded-lg border p-8 transition-all duration-500 hover:shadow-xl"
-        >
+          class="bg-primary/90 border-brdr/50 hover:border-acc/30 relative h-full rounded-lg border p-8 transition-all duration-500 hover:shadow-xl">
           <div class="mb-6 inline-flex">
             <div class="relative">
               <div
-                class="bg-acc/20 group-hover:bg-acc/30 absolute inset-0 rounded-full blur-xl transition-colors duration-500"
-              ></div>
+                class="bg-acc/20 group-hover:bg-acc/30 absolute inset-0 rounded-lg blur-xl transition-colors duration-500">
+              </div>
               <div
-                class="bg-acc/10 border-acc/20 group-hover:border-acc/40 relative rounded-full border p-4 transition-all duration-300"
-              >
+                class="bg-acc/10 border-acc/20 group-hover:border-acc/40 relative rounded-lg border p-4 transition-all duration-300">
                 <WrenchIcon class="text-acc size-6" />
               </div>
             </div>
@@ -92,21 +77,17 @@ import { WrenchIcon, Cog6ToothIcon, SparklesIcon } from '@heroicons/vue/24/outli
 
       <!-- Service 3: Case & Bracelet Restoration -->
       <div class="group relative">
-        <div
-          class="from-primary to-sec-light absolute inset-0 rounded-lg bg-gradient-to-br opacity-50"
-        ></div>
+        <div class="from-primary to-sec-light absolute inset-0 rounded-lg bg-gradient-to-br opacity-50"></div>
 
         <div
-          class="bg-primary/90 border-brdr/50 hover:border-acc/30 relative rounded-lg border p-8 transition-all duration-500 hover:shadow-xl"
-        >
+          class="bg-primary/90 border-brdr/50 hover:border-acc/30 relative rounded-lg border p-8 transition-all duration-500 hover:shadow-xl">
           <div class="mb-6 inline-flex">
             <div class="relative">
               <div
-                class="bg-acc/20 group-hover:bg-acc/30 absolute inset-0 rounded-full blur-xl transition-colors duration-500"
-              ></div>
+                class="bg-acc/20 group-hover:bg-acc/30 absolute inset-0 rounded-lg blur-xl transition-colors duration-500">
+              </div>
               <div
-                class="bg-acc/10 border-acc/20 group-hover:border-acc/40 relative rounded-full border p-4 transition-all duration-300"
-              >
+                class="bg-acc/10 border-acc/20 group-hover:border-acc/40 relative rounded-lg border p-4 transition-all duration-300">
                 <SparklesIcon class="text-acc size-6" />
               </div>
             </div>
@@ -125,8 +106,8 @@ import { WrenchIcon, Cog6ToothIcon, SparklesIcon } from '@heroicons/vue/24/outli
 
     <!-- Additional Service Note -->
     <div class="mt-12 text-center">
-      <p class="text-fg-subtle text-sm">
-        All services include a comprehensive 24-month warranty · Free estimates available
+      <p class="text-fg/90 text-sm">
+        All services include a comprehensive 12-month warranty · Free estimates available
       </p>
     </div>
   </section>

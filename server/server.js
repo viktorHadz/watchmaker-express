@@ -12,6 +12,7 @@ import formRouter from './routes/formRouter.js'
 import getPostRouter from './routes/getPostRouter.js'
 import deletePostRouter from './routes/deletePostRouter.js'
 import editPostRouter from './routes/editPostRouter.js'
+import authRouter from './routes/authRouter.js'
 
 const app = express()
 const __filename = fileURLToPath(import.meta.url) // get the resolved path to the file
@@ -29,7 +30,7 @@ app.use(
       useDefaults: true,
       directives: {
         'img-src': ["'self'", 'data:', 'blob:'],
-        'connect-src': ["'self'", 'https://dtdtklhtdxytgcjxhmsu.supabase.co'],
+        'connect-src': ["'self'"],
       },
     },
     referrerPolicy: {
@@ -45,6 +46,7 @@ app.use(express.json())
 app.use('/api/', apiLimiter)
 
 // Registering routes
+app.use('/api/auth/', authRouter)
 app.use('/api/form/', formRouter)
 app.use('/api/posts/', insertPostRouter)
 app.use('/api/posts/', getPostRouter)
@@ -74,26 +76,6 @@ app.use(
 )
 
 app.use(express.static(distURL))
-
-// GET homepage
-// app.get('/home-baby', (req, res) => {
-//   const htmlString = `
-//   <style>
-//   h1 {color: white;}
-//   html {
-//     height: 100%;
-//     width: 100%;
-//     background-color: #161515;
-//     color:white;
-//   }
-//   </style>
-//   <h1>Mama ti deba</h1>
-//   <div>
-//     На кака ти хуя
-//   </div>
-//   `
-//   res.send(htmlString)
-// })
 
 app.use((req, res, next) => {
   // Skip if it's an API route
