@@ -1,166 +1,114 @@
 <script setup>
 import TheLogo from '@/components/logo/TheLogo.vue'
 import { ArrowRightEndOnRectangleIcon } from '@heroicons/vue/24/outline'
-import { loginSchema } from './loginSchema'
-import { ref, computed, onMounted, useTemplateRef } from 'vue'
+import { computed, onMounted, watch } from 'vue'
 import { useToastStore } from '@/stores/toast'
 import { useAuth } from '@/composables/useAuth'
-import router from '@/router'
+import { useRoute, useRouter } from 'vue-router'
+import TheDivider from '@/components/TheDivider.vue'
 
 const toast = (message, type) => useToastStore().showToast(message, type)
-const { user, loading, logIn } = useAuth()
+const { loading, logIn, isAuthenticated } = useAuth()
+const router = useRouter()
+const route = useRoute()
 
-const email = ref('')
-const password = ref('')
-const errors = ref([])
-const emailError = computed(() => errors.value.find((err) => err.field === 'email')?.message || '')
-const passwordError = computed(
-  () => errors.value.find((err) => err.field === 'password')?.message || '',
-)
+const getAdminDestination = () => {
+  const redirect = route.query.redirect
+  return typeof redirect === 'string' && redirect.startsWith('/admin/editor')
+    ? redirect
+    : '/admin/editor'
+}
 
-async function validate() {
-  clearErrors()
-  const results = loginSchema.safeParse({
-    email: email.value,
-    password: password.value,
-  })
-  if (!results.success) {
-    const issues = results.error.issues
-    issues.forEach((issue) => {
-      errors.value.push({
-        field: issue.path[0],
-        code: issue.code,
-        message: issue.message,
-      })
-    })
-    return false
+const authErrorMessage = computed(() => {
+  const error = route.query.authError
+
+  switch (error) {
+    case 'access_denied':
+      return 'Google sign-in was cancelled.'
+    case 'unauthorized':
+      return 'This Google account is not allowed to access the admin area.'
+    case 'email_not_verified':
+      return 'Your Google account email must be verified before you can sign in.'
+    case 'state_mismatch':
+      return 'The sign-in session expired. Please try again.'
+    case 'callback_failed':
+      return 'Google sign-in failed during the callback step.'
+    case 'config':
+      return 'Google authentication is not configured correctly on the server.'
+    case 'missing_code':
+      return 'Google did not return a valid login code.'
+    default:
+      return error ? 'Unable to sign in with Google right now.' : ''
   }
-
-  return results.data
-}
-
-const clearErrors = () => {
-  errors.value = []
-}
-const clearFieldError = (fieldName) => {
-  errors.value = errors.value.filter((err) => err.field !== fieldName)
-}
-const clearInputs = () => {
-  email.value = ''
-  password.value = ''
-}
+})
 
 async function handleLogin() {
   try {
-    loading.value = true
-    const loginDetails = await validate()
-    if (!loginDetails) {
-      return
-    }
-    await logIn(loginDetails.email, loginDetails.password)
-
-    toast(`Logged in successfully. Welcome ${user.value?.username || 'back'}!`, 'success')
-    clearInputs()
-    router.push('/my-work')
+    toast('Redirecting to Google sign-in...', 'info')
+    await logIn()
   } catch (error) {
-    emailInputRef.value.focus()
     console.error('Login error:', error)
     toast(error.message || 'Login failed. Please try again.', 'error')
-  } finally {
-    loading.value = false
   }
 }
-const emailInputRef = useTemplateRef('email-input-ref')
+
 onMounted(() => {
-  emailInputRef.value.focus()
+  if (authErrorMessage.value) {
+    toast(authErrorMessage.value, 'error')
+    router.replace({ path: route.path, query: {} })
+  }
 })
+
+watch(
+  isAuthenticated,
+  (authenticated) => {
+    if (authenticated && router.currentRoute.value.path === '/admin') {
+      router.replace(getAdminDestination())
+    }
+  },
+  { immediate: true },
+)
 </script>
 
 <template>
-  <div class="flex min-h-full flex-1 flex-col justify-center px-6 py-12 lg:px-8">
+  <div class="my-4 flex min-h-full flex-1 flex-col justify-center px-6 py-12 sm:my-22 lg:px-8">
     <div class="sm:mx-auto sm:w-full sm:max-w-sm">
       <TheLogo class="mb-8 flex place-self-center"></TheLogo>
       <!-- Decorative divider -->
-      <div class="flex items-center justify-center space-x-4">
-        <div class="to-acc h-px w-16 bg-gradient-to-r from-transparent"></div>
-        <div class="flex space-x-2">
-          <div class="bg-acc h-1.5 w-1.5 rounded-full"></div>
-          <div class="bg-acc/60 h-1.5 w-1.5 rounded-full"></div>
-          <div class="bg-acc/30 h-1.5 w-1.5 rounded-full"></div>
-        </div>
-        <div class="to-acc h-px w-16 bg-gradient-to-l from-transparent"></div>
-      </div>
+      <TheDivider />
     </div>
     <h2 class="font-sec text-fg mt-6 line-clamp-1 text-center text-4xl font-normal tracking-wide">
       Sign in to your account
     </h2>
 
     <div
-      class="from-acc/90 mx-auto mt-10 w-full rounded-lg bg-gradient-to-br to-transparent p-[1px] sm:w-lg"
+      class="from-acc mx-auto mt-10 w-full rounded-lg bg-gradient-to-br to-transparent p-px sm:w-lg"
     >
-      <form
-        class="from-sec to-sec-mute dark:from-sec-mute dark:to-sec space-y-2 rounded-lg bg-gradient-to-br p-4 sm:p-6"
-        @submit.prevent="handleLogin"
+      <div
+        class="from-sec to-sec-mute dark:from-sec dark:to-sec-mute space-y-6 rounded-lg bg-gradient-to-br p-6"
       >
-        <div class="pt-4">
-          <div>
-            <label for="email" class="input-lbl">Email address</label>
-            <div class="mt-2">
-              <input
-                ref="email-input-ref"
-                v-model="email"
-                type="email"
-                name="email"
-                id="email"
-                autocomplete="email"
-                required="true"
-                class="input"
-                @input="clearFieldError('email')"
-              />
-            </div>
-          </div>
-          <span class="text-danger line-clamp-2 flex h-12 items-start p-2 text-sm">
-            {{ emailError }}
-          </span>
+        <div class="space-y-3 text-center">
+          <p class="text-fg text-2xl leading-relaxed">Admin now uses your Google account.</p>
         </div>
 
-        <div>
-          <div>
-            <div class="flex items-center justify-between">
-              <label for="password" class="input-lbl">Password</label>
-            </div>
-            <div class="mt-2">
-              <input
-                v-model="password"
-                type="password"
-                name="password"
-                id="password"
-                autocomplete="current-password"
-                required="true"
-                maxlength="64"
-                class="input"
-                @input="clearFieldError('password')"
-              />
-            </div>
-          </div>
-          <span class="text-danger line-clamp-2 flex h-12 items-start p-2 text-sm">
-            {{ passwordError }}
-          </span>
-        </div>
-
-        <div class="flex w-full items-center justify-center pb-4">
-          <button type="submit" :disabled="loading" class="btn flex items-center gap-x-2 text-lg">
+        <div class="flex w-full items-center justify-center pb-2">
+          <button
+            type="button"
+            :disabled="loading"
+            class="btn text-fg2 flex min-w-64 items-center justify-center gap-x-3 text-lg"
+            @click="handleLogin"
+          >
             <div
               v-if="loading"
-              class="h-5 w-5 animate-spin rounded-full border-b-2 border-current"
+              class="h-5 w-5 animate-spin rounded-lg border-b-2 border-current"
             ></div>
             <template v-else>
               <ArrowRightEndOnRectangleIcon class="size-5"></ArrowRightEndOnRectangleIcon>
-              Sign in
+              Continue With Google
             </template>
           </button>
         </div>
-      </form>
+      </div>
     </div>
   </div>
 </template>

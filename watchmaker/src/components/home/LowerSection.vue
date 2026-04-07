@@ -31,13 +31,13 @@ import { ChatBubbleLeftEllipsisIcon, CameraIcon } from '@heroicons/vue/24/outlin
           <div class="relative flex h-full flex-col justify-between p-4 sm:p-8">
             <!-- Top icon -->
             <div class="flex items-start justify-between">
-              <div class="rounded-full border border-white/20 bg-white/10 p-3 backdrop-blur-sm">
+              <div class="rounded-lg border border-white/20 bg-white/10 p-3 backdrop-blur-sm">
                 <ChatBubbleLeftEllipsisIcon class="size-5 text-white" />
               </div>
               <!-- Decorative element -->
               <div class="flex items-center space-x-1">
-                <div class="bg-acc h-1 w-1 rounded-full"></div>
-                <div class="from-acc h-1 w-8 rounded-full bg-gradient-to-r to-transparent"></div>
+                <div class="bg-acc h-1 w-1 rounded-lg"></div>
+                <div class="from-acc h-1 w-8 rounded-lg bg-gradient-to-r to-transparent"></div>
               </div>
             </div>
 
@@ -99,13 +99,13 @@ import { ChatBubbleLeftEllipsisIcon, CameraIcon } from '@heroicons/vue/24/outlin
           <div class="relative flex h-full flex-col justify-between p-4 sm:p-8">
             <!-- Top icon -->
             <div class="flex items-start justify-between">
-              <div class="rounded-full border border-white/20 bg-white/10 p-3 backdrop-blur-sm">
+              <div class="rounded-lg border border-white/20 bg-white/10 p-3 backdrop-blur-sm">
                 <CameraIcon class="size-5 text-white" />
               </div>
               <!-- Decorative element -->
               <div class="flex items-center space-x-1">
-                <div class="from-acc h-1 w-8 rounded-full bg-gradient-to-l to-transparent"></div>
-                <div class="bg-acc h-1 w-1 rounded-full"></div>
+                <div class="from-acc h-1 w-8 rounded-lg bg-gradient-to-l to-transparent"></div>
+                <div class="bg-acc h-1 w-1 rounded-lg"></div>
               </div>
             </div>
 
@@ -139,11 +139,15 @@ import { ChatBubbleLeftEllipsisIcon, CameraIcon } from '@heroicons/vue/24/outlin
         </div>
       </RouterLink>
     </div>
-
-    <div class="border-brdr/20 mt-16 border-t pt-16">
+    <div
+      class="bg-acc/40 dark:bg-acc/20 my-16 h-px w-full mask-x-from-60% mask-x-to-transparent mask-center"
+    ></div>
+    <div>
       <div class="grid grid-cols-2 gap-8 text-center md:grid-cols-4">
         <div>
-          <p class="font-sec text-acc text-3xl font-light">7+</p>
+          <p class="font-sec text-acc text-3xl font-light">
+            {{ new Date().getFullYear() - 2016 }}+
+          </p>
           <p class="text-fg-subtle text-sm tracking-wider uppercase">Years Experience</p>
         </div>
         <div>

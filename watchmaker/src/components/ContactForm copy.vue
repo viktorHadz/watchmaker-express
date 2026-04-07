@@ -475,7 +475,7 @@ const clearForm = () => {
                   <!-- Remove button -->
                   <button
                     @click.stop="removeImage(index)"
-                    class="bg-danger hover:bg-danger/90 focus:ring-danger/50 pointer-events-auto absolute top-1 right-1 z-10 cursor-pointer rounded-full p-1.5 text-white opacity-100 shadow-md transition-all duration-200 hover:scale-110 focus:opacity-100 focus:ring-2 focus:outline-none xl:opacity-0 xl:group-hover:opacity-100"
+                    class="bg-danger hover:bg-danger/90 focus:ring-danger/50 pointer-events-auto absolute top-1 right-1 z-10 cursor-pointer rounded-lg p-1.5 text-white opacity-100 shadow-md transition-all duration-200 hover:scale-110 focus:opacity-100 focus:ring-2 focus:outline-none xl:opacity-0 xl:group-hover:opacity-100"
                     type="button"
                     :aria-label="`Remove ${image.name}`"
                   >
@@ -536,7 +536,7 @@ const clearForm = () => {
           <!--Progress bar -->
           <div class="flex items-center gap-3" v-if="uploadedImages.length > 0">
             <div
-              class="bg-sec relative h-4 w-16 overflow-hidden rounded-full border"
+              class="bg-sec relative h-4 w-16 overflow-hidden rounded-lg border"
               :class="[
                 uploadedImages.length < 5
                   ? 'drop-shadow-acc/50 border-acc drop-shadow-sm'
@@ -564,7 +564,7 @@ const clearForm = () => {
               <!-- Full indicator -->
               <div
                 v-if="uploadedImages.length === 5"
-                class="bg-success text-fg2 drop-shadow-success flex items-center rounded-full px-2.5 py-2 leading-0 font-semibold drop-shadow-sm"
+                class="bg-success text-fg2 drop-shadow-success flex items-center rounded-lg px-2.5 py-2 leading-0 font-semibold drop-shadow-sm"
               >
                 <span class="text-lg leading-1">✓ </span> Done
               </div>
@@ -585,7 +585,7 @@ const clearForm = () => {
             id="message"
             maxlength="1000"
             rows="8"
-            class="text-fg placeholder-fg/50 focus:ring-acc/50 focus:border-acc input custom-scrollbar w-full resize-none rounded-xl"
+            class="text-fg placeholder-fg/50 focus:ring-acc/50 focus:border-acc input custom-scrollbar w-full resize-none rounded-lg"
             placeholder="Tell me about your watch, what issues you're experiencing, or any specific requirements..."
             v-model="form.message"
             @focus="handleFocus('message')"
@@ -612,7 +612,7 @@ const clearForm = () => {
         <button
           type="submit"
           @click.prevent="onSubmit()"
-          class="from-acc to-acc/80 hover:from-acc/90 hover:to-acc/70 focus:ring-acc/50 inline-flex transform cursor-pointer items-center rounded-xl bg-gradient-to-r px-8 py-3 font-semibold text-white shadow-lg transition-all duration-200 hover:scale-[1.02] focus:ring-2 focus:outline-none"
+          class="from-acc to-acc/80 hover:from-acc/90 hover:to-acc/70 focus:ring-acc/50 inline-flex transform cursor-pointer items-center rounded-lg bg-gradient-to-r px-8 py-3 font-semibold text-white shadow-lg transition-all duration-200 hover:scale-[1.02] focus:ring-2 focus:outline-none"
         >
           <PaperAirplaneIcon class="mr-2 size-5 -rotate-90 transform"></PaperAirplaneIcon>
           Send Message

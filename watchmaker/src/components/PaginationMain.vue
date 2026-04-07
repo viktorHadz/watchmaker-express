@@ -24,7 +24,7 @@
         <button
           @click="$emit('page-change', currentPage - 1)"
           :disabled="currentPage === 1"
-          class="group border-brdr bg-primary hover:border-acc/50 disabled:hover:border-brdr relative flex h-8 w-8 cursor-pointer items-center justify-center rounded-full border transition-all duration-200 ease-out disabled:cursor-not-allowed disabled:opacity-30 sm:h-11 sm:w-11"
+          class="group border-brdr bg-primary hover:border-acc/50 disabled:hover:border-brdr relative flex h-8 w-8 cursor-pointer items-center justify-center rounded-lg border transition-all duration-200 ease-out disabled:cursor-not-allowed disabled:opacity-30 sm:h-11 sm:w-11"
           aria-label="Previous page"
         >
           <ChevronLeftIcon
@@ -54,7 +54,7 @@
               @click="$emit('page-change', page)"
               :disabled="page === currentPage"
               :class="[
-                'relative flex h-7 w-7 cursor-pointer items-center justify-center rounded-full text-xs font-medium transition-all duration-200 ease-out disabled:cursor-not-allowed sm:h-10 sm:w-10 sm:text-sm',
+                'relative flex h-7 w-7 cursor-pointer items-center justify-center rounded-lg text-xs font-medium transition-all duration-200 ease-out disabled:cursor-not-allowed sm:h-10 sm:w-10 sm:text-sm',
                 page === currentPage
                   ? 'bg-acc text-fg2 shadow-acc/25 shadow-md'
                   : 'text-fg-mute hover:bg-sec-mute/50 hover:text-acc dark:hover:bg-sec-light/30',
@@ -71,7 +71,7 @@
         <button
           @click="$emit('page-change', currentPage + 1)"
           :disabled="currentPage === paginationData.totalPages"
-          class="group border-brdr bg-primary hover:border-acc/50 disabled:hover:border-brdr relative flex h-8 w-8 items-center justify-center rounded-full border transition-all duration-200 ease-out disabled:cursor-not-allowed disabled:opacity-30 sm:h-11 sm:w-11"
+          class="group border-brdr bg-primary hover:border-acc/50 disabled:hover:border-brdr relative flex h-8 w-8 items-center justify-center rounded-lg border transition-all duration-200 ease-out disabled:cursor-not-allowed disabled:opacity-30 sm:h-11 sm:w-11"
           aria-label="Next page"
         >
           <ChevronRightIcon
@@ -117,9 +117,9 @@
       <div class="flex items-center gap-4">
         <div class="to-acc/50 h-px w-16 bg-gradient-to-r from-transparent sm:w-20"></div>
         <div class="flex gap-1">
-          <div class="bg-acc/70 size-1.5 rounded-full"></div>
-          <div class="bg-acc/45 size-1.5 rounded-full"></div>
-          <div class="bg-acc/20 size-1.5 rounded-full"></div>
+          <div class="bg-acc/70 size-1.5 rounded-lg"></div>
+          <div class="bg-acc/45 size-1.5 rounded-lg"></div>
+          <div class="bg-acc/20 size-1.5 rounded-lg"></div>
         </div>
         <div class="to-acc/50 h-px w-16 bg-gradient-to-l from-transparent sm:w-20"></div>
       </div>

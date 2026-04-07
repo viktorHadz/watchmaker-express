@@ -11,6 +11,7 @@
     /* Firefox */
     input[type='number'] {
       -moz-appearance: textfield;
+      appearance: textfield;
     }
   }
 }
@@ -105,39 +106,6 @@
   @apply text-acc;
 }
 
-@keyframes rotate-cw {
-  0% {
-    transform: rotate(0deg);
-  }
-  100% {
-    transform: rotate(360deg);
-  }
-}
-
-@keyframes rotate-ccw {
-  0% {
-    transform: rotate(0deg);
-  }
-  100% {
-    transform: rotate(-360deg);
-  }
-}
-
-#bottom-wheel {
-  animation: rotate-cw 2s linear infinite;
-  transform-origin: center;
-  transform-box: fill-box;
-}
-#middle-wheel {
-  animation: rotate-ccw 6s linear infinite;
-  transform-origin: center;
-  transform-box: fill-box;
-}
-#top-wheel {
-  animation: rotate-cw 2s linear infinite;
-  transform-origin: center;
-  transform-box: fill-box;
-}
 /* Diagonal transition for the admin menu */
 .diagonal-scale-enter-active {
   @apply transition-all duration-500 ease-out;
@@ -161,18 +129,18 @@
 
 @layer components {
   .input {
-    @apply dark:border-sec-light dark:bg-sec text-fg placeholder-fg/50 bg-sec-light border-brdr focus:ring-acc/80 focus:border-acc/90 flex min-h-12 w-full items-center rounded-xl border p-2 px-3 ring-0 transition duration-200 focus:ring-2 focus:outline-none;
+    @apply dark:border-sec-mute/90 dark:bg-sec/80 text-fg/92 dark:text-fg/96 placeholder-fg/50 bg-sec-light border-brdr focus:ring-acc/80 focus:border-acc/90 flex min-h-12 w-full items-center rounded-lg border p-2 px-3 ring-0 transition duration-200 focus:ring-2 focus:outline-none;
   }
   .input-lbl {
-    @apply font-sec text-fg font-medium;
+    @apply font-sec text-fg text-lg font-medium;
   }
 
   .btn {
-    @apply bg-acc hover:bg-acc-mute focus-visible:ring-acc/50 text-fg2 cursor-pointer rounded-md px-3.5 py-2.5 text-sm font-semibold shadow-sm transition-all duration-200 hover:shadow-md focus-visible:ring-2 focus-visible:ring-offset-2;
+    @apply bg-acc hover:bg-acc-mute focus-visible:ring-acc/50 text-fg2 cursor-pointer rounded-lg px-3.5 py-2.5 text-sm font-semibold shadow-sm transition-all duration-200 hover:shadow-md focus-visible:ring-2 focus-visible:ring-offset-2;
   }
 
   .card {
-    @apply bg-primary dark:bg-sec/80 border-brdr/20 dark:border-sec-mute/50 rounded-xl border shadow-lg backdrop-blur-sm transition-all duration-300;
+    @apply bg-primary dark:bg-sec/80 border-brdr/20 dark:border-sec-mute/50 rounded-lg border shadow-lg backdrop-blur-sm transition-all duration-300;
   }
 
   .grad-container {

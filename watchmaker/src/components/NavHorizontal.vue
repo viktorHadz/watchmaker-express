@@ -1,6 +1,6 @@
 <script setup>
-import { ref, onMounted, onUnmounted, computed, useTemplateRef } from 'vue'
-import { useRouter } from 'vue-router'
+import { ref, onMounted, onUnmounted, computed, useTemplateRef, watch } from 'vue'
+import { useRouter, useRoute } from 'vue-router'
 import { useAuth } from '@/composables/useAuth'
 import { onClickOutside } from '@vueuse/core'
 import {
@@ -12,43 +12,49 @@ import {
 } from '@heroicons/vue/24/outline'
 import IconGallery from './icons/IconGallery.vue'
 import DarkMode from './DarkMode.vue'
-
 import NavDropdown from './DropDown.vue'
 
-const isVisible = ref(true) // menu
+const DEFAULT_AVATAR_PATH = '/pictures/avatars/vik_avatar_sm.png'
+
+const router = useRouter()
+const route = useRoute()
+const { user, isAuthenticated, signOut } = useAuth()
+
+const isVisible = ref(true)
 const lastScrollY = ref(0)
 const scrollThreshold = 10
-let scrollElement = null
+const avatarLoadFailed = ref(false)
+
 const handleScroll = () => {
-  if (!scrollElement) return
+  const currentScrollY = window.scrollY
 
-  const currentScrollY = scrollElement.scrollTop
-
-  // Always show when at top
   if (currentScrollY <= 50) {
     isVisible.value = true
     lastScrollY.value = currentScrollY
     return
   }
 
-  // Only trigger if scrolled more than threshold
-  if (Math.abs(currentScrollY - lastScrollY.value) < scrollThreshold) {
-    return
-  }
+  if (Math.abs(currentScrollY - lastScrollY.value) < scrollThreshold) return
 
-  // Hide when scrolling down, show when scrolling up
-  if (currentScrollY > lastScrollY.value) {
-    isVisible.value = false // Scrolling down
-  } else {
-    isVisible.value = true // Scrolling up
-  }
-
+  isVisible.value = currentScrollY < lastScrollY.value
   lastScrollY.value = currentScrollY
 }
 
-const router = useRouter()
-const { user, isAuthenticated, signOut } = useAuth()
-const avatarUrl = computed(() => user.value?.avatar || '/default-avatar.png')
+const avatarUrl = computed(() => {
+  if (avatarLoadFailed.value) {
+    return DEFAULT_AVATAR_PATH
+  }
+
+  if (user.value?.provider === 'google') {
+    return '/api/auth/avatar'
+  }
+
+  return user.value?.avatar || DEFAULT_AVATAR_PATH
+})
+
+const handleAvatarError = () => {
+  avatarLoadFailed.value = true
+}
 
 const DropdownRef = useTemplateRef('tooltip-ref')
 const tooltipButtonRef = useTemplateRef('tooltip-button-ref')
@@ -57,45 +63,45 @@ const showDropdown = ref(false)
 function toggleDropdown() {
   showDropdown.value = !showDropdown.value
 }
+
 function toolNewPostNav() {
-  router.push('/my-work')
-  toggleDropdown()
+  router.push('/admin/editor')
+  isOpenMobile.value = false
+  showDropdown.value = false
 }
 
-// Mobile nav slider
 const isOpenMobile = ref(false)
 const isOpenRef = useTemplateRef('mobile-dropdown-ref')
 const mobileButtonRef = useTemplateRef('mobile-dropdown-button-ref')
-const toggleMenu = () => {
+
+function toggleMenu() {
   isOpenMobile.value = !isOpenMobile.value
 }
 
 onClickOutside(DropdownRef, (event) => {
-  if (tooltipButtonRef.value && tooltipButtonRef.value.contains(event.target)) {
-    return
-  }
+  if (tooltipButtonRef.value?.contains(event.target)) return
   showDropdown.value = false
 })
-// Mobile click outside
-onClickOutside(isOpenRef, () => {
-  if (mobileButtonRef.value && mobileButtonRef.value.contains(event.target)) {
-    return
-  }
+
+onClickOutside(isOpenRef, (event) => {
+  if (mobileButtonRef.value?.contains(event.target)) return
   isOpenMobile.value = false
 })
 
 onMounted(() => {
-  // Finds the actual scrolling container (the div with overflow-y-auto)
-  scrollElement = document.querySelector('.overflow-y-auto')
-  if (scrollElement) {
-    scrollElement.addEventListener('scroll', handleScroll, { passive: true })
-  }
+  lastScrollY.value = window.scrollY
+  window.addEventListener('scroll', handleScroll, { passive: true })
 })
 
+watch(
+  () => user.value?.avatar,
+  () => {
+    avatarLoadFailed.value = false
+  },
+)
+
 onUnmounted(() => {
-  if (scrollElement) {
-    scrollElement.removeEventListener('scroll', handleScroll)
-  }
+  window.removeEventListener('scroll', handleScroll)
 })
 </script>
 
@@ -103,100 +109,114 @@ onUnmounted(() => {
   <!-- Desktop Navigation -->
   <nav
     :class="[
-      'border-brdr/20 bg-primary/80 fixed top-5 left-1/2 z-[99] hidden w-xl -translate-x-1/2 items-center justify-between rounded-xl border p-2 shadow-lg backdrop-blur-md transition-all duration-300 ease-in-out sm:flex 2xl:max-w-[80vw]',
-      isVisible ? 'translate-y-0 opacity-95' : '-translate-y-20 opacity-0',
+      'border-brdr/20 bg-primary/80 fixed top-5 left-1/2 z-[99] hidden w-[min(92vw,64rem)] -translate-x-1/2 items-center justify-between rounded-xl border px-3 py-2 shadow-lg backdrop-blur-md transition-all duration-300 ease-in-out sm:flex',
+      isVisible ? 'translate-y-0 opacity-100' : '-translate-y-20 opacity-0',
     ]"
   >
-    <div class="ml-4 flex gap-8">
-      <RouterLink to="/" class="group relative">
+    <div class="flex items-center gap-2 sm:gap-4">
+      <RouterLink to="/" class="group">
         <button
-          class="group group-hover:text-acc text-fg hover:bg-sec/60 dark:hover:bg-sec cursor-pointer rounded-lg transition-colors duration-200"
+          class="text-fg hover:bg-sec/60 hover:text-acc cursor-pointer rounded-lg transition-colors duration-200"
         >
-          <!-- Active Indicator -->
           <div
-            class="relative flex flex-col items-center rounded-md px-2 py-1 text-xs whitespace-nowrap"
+            class="relative flex flex-col items-center rounded-md px-3 py-1 text-xs whitespace-nowrap"
           >
             <div
-              v-if="$route.path === '/'"
-              class="bg-acc absolute top-0 -right-0.5 h-2 w-2 animate-pulse rounded-full"
+              v-if="route.path === '/'"
+              class="bg-acc absolute top-0 right-0 h-2 w-2 animate-pulse rounded-full"
             ></div>
             <HomeIcon class="size-6 stroke-1" />
             <p>Home</p>
           </div>
         </button>
       </RouterLink>
-      <RouterLink to="/repairs" class="group relative">
+
+      <RouterLink to="/repairs" class="group">
         <button
-          class="group group-hover:text-acc text-fg hover:bg-sec/60 dark:hover:bg-sec transi6 tion-colors cursor-pointer rounded-lg duration-200"
+          class="text-fg hover:bg-sec/60 hover:text-acc cursor-pointer rounded-lg transition-colors duration-200"
         >
-          <!-- Active Indicator -->
           <div
-            class="relative flex flex-col items-center rounded-md px-2 py-1 text-xs whitespace-nowrap"
+            class="relative flex flex-col items-center rounded-md px-3 py-1 text-xs whitespace-nowrap"
           >
             <div
-              v-if="$route.path === '/repairs'"
-              class="bg-acc absolute top-0 -right-0.5 h-2 w-2 animate-pulse rounded-full"
+              v-if="route.path === '/repairs'"
+              class="bg-acc absolute top-0 right-0 h-2 w-2 animate-pulse rounded-full"
             ></div>
             <WrenchScrewdriverIcon class="size-6 stroke-1" />
-            Contact
+            <p>Repairs</p>
           </div>
         </button>
       </RouterLink>
-      <RouterLink to="/my-work" class="group relative">
+
+      <RouterLink to="/my-work" class="group">
         <button
-          class="group group-hover:text-acc text-fg hover:bg-sec/60 dark:hover:bg-sec cursor-pointer rounded-lg transition-colors duration-200"
+          class="text-fg hover:bg-sec/60 hover:text-acc cursor-pointer rounded-lg transition-colors duration-200"
         >
-          <!-- Active Indicator -->
           <div
-            class="relative flex flex-col items-center rounded-md px-2 py-1 text-xs whitespace-nowrap"
+            class="relative flex flex-col items-center rounded-md px-3 py-1 text-xs whitespace-nowrap"
           >
             <div
-              v-if="$route.path === '/my-work'"
-              class="bg-acc absolute top-0 -right-0.5 h-2 w-2 animate-pulse rounded-full"
+              v-if="route.path.startsWith('/my-work')"
+              class="bg-acc absolute top-0 right-0 h-2 w-2 animate-pulse rounded-full"
             ></div>
-            <IconGallery class="size-6 stroke-1"></IconGallery>
-            My Work
+            <IconGallery class="size-6 stroke-1" />
+            <p>My Work</p>
           </div>
         </button>
       </RouterLink>
     </div>
-    <!-- Main nav & Dark mode border (pl-5 to control) -->
-    <div class="border-brdr dark:border-brdr group relative ml-4 border-l pl-5">
-      <div v-if="isAuthenticated" class="flex items-center gap-8">
-        <div>
-          <div
+
+    <div class="border-brdr ml-4 flex items-center border-l pl-4">
+      <div v-if="isAuthenticated" class="flex items-center gap-4">
+        <div class="relative">
+          <button
             ref="tooltip-button-ref"
-            class="hover:bg-acc overflow-hidden rounded-full"
-            :class="[showDropdown ? 'bg-acc' : 'cursor-pointer']"
-            @click="toggleDropdown()"
+            class="hover:bg-acc h-9 w-9 cursor-pointer overflow-hidden rounded-lg transition-colors duration-200"
+            :class="showDropdown ? 'bg-acc' : ''"
+            @click="toggleDropdown"
           >
-            <img :src="avatarUrl" alt="avatar" class="max-h-9 w-full object-cover" />
-          </div>
+            <img
+              :src="avatarUrl"
+              alt="avatar"
+              class="h-full w-full object-cover"
+              loading="lazy"
+              decoding="async"
+              referrerpolicy="no-referrer"
+              @error="handleAvatarError"
+            />
+          </button>
+
           <div ref="tooltip-ref">
             <Transition>
-              <NavDropdown wrapper-class="absolute right-3 top-12" v-if="showDropdown">
-                <div class="text-fg font-sec flex flex-col items-start gap-4 p-2 font-medium">
+              <NavDropdown
+                v-if="showDropdown"
+                wrapper-class="absolute top-[calc(100%+0.75rem)] right-0"
+                triangle-class="left-auto right-3 translate-x-0"
+                triangle-border-class="left-auto right-[9px] translate-x-0"
+              >
+                <div
+                  class="text-fg font-sec flex min-w-44 flex-col items-start gap-3 p-2 font-medium"
+                >
                   <button
-                    class="hover:text-acc flex cursor-pointer items-center gap-3 truncate transition duration-200"
-                    @click="toolNewPostNav()"
+                    class="hover:text-acc flex w-full cursor-pointer items-center gap-3 truncate rounded-lg p-1 transition duration-200"
+                    @click="toolNewPostNav"
                   >
                     <div
                       class="bg-acc/15 flex size-8 flex-shrink-0 items-center justify-center rounded-md"
                     >
-                      <PlusIcon class="text-acc size-4"></PlusIcon>
+                      <PlusIcon class="text-acc size-4" />
                     </div>
                     New post
                   </button>
+
                   <button
-                    class="hover:text-danger flex cursor-pointer items-center gap-3 transition duration-200"
+                    class="hover:text-danger flex w-full cursor-pointer items-center gap-3 rounded-lg p-1 transition duration-200"
                     @click="signOut()"
                   >
                     <div
-                      class="bg-danger/15 flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-md"
+                      class="bg-danger/15 flex size-8 flex-shrink-0 items-center justify-center rounded-md"
                     >
-                      <ArrowRightStartOnRectangleIcon
-                        class="text-danger size-4"
-                      ></ArrowRightStartOnRectangleIcon>
+                      <ArrowRightStartOnRectangleIcon class="text-danger size-4" />
                     </div>
                     Sign out
                   </button>
@@ -205,29 +225,28 @@ onUnmounted(() => {
             </Transition>
           </div>
         </div>
-        <div class="relative pr-2">
-          <DarkMode size="9" class="hover:text-acc transition duration-200" />
-        </div>
+
+        <DarkMode size="9" class="hover:text-acc transition duration-200" />
       </div>
-      <div v-else class="flex gap-4">
-        <DarkMode size="8" class="hover:text-acc mr-4 transition duration-200" />
+
+      <div v-else>
+        <DarkMode size="8" class="hover:text-acc transition duration-200" />
       </div>
     </div>
   </nav>
 
   <!-- Mobile Navigation -->
   <nav class="fixed right-0 bottom-0 left-0 z-[99] sm:hidden">
-    <div v-if="isAuthenticated" class="fixed right-4 bottom-16 will-change-transform">
+    <div v-if="isAuthenticated" class="fixed right-4 bottom-16">
       <div
-        class="card flex transform-gpu flex-col items-stretch overflow-hidden rounded-t-xl rounded-b-none shadow-xl backdrop-blur-md transition-all duration-400 ease-out"
+        class="card flex flex-col items-stretch overflow-hidden rounded-t-lg rounded-b-none shadow-xl backdrop-blur-md transition-all duration-300 ease-out"
         :class="isOpenMobile ? 'w-44' : 'w-20'"
       >
-        <!-- Admin Button - Optimized for touch -->
         <button
           ref="mobile-dropdown-button-ref"
-          @click="toggleMenu()"
-          class="group relative flex h-14 max-h-10 touch-manipulation flex-col items-center justify-center rounded-t-xl px-4 transition-colors duration-300 ease-out"
+          class="group relative flex h-14 touch-manipulation flex-col items-center justify-center rounded-t-lg px-4 transition-colors duration-300 ease-out"
           :class="isOpenMobile ? 'bg-sec-light/30' : 'active:bg-sec-light/20'"
+          @click="toggleMenu"
         >
           <ChevronUpIcon
             class="size-5 transition-transform duration-300 ease-out"
@@ -239,35 +258,30 @@ onUnmounted(() => {
           >
             admin
           </div>
-          <!-- Active indicator -->
+
           <div
-            class="bg-acc absolute bottom-0 left-1/2 h-0.5 transition-all duration-400 ease-out"
+            class="bg-acc absolute bottom-0 left-1/2 h-0.5 transition-all duration-300 ease-out"
             :class="
               isOpenMobile ? 'w-12 -translate-x-1/2 opacity-60' : 'w-0 -translate-x-1/2 opacity-0'
             "
           ></div>
         </button>
-        <!-- Background active admin btn -->
-        <div
-          class="bg-acc/15 dark:bg-acc/5 pointer-events-none absolute -inset-px -z-10 h-10.5 rounded-t-xl transition-opacity duration-200 ease-out"
-          :class="isOpenMobile ? 'opacity-100' : 'opacity-0'"
-        ></div>
 
         <div
-          class="overflow-hidden transition-all duration-400 ease-out"
-          :class="isOpenMobile ? 'max-h-40 opacity-100' : 'max-h-0 opacity-0'"
           ref="mobile-dropdown-ref"
+          class="overflow-hidden transition-all duration-300 ease-out"
+          :class="isOpenMobile ? 'max-h-40 opacity-100' : 'max-h-0 opacity-0'"
         >
           <div class="border-brdr/40 bg-sec/10 border-t">
             <div class="space-y-1 p-3">
               <button
                 class="font-sec active:bg-acc/10 flex w-full items-center gap-3 rounded-lg px-3 py-3 text-left text-sm font-medium transition duration-200 active:scale-95"
-                @click="toolNewPostNav()"
+                @click="toolNewPostNav"
               >
                 <div
                   class="bg-acc/15 flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-md"
                 >
-                  <PlusIcon class="text-acc size-4"></PlusIcon>
+                  <PlusIcon class="text-acc size-4" />
                 </div>
                 <span class="text-fg line-clamp-1">New post</span>
               </button>
@@ -279,9 +293,7 @@ onUnmounted(() => {
                 <div
                   class="bg-danger/15 flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-md"
                 >
-                  <ArrowRightStartOnRectangleIcon
-                    class="text-danger size-4"
-                  ></ArrowRightStartOnRectangleIcon>
+                  <ArrowRightStartOnRectangleIcon class="text-danger size-4" />
                 </div>
                 <span class="text-fg line-clamp-1">Sign out</span>
               </button>
@@ -291,15 +303,13 @@ onUnmounted(() => {
       </div>
     </div>
 
-    <div
-      class="bg-primary dark:bg-sec/95 border-brdr/30 absolute inset-0 border-t backdrop-blur-md"
-    ></div>
+    <div class="bg-primary/90 border-brdr/30 absolute inset-0 border-t backdrop-blur-md"></div>
 
     <div class="relative flex items-center justify-around px-2 py-2">
       <RouterLink
         to="/"
         class="flex flex-col items-center gap-2 text-xs transition-all active:scale-95"
-        :class="$route.path === '/' ? 'text-acc' : 'text-fg'"
+        :class="route.path === '/' ? 'text-acc' : 'text-fg'"
       >
         <HomeIcon class="size-6 stroke-1" />
         <span class="font-sec tracking-wide">Home</span>
@@ -308,7 +318,7 @@ onUnmounted(() => {
       <RouterLink
         to="/repairs"
         class="flex flex-col items-center gap-2 text-xs transition-all duration-200 ease-out active:scale-95"
-        :class="$route.path === '/repairs' ? 'text-acc' : 'text-fg'"
+        :class="route.path === '/repairs' ? 'text-acc' : 'text-fg'"
       >
         <WrenchScrewdriverIcon class="size-6 stroke-1" />
         <span class="font-sec font-medium tracking-wide">Repairs</span>
@@ -317,21 +327,20 @@ onUnmounted(() => {
       <RouterLink
         to="/my-work"
         class="flex flex-col items-center gap-2 text-xs transition-all duration-200 ease-out active:scale-95"
-        :class="$route.path === '/my-work' ? 'text-acc' : 'text-fg'"
+        :class="route.path.startsWith('/my-work') ? 'text-acc' : 'text-fg'"
       >
-        <IconGallery class="size-6"></IconGallery>
+        <IconGallery class="size-6" />
         <span class="font-sec font-medium tracking-wide">My Work</span>
       </RouterLink>
 
-      <button
-        class="text-fg flex flex-col items-center gap-2 text-xs transition-all duration-200 ease-out active:scale-95"
-      >
+      <div class="text-fg flex flex-col items-center gap-2 text-xs">
         <DarkMode />
         <span class="font-sec font-medium tracking-wide">Theme</span>
-      </button>
+      </div>
     </div>
   </nav>
 </template>
+
 <style scoped>
 .v-enter-active,
 .v-leave-active {
@@ -341,8 +350,5 @@ onUnmounted(() => {
 .v-enter-from,
 .v-leave-to {
   opacity: 0;
-}
-h-auto {
-  height: auto;
 }
 </style>

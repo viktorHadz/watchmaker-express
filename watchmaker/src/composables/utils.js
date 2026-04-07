@@ -1,17 +1,18 @@
 import { computed } from 'vue'
+import { hasPostContent } from '@/utils/postContent'
 
 export function usePostType(object) {
   const postType = computed(() => {
     const title = object.value.title?.trim()
-    const bodyText = object.value.bodyText?.trim()
+    const hasBodyContent = hasPostContent(object.value.bodyText)
     const titleImage = object.value.titleImage?.length
     const extraImages = object.value.extraImages?.length
 
-    if (title === '' && bodyText === '' && titleImage === 0 && extraImages === 0) {
+    if (title === '' && !hasBodyContent && titleImage === 0 && extraImages === 0) {
       return 'empty'
     } else if (titleImage === 0 && extraImages === 0) {
       return 'blog'
-    } else if (title === '' && bodyText === '') {
+    } else if (title === '' && !hasBodyContent) {
       return 'gallery'
     } else {
       return 'mixed'

@@ -1,6 +1,6 @@
 import express from 'express'
 import { db } from '../database.js'
-import { verifyUserIdentity } from '../middleware/supabaseAuth.js'
+import { verifyUserIdentity } from '../middleware/requireAuth.js'
 import fs from 'node:fs/promises'
 import path from 'node:path'
 import { dirname } from 'path'

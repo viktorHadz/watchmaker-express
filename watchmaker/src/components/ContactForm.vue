@@ -434,12 +434,12 @@ const clearForm = () => {
 <template>
   <form action="#" method="POST" enctype="multipart/form-data" class="p-4 md:p-8">
     <div class="space-y-8">
-      <!-- Name Row -->
       <div class="grid grid-cols-1 gap-6 md:grid-cols-2">
-        <div class="group">
+        <div class="group mb-4">
           <div class="mb-2 flex items-baseline">
+            <!-- Name Row -->
             <label for="first-name" class="font-sec text-fg font-medium">First name</label>
-            <span class="ml-1 text-red-500">*</span>
+            <span class="ml-1 text-red-500 dark:text-red-400">*</span>
           </div>
           <div class="relative">
             <input
@@ -465,10 +465,10 @@ const clearForm = () => {
           </div>
         </div>
 
-        <div class="group">
+        <div class="group mb-4 sm:mb-0">
           <div class="mb-2 flex items-baseline">
             <label for="last-name" class="font-sec text-fg font-medium">Last name</label>
-            <span class="ml-1 text-red-500">*</span>
+            <span class="ml-1 text-red-500 dark:text-red-400">*</span>
           </div>
           <div class="relative">
             <input
@@ -498,7 +498,7 @@ const clearForm = () => {
       <div class="group">
         <div class="mb-2 flex items-baseline">
           <label for="email" class="font-sec text-fg font-medium">Email address</label>
-          <span class="ml-1 text-red-500">*</span>
+          <span class="ml-1 text-red-500 dark:text-red-400">*</span>
         </div>
         <div class="relative">
           <input
@@ -554,8 +554,10 @@ const clearForm = () => {
       <!-- File Upload / Dropzone -->
       <div>
         <div class="mb-4 flex items-center justify-between">
-          <label for="file-upload" class="font-sec text-fg font-medium"> Watch Images </label>
-
+          <div>
+            <label for="file-upload" class="font-sec text-fg font-medium">Upload images </label>
+            <p class="text-acc pr-6 text-base">To help me understand the nature of your issue</p>
+          </div>
           <div class="lg flex items-center gap-3">
             <label
               for="file-upload"
@@ -591,8 +593,8 @@ const clearForm = () => {
             isOverDropZone
               ? 'border-acc bg-acc/10 scale-[1.02]'
               : uploadedImages.length < 5
-                ? 'border-acc/30 bg-acc/5 hover:border-acc/50 hover:bg-acc/10 cursor-pointer'
-                : 'border-acc/20 dark:bg-sec bg-sec-light cursor-not-allowed',
+                ? 'border-acc/20 bg-acc/5 hover:border-acc/40 hover:bg-acc/10 cursor-pointer'
+                : 'border-acc/10 dark:bg-sec bg-sec-light cursor-not-allowed',
           ]"
           @click="uploadedImages.length < 5 && $refs.fileInput?.click()"
         >
@@ -623,7 +625,7 @@ const clearForm = () => {
                   />
                   <button
                     @click.stop="removeImage(index)"
-                    class="bg-danger hover:bg-danger/90 focus:ring-danger/50 pointer-events-auto absolute top-1 right-1 z-10 cursor-pointer rounded-full p-1.5 text-white opacity-100 shadow-md transition-all duration-200 hover:scale-110 focus:opacity-100 focus:ring-2 focus:outline-none xl:opacity-0 xl:group-hover:opacity-100"
+                    class="bg-danger hover:bg-danger/90 focus:ring-danger/50 pointer-events-auto absolute top-1 right-1 z-10 cursor-pointer rounded-lg p-1.5 text-white opacity-100 shadow-md transition-all duration-200 hover:scale-110 focus:opacity-100 focus:ring-2 focus:outline-none xl:opacity-0 xl:group-hover:opacity-100"
                     type="button"
                     :aria-label="`Remove ${image.name}`"
                   >
@@ -655,7 +657,7 @@ const clearForm = () => {
                     class="bg-primary/20 absolute inset-0 flex flex-col items-center justify-center gap-2"
                   >
                     <div
-                      class="border-acc/60 h-6 w-6 animate-spin rounded-full border-2 border-t-transparent"
+                      class="border-acc/60 h-6 w-6 animate-spin rounded-lg border-2 border-t-transparent"
                     ></div>
                     <span class="text-acc/80 animate-pulse text-center text-xs font-medium"
                       >Processing...</span
@@ -692,7 +694,7 @@ const clearForm = () => {
             <!-- Drag & Drop Indicator -->
             <div v-if="isOverDropZone" class="text-acc flex flex-col items-center">
               <IconGallery class="mb-3 size-16 animate-bounce" />
-              <p class="text-lg font-semibold">Drop your images here!</p>
+              <p class="text-lg font-semibold">Drop your images here</p>
               <p class="text-sm opacity-80">Release to upload</p>
             </div>
 
@@ -716,7 +718,7 @@ const clearForm = () => {
           <!--Progress bar -->
           <div class="flex items-center gap-3" v-if="uploadedImages.length > 0">
             <div
-              class="bg-sec relative h-4 w-16 overflow-hidden rounded-full border"
+              class="bg-sec relative h-4 w-16 overflow-hidden rounded-lg border"
               :class="[
                 uploadedImages.length < 5
                   ? 'drop-shadow-acc/50 border-acc drop-shadow-sm'
@@ -744,7 +746,7 @@ const clearForm = () => {
               <!-- Full indicator -->
               <div
                 v-if="uploadedImages.length === 5"
-                class="bg-success text-fg2 drop-shadow-success flex items-center rounded-full px-2.5 py-2 leading-0 font-semibold drop-shadow-sm"
+                class="bg-success text-fg2 drop-shadow-success flex items-center rounded-lg px-2.5 py-2 leading-0 font-semibold drop-shadow-sm"
               >
                 <span class="text-lg leading-1">✓ </span> Done
               </div>
@@ -757,7 +759,7 @@ const clearForm = () => {
       <div>
         <div class="mb-2 flex items-baseline">
           <label for="message" class="font-sec text-fg font-medium">Message</label>
-          <span class="ml-1 text-red-500">*</span>
+          <span class="ml-1 text-red-500 dark:text-red-400">*</span>
         </div>
         <div class="relative">
           <textarea
@@ -765,7 +767,7 @@ const clearForm = () => {
             id="message"
             maxlength="5000"
             rows="8"
-            class="text-fg placeholder-fg/50 focus:ring-acc/50 focus:border-acc input custom-scrollbar w-full resize-none rounded-xl"
+            class="text-fg placeholder-fg/50 focus:ring-acc/50 focus:border-acc input custom-scrollbar w-full resize-none rounded-lg"
             placeholder="Tell me about your watch, what issues you're experiencing, or any specific requirements..."
             v-model="form.message"
             @focus="handleFocus('message')"
@@ -783,15 +785,12 @@ const clearForm = () => {
       </div>
     </div>
     <!-- Form Footer -->
-    <div class="border-brdr/10 mt-8 border-t pt-6">
-      <div class="flex flex-col items-center justify-between gap-4 sm:flex-row">
-        <p class="dark:text-acc/60 text-acc/80 text-sm">
-          Fields marked with <span class="text-lg text-red-500">*</span> are required
-        </p>
+    <div class="border-brdr/10 mt-12 border-t pt-6">
+      <div class="flex flex-col items-end justify-between gap-4 sm:flex-row">
         <button
           type="submit"
           @click.prevent="onSubmit()"
-          class="from-acc to-acc/80 hover:from-acc/90 hover:to-acc/70 focus:ring-acc/50 transform cursor-pointer rounded-xl bg-gradient-to-r px-4 py-3 font-semibold text-white shadow-lg transition-all duration-200 hover:scale-[1.02] focus:ring-2 focus:outline-none"
+          class="from-acc to-acc/80 hover:from-acc/90 hover:to-acc/70 focus:ring-acc/50 transform cursor-pointer rounded-lg bg-gradient-to-r px-4 py-3 font-semibold text-white shadow-lg transition-all duration-200 hover:scale-[1.02] focus:ring-2 focus:outline-none"
         >
           <div v-if="!emailLoading" class="flex items-center">
             <PaperAirplaneIcon class="mr-2 size-5 -rotate-90 transform"></PaperAirplaneIcon>
@@ -803,7 +802,7 @@ const clearForm = () => {
             :class="emailLoading ? 'cursor-not-allowed' : 'cursor-pointer'"
           >
             <div
-              class="mr-2 size-5 animate-spin rounded-full border-2 border-white border-t-transparent"
+              class="mr-2 size-5 animate-spin rounded-lg border-2 border-white border-t-transparent"
             ></div>
             Emailing...
           </div>
