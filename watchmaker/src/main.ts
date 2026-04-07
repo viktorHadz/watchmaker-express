@@ -5,7 +5,7 @@ import './assets/main.css'
 import { createApp } from 'vue'
 import { createPinia } from 'pinia'
 import Vue3SocialSharingPlugin from 'vue3-social-sharing'
-import { createHead } from '@vueuse/head'
+import { createHead } from '@unhead/vue/client'
 
 import App from './App.vue'
 import router from './router'

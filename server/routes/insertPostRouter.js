@@ -8,20 +8,23 @@ import path from 'path'
 import fs from 'fs'
 import { verifyUserIdentity } from '../middleware/requireAuth.js'
 import { getNormalDate } from '../utils/security.js'
+import { sanitizePlainTextContent, sanitizeRichTextContent } from '../utils/contentSanitizer.js'
 
 const database = db
 const router = express.Router()
+const ALLOWED_POST_TYPES = new Set(['empty', 'blog', 'gallery', 'mixed'])
+const INLINE_MEDIA_TOKEN_PATTERN = /__WATCHMAKER_MEDIA__:([a-zA-Z0-9_-]+)/g
 
 // Base upload directory - use temp directory first
 const tempUploadDir = './temp/uploads'
 const finalUploadDir = './public/uploads'
 
-  // Ensure directories exist
-  ;[tempUploadDir, finalUploadDir].forEach((dir) => {
-    if (!fs.existsSync(dir)) {
-      fs.mkdirSync(dir, { recursive: true })
-    }
-  })
+// Ensure directories exist
+;[tempUploadDir, finalUploadDir].forEach((dir) => {
+  if (!fs.existsSync(dir)) {
+    fs.mkdirSync(dir, { recursive: true })
+  }
+})
 
 // Generate unique post folder name
 function generatePostFolderName() {
@@ -30,6 +33,24 @@ function generatePostFolderName() {
   return `post_${dateStr}_${timestamp}`
 }
 
+const normaliseFieldArray = (value) => {
+  if (Array.isArray(value)) {
+    return value
+  }
+
+  return value ? [value] : []
+}
+
+const sanitiseMediaId = (value = '') => `${value}`.replace(/[^a-zA-Z0-9_-]/g, '').slice(0, 64)
+
+const replaceInlineMediaTokens = (content, imagePathLookup) =>
+  typeof content === 'string'
+    ? content.replace(INLINE_MEDIA_TOKEN_PATTERN, (_, mediaId) => {
+        const resolvedPath = imagePathLookup.get(mediaId)
+        return resolvedPath ? `/public${resolvedPath}` : ''
+      })
+    : content
+
 // Multer configuration with memory storage first
 const storage = multer.memoryStorage()
 
@@ -37,7 +58,7 @@ const upload = multer({
   storage,
   limits: {
     fileSize: 20 * 1024 * 1024,
-    files: 100, // 1 title + 5 extra + 5 thumbnails
+    files: 201, // 1 title + 100 extras + 100 thumbnails
   },
   fileFilter: (req, file, cb) => {
     const allowedTypes = ['image/jpeg', 'image/png', 'image/webp']
@@ -50,7 +71,7 @@ const upload = multer({
 })
 
 // Helper to save files to disk with proper naming
-async function saveFilesToDisk(files, postFolder) {
+async function saveFilesToDisk(files, postFolder, extraImageIds = []) {
   const savedFiles = {
     titleImage: null,
     extraImages: [],
@@ -88,8 +109,9 @@ async function saveFilesToDisk(files, postFolder) {
         }
 
         // Generate base name for this image pair with guaranteed uniqueness
-        const timestamp = Date.now()
-        const uniqueId = `${timestamp}_${i}_${Math.random().toString(36).substr(2, 9)}`
+        const uniqueId =
+          sanitiseMediaId(extraImageIds[i]) ||
+          `${Date.now()}_${i}_${Math.random().toString(36).substr(2, 9)}`
         const ext = getExtensionFromMimetype(extraFile.mimetype)
 
         // Save extra image
@@ -103,11 +125,13 @@ async function saveFilesToDisk(files, postFolder) {
         fs.writeFileSync(thumbPath, thumbFile.buffer)
 
         savedFiles.extraImages.push({
+          id: uniqueId,
           path: `/uploads/${postFolder}/${extraFilename}`,
           order: i,
         })
 
         savedFiles.thumbnails.push({
+          id: uniqueId,
           path: `/uploads/${postFolder}/${thumbFilename}`,
           order: i,
           parentName: extraFilename,
@@ -188,7 +212,7 @@ router.post('/new-post', verifyUserIdentity, (req, res) => {
         if (err.code === 'LIMIT_FILE_COUNT') {
           return res.status(400).json({
             success: false,
-            error: 'Too many files. Maximum is 1 title image and 5 extra images.',
+            error: 'Too many files. Maximum is 1 title image and 100 extra images.',
           })
         }
 
@@ -198,25 +222,42 @@ router.post('/new-post', verifyUserIdentity, (req, res) => {
         })
       }
 
-      console.log('Files received:', Object.keys(req.files))
+      const files = req.files || {}
+      console.log('Files received:', Object.keys(files))
       console.log('Body received:', req.body)
 
       const { title, bodyText, date, type } = req.body
+      const extraImageIds = normaliseFieldArray(req.body.extraImageIds).map(sanitiseMediaId)
+      const rawBodyText = typeof bodyText === 'string' ? bodyText : ''
+      const safeTitle = sanitizePlainTextContent(title ?? '')
+      const safeDate = sanitizePlainTextContent(date ?? '')
+      const safeType = sanitizePlainTextContent(type ?? '')
 
       // Validate required fields
-      if (
-        !title ||
-        (!req.files.titleImage && (!req.files.extraImages || req.files.extraImages.length === 0))
-      ) {
+      if (!safeTitle || !files.titleImage) {
         return res.status(400).json({
           success: false,
-          error: 'Title and at least one image are required.',
+          error: 'Title and featured image are required.',
+        })
+      }
+
+      if (!safeDate) {
+        return res.status(400).json({
+          success: false,
+          error: 'A valid post date is required.',
+        })
+      }
+
+      if (!ALLOWED_POST_TYPES.has(safeType)) {
+        return res.status(400).json({
+          success: false,
+          error: 'Invalid post type.',
         })
       }
 
       // Validate thumbnails match extra images
-      const extraCount = req.files.extraImages ? req.files.extraImages.length : 0
-      const thumbCount = req.files.thumbnails ? req.files.thumbnails.length : 0
+      const extraCount = files.extraImages ? files.extraImages.length : 0
+      const thumbCount = files.thumbnails ? files.thumbnails.length : 0
 
       console.log(`Validation: ${extraCount} extra images, ${thumbCount} thumbnails`)
 
@@ -231,7 +272,11 @@ router.post('/new-post', verifyUserIdentity, (req, res) => {
       const postFolder = generatePostFolderName()
 
       // Save files to temp directory with proper naming
-      const { savedFiles, tempPostDir: tempDir } = await saveFilesToDisk(req.files, postFolder)
+      const { savedFiles, tempPostDir: tempDir } = await saveFilesToDisk(
+        files,
+        postFolder,
+        extraImageIds,
+      )
       tempPostDir = tempDir
 
       console.log('Files saved to temp:', {
@@ -253,10 +298,16 @@ router.post('/new-post', verifyUserIdentity, (req, res) => {
       const insertImage = database.prepare(
         `INSERT INTO images (post_id, image_path, image_type, folder_url, order_index) VALUES (?, ?, ?, ?, ?)`,
       )
+      const inlineImagePathLookup = new Map(
+        savedFiles.extraImages.map((image) => [image.id, image.path]),
+      )
+      const safeBodyText = sanitizeRichTextContent(
+        replaceInlineMediaTokens(rawBodyText, inlineImagePathLookup),
+      )
 
       const savePost = database.transaction(() => {
         // Insert post
-        const result = insertPost.run(title, bodyText, date, type)
+        const result = insertPost.run(safeTitle, safeBodyText, safeDate, safeType)
         const postId = result.lastInsertRowid
 
         // Insert title image
@@ -288,13 +339,13 @@ router.post('/new-post', verifyUserIdentity, (req, res) => {
         postId,
         post: {
           id: postId,
-          title,
-          bodyText,
+          title: safeTitle,
+          bodyText: safeBodyText,
           titleImage: savedFiles.titleImage,
           extraImages: savedFiles.extraImages.map((img) => img.path),
           thumbnails: savedFiles.thumbnails.map((thumb) => thumb.path),
-          date,
-          type,
+          date: safeDate,
+          type: safeType,
           folder: postFolder,
         },
       })

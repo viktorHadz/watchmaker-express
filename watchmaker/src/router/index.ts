@@ -6,6 +6,7 @@ import MyWorkView from '@/views/MyWorkView.vue'
 import PostDetailView from '@/views/PostDetailView.vue'
 import LoginPanel from '@/views/Admin/LoginPanel.vue'
 import EditorView from '@/views/Admin/EditorView.vue'
+import NotFoundView from '@/views/NotFoundView.vue'
 import { useAuth } from '@/composables/useAuth'
 
 const requireAuthenticatedAdmin = async (to: RouteLocationNormalized) => {
@@ -60,6 +61,11 @@ const router = createRouter({
       component: EditorView,
       props: true,
       beforeEnter: requireAuthenticatedAdmin,
+    },
+    {
+      path: '/:pathMatch(.*)*',
+      name: 'notFound',
+      component: NotFoundView,
     },
   ],
   scrollBehavior() {

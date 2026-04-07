@@ -1,20 +1,22 @@
 <script setup>
 import { WrenchIcon, Cog6ToothIcon, SparklesIcon } from '@heroicons/vue/24/outline'
-import TheDivider from '../TheDivider.vue'
+import TheDivider from '@/components/TheDivider.vue'
 </script>
 
 <template>
-  <section class="mt-16 w-full max-w-7xl px-6">
+  <section class="my-16 w-full max-w-7xl px-6 sm:my-32">
     <!-- Section Header -->
     <div class="mb-16 text-center">
-      <h2 class="font-sec text-fg mb-2 text-4xl font-normal tracking-wide">Horological Services</h2>
+      <h2
+        class="font-sec text-fg dark:text-fg2 mb-4 text-center text-2xl font-light tracking-wide uppercase md:text-4xl">
+        Horological Services
+      </h2>
       <TheDivider variant="sm" />
-      <p class="text-fg/80 mx-auto max-w-2xl text-lg leading-relaxed">
+      <p class="text-fg/90 mx-auto max-w-2xl text-lg leading-relaxed">
         Preserving the art of mechanical timekeeping through meticulous restoration and expert
         servicing
       </p>
     </div>
-
     <!-- Services Grid -->
     <div class="grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-3">
       <!-- Service 1: Movement Restoration -->

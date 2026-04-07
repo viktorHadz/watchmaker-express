@@ -1,6 +1,6 @@
 <script setup>
 import { onMounted } from 'vue'
-import { useHead } from '@vueuse/head'
+import { useHead } from '@unhead/vue'
 import GalleryEl from '@/components/Gallery/GalleryEl.vue'
 import { usePostsStore } from '@/stores/usePostsStore'
 

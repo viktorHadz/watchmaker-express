@@ -3,7 +3,7 @@ import { fileURLToPath, URL } from 'node:url'
 import { defineConfig, loadEnv } from 'vite'
 import tailwindcss from '@tailwindcss/vite'
 import vue from '@vitejs/plugin-vue'
-//import vueDevTools from 'vite-plugin-vue-devtools'
+// import vueDevTools from 'vite-plugin-vue-devtools'
 
 export default defineConfig((env) => {
   const envars = loadEnv(env.mode, './')
@@ -20,7 +20,7 @@ export default defineConfig((env) => {
     plugins: [
       vue(),
       // Only include dev tools in development
-      //...(env.mode === 'development' ? [vueDevTools()] : []),
+      // ...(env.mode === 'development' ? [vueDevTools()] : []),
       tailwindcss(),
     ],
     resolve: {

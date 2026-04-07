@@ -242,17 +242,21 @@ export const usePostsStore = defineStore('posts', () => {
     showPostModal.value = true
   }
 
-  async function saveEdit(postId) {
+  async function saveEdit(postId, payload) {
     try {
+      const body =
+        payload instanceof FormData
+          ? payload
+          : (() => {
+              const formData = new FormData()
+              formData.append('postTitle', editForm.value.postTitle)
+              formData.append('postBody', editForm.value.postBody)
+              return formData
+            })()
+
       const response = await fetch(`/api/posts/edit/${postId}`, {
         method: 'PATCH',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          postTitle: editForm.value.postTitle,
-          postBody: editForm.value.postBody,
-        }),
+        body,
       })
 
       const result = await response.json()
@@ -261,17 +265,25 @@ export const usePostsStore = defineStore('posts', () => {
         throw new Error(result.error || `Error in response: ${response.status}`)
       }
 
+      const savedPost = result.post || {
+        postTitle: editForm.value.postTitle,
+        postBody: editForm.value.postBody,
+      }
+
       const postIndex = posts.value.findIndex((post) => post.postId == postId)
 
       if (postIndex > -1) {
-        posts.value[postIndex].postTitle = editForm.value.postTitle
-        posts.value[postIndex].postBody = editForm.value.postBody
+        posts.value[postIndex].postTitle = savedPost.postTitle
+        posts.value[postIndex].postBody = savedPost.postBody
       }
 
       if (selectedPost.value?.postId == postId) {
-        selectedPost.value.postTitle = editForm.value.postTitle
-        selectedPost.value.postBody = editForm.value.postBody
+        selectedPost.value.postTitle = savedPost.postTitle
+        selectedPost.value.postBody = savedPost.postBody
       }
+
+      editForm.value.postTitle = savedPost.postTitle
+      editForm.value.postBody = savedPost.postBody
 
       editing.value = false
       toast(result.message)

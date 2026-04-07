@@ -1,5 +1,5 @@
 <script setup>
-import { useHead } from '@vueuse/head'
+import { useHead } from '@unhead/vue'
 import TopSection from '@/components/home/TopSection.vue'
 import ServicesSection from '@/components/home/ServicesSection.vue'
 import TestimonialSection from '@/components/home/TestimonialSection.vue'
@@ -9,8 +9,8 @@ useHead({
   title: 'Expert Watch Repair Services | The Watchmaker',
   meta: [
     { name: 'description', content: 'Professional watch repair and restoration services...' },
-    { name: 'keywords', content: 'watch repair, timepiece restoration, luxury watch service' }
-  ]
+    { name: 'keywords', content: 'watch repair, timepiece restoration, luxury watch service' },
+  ],
 })
 </script>
 

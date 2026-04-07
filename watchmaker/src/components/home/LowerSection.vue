@@ -8,14 +8,23 @@ import { ChatBubbleLeftEllipsisIcon, CameraIcon } from '@heroicons/vue/24/outlin
       <!-- Get in Touch Card -->
       <RouterLink to="/repairs" class="group">
         <div
-          class="border-brdr/50 bg-primary hover:border-acc/50 relative h-80 overflow-hidden rounded-lg border transition-all duration-500 hover:shadow-2xl">
+          class="border-brdr/50 bg-primary hover:border-acc/50 relative h-80 overflow-hidden rounded-lg border transition-all duration-500 hover:shadow-2xl"
+        >
           <!-- Background Image -->
           <div class="absolute inset-0">
-            <img src="../../assets/pictures/get-in-touch.webp" alt="Vintage pocket watch"
-              class="h-full w-full object-cover transition-transform duration-700 group-hover:scale-105" loading="lazy"
-              decoding="async" width="600" height="320" />
+            <img
+              src="../../assets/pictures/get-in-touch.webp"
+              alt="Vintage pocket watch"
+              class="h-full w-full object-cover transition-transform duration-700 group-hover:scale-105"
+              loading="lazy"
+              decoding="async"
+              width="600"
+              height="320"
+            />
             <!-- Elegant gradient overlay -->
-            <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent"></div>
+            <div
+              class="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent"
+            ></div>
           </div>
 
           <!-- Content -->
@@ -42,10 +51,21 @@ import { ChatBubbleLeftEllipsisIcon, CameraIcon } from '@heroicons/vue/24/outlin
                 glory.
               </p>
               <div class="text-acc flex items-center space-x-2">
-                <span class="text-sm font-medium tracking-wider uppercase">Schedule Consultation</span>
-                <svg class="h-4 w-4 transition-transform duration-300 group-hover:translate-x-1" fill="none"
-                  stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3" />
+                <span class="text-sm font-medium tracking-wider uppercase"
+                  >Schedule Consultation</span
+                >
+                <svg
+                  class="h-4 w-4 transition-transform duration-300 group-hover:translate-x-1"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M17 8l4 4m0 0l-4 4m4-4H3"
+                  />
                 </svg>
               </div>
             </div>
@@ -56,14 +76,23 @@ import { ChatBubbleLeftEllipsisIcon, CameraIcon } from '@heroicons/vue/24/outlin
       <!-- My Work Card -->
       <RouterLink to="/my-work" class="group">
         <div
-          class="border-brdr/50 bg-primary hover:border-acc/50 relative h-80 overflow-hidden rounded-lg border transition-all duration-500 hover:shadow-2xl">
+          class="border-brdr/50 bg-primary hover:border-acc/50 relative h-80 overflow-hidden rounded-lg border transition-all duration-500 hover:shadow-2xl"
+        >
           <!-- Background Image -->
           <div class="absolute inset-0">
-            <img src="../../assets/pictures/my-work.webp" alt="Watch restoration workspace"
-              class="h-full w-full object-cover transition-transform duration-700 group-hover:scale-105" loading="lazy"
-              decoding="async" width="600" height="320" />
+            <img
+              src="../../assets/pictures/my-work.webp"
+              alt="Watch restoration workspace"
+              class="h-full w-full object-cover transition-transform duration-700 group-hover:scale-105"
+              loading="lazy"
+              decoding="async"
+              width="600"
+              height="320"
+            />
             <!-- Elegant gradient overlay -->
-            <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent"></div>
+            <div
+              class="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent"
+            ></div>
           </div>
 
           <!-- Content -->
@@ -91,9 +120,18 @@ import { ChatBubbleLeftEllipsisIcon, CameraIcon } from '@heroicons/vue/24/outlin
               </p>
               <div class="text-acc flex items-center space-x-2">
                 <span class="text-sm font-medium tracking-wider uppercase">View Gallery</span>
-                <svg class="h-4 w-4 transition-transform duration-300 group-hover:translate-x-1" fill="none"
-                  stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3" />
+                <svg
+                  class="h-4 w-4 transition-transform duration-300 group-hover:translate-x-1"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M17 8l4 4m0 0l-4 4m4-4H3"
+                  />
                 </svg>
               </div>
             </div>
@@ -101,11 +139,15 @@ import { ChatBubbleLeftEllipsisIcon, CameraIcon } from '@heroicons/vue/24/outlin
         </div>
       </RouterLink>
     </div>
-
-    <div class="border-brdr/20 mt-16 border-t pt-16">
+    <div
+      class="bg-acc/40 dark:bg-acc/20 my-16 h-px w-full mask-x-from-60% mask-x-to-transparent mask-center"
+    ></div>
+    <div>
       <div class="grid grid-cols-2 gap-8 text-center md:grid-cols-4">
         <div>
-          <p class="font-sec text-acc text-3xl font-light">{{ new Date().getFullYear() - 2016 }}+</p>
+          <p class="font-sec text-acc text-3xl font-light">
+            {{ new Date().getFullYear() - 2016 }}+
+          </p>
           <p class="text-fg-subtle text-sm tracking-wider uppercase">Years Experience</p>
         </div>
         <div>

@@ -5,6 +5,7 @@ import { computed, onMounted, watch } from 'vue'
 import { useToastStore } from '@/stores/toast'
 import { useAuth } from '@/composables/useAuth'
 import { useRoute, useRouter } from 'vue-router'
+import TheDivider from '@/components/TheDivider.vue'
 
 const toast = (message, type) => useToastStore().showToast(message, type)
 const { loading, logIn, isAuthenticated } = useAuth()
@@ -70,44 +71,31 @@ watch(
 </script>
 
 <template>
-  <div class="flex min-h-full flex-1 flex-col justify-center px-6 py-12 lg:px-8">
+  <div class="my-4 flex min-h-full flex-1 flex-col justify-center px-6 py-12 sm:my-22 lg:px-8">
     <div class="sm:mx-auto sm:w-full sm:max-w-sm">
       <TheLogo class="mb-8 flex place-self-center"></TheLogo>
       <!-- Decorative divider -->
-      <div class="flex items-center justify-center space-x-4">
-        <div class="to-acc h-px w-16 bg-gradient-to-r from-transparent"></div>
-        <div class="flex space-x-2">
-          <div class="bg-acc h-1.5 w-1.5 rounded-lg"></div>
-          <div class="bg-acc/60 h-1.5 w-1.5 rounded-lg"></div>
-          <div class="bg-acc/30 h-1.5 w-1.5 rounded-lg"></div>
-        </div>
-        <div class="to-acc h-px w-16 bg-gradient-to-l from-transparent"></div>
-      </div>
+      <TheDivider />
     </div>
     <h2 class="font-sec text-fg mt-6 line-clamp-1 text-center text-4xl font-normal tracking-wide">
       Sign in to your account
     </h2>
 
     <div
-      class="from-acc/90 mx-auto mt-10 w-full rounded-lg bg-gradient-to-br to-transparent p-[1px] sm:w-lg"
+      class="from-acc mx-auto mt-10 w-full rounded-lg bg-gradient-to-br to-transparent p-px sm:w-lg"
     >
       <div
-        class="from-sec to-sec-mute dark:from-sec-mute dark:to-sec space-y-6 rounded-lg bg-gradient-to-br p-6 sm:p-8"
+        class="from-sec to-sec-mute dark:from-sec dark:to-sec-mute space-y-6 rounded-lg bg-gradient-to-br p-6"
       >
         <div class="space-y-3 text-center">
-          <p class="text-fg/80 text-base leading-relaxed">
-            Admin access now uses your approved Google account.
-          </p>
-          <p class="text-fg/60 text-sm leading-relaxed">
-            Continue with Google and we will bring you back here with a secure session.
-          </p>
+          <p class="text-fg text-2xl leading-relaxed">Admin now uses your Google account.</p>
         </div>
 
         <div class="flex w-full items-center justify-center pb-2">
           <button
             type="button"
             :disabled="loading"
-            class="btn flex min-w-64 items-center justify-center gap-x-3 text-lg"
+            class="btn text-fg2 flex min-w-64 items-center justify-center gap-x-3 text-lg"
             @click="handleLogin"
           >
             <div
@@ -120,10 +108,6 @@ watch(
             </template>
           </button>
         </div>
-
-        <p class="text-fg/50 text-center text-xs leading-relaxed">
-          Only approved admin email addresses can access post management.
-        </p>
       </div>
     </div>
   </div>

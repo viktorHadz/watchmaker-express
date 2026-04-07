@@ -5,6 +5,7 @@ import { Resend } from 'resend'
 import multer from 'multer'
 import { generateEmailTemplate } from '../utils/generateEmailTemplate.js'
 
+
 const router = express.Router()
 const resend = new Resend(process.env.RESEND_KEY_TOKEN)
 
@@ -61,7 +62,7 @@ router.post(
         }))
       }
       const emailContent = generateEmailTemplate(req.body)
-        
+
       const { data, error } = await resend.emails.send({
         from: 'Viktor <mailer@mail.thewatchmaker.uk>',
         to: sendToMail,

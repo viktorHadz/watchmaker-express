@@ -18,6 +18,8 @@ const router = express.Router()
 const GOOGLE_AUTH_URL = 'https://accounts.google.com/o/oauth2/v2/auth'
 const GOOGLE_TOKEN_URL = 'https://oauth2.googleapis.com/token'
 const GOOGLE_USERINFO_URL = 'https://openidconnect.googleapis.com/v1/userinfo'
+const DEFAULT_AVATAR_PATH = '/pictures/avatars/vik_avatar_sm.png'
+const GOOGLE_AVATAR_HOST_PATTERN = /(^|\.)googleusercontent\.com$/i
 
 function getRequiredEnv(name) {
   const value = process.env[name]
@@ -102,8 +104,18 @@ function buildAppUser(googleUser) {
     id: googleUser.sub,
     email: googleUser.email,
     username: googleUser.name || googleUser.given_name || googleUser.email,
-    avatar: googleUser.picture || '/default-avatar.png',
+    avatar: googleUser.picture || DEFAULT_AVATAR_PATH,
     provider: 'google',
+  }
+}
+
+function isAllowedGoogleAvatarUrl(value = '') {
+  try {
+    const url = new URL(value)
+
+    return url.protocol === 'https:' && GOOGLE_AVATAR_HOST_PATTERN.test(url.hostname)
+  } catch {
+    return false
   }
 }
 
@@ -126,6 +138,42 @@ router.get('/me', (req, res) => {
 router.post('/logout', (req, res) => {
   clearAuthCookies(res, req)
   res.json({ success: true })
+})
+
+router.get('/avatar', async (req, res) => {
+  try {
+    const user = getSessionUserFromRequest(req)
+    const avatarUrl = user?.avatar || ''
+
+    if (!isAllowedGoogleAvatarUrl(avatarUrl)) {
+      return res.redirect(DEFAULT_AVATAR_PATH)
+    }
+
+    const response = await fetch(avatarUrl, {
+      headers: {
+        Accept: 'image/*',
+      },
+    })
+
+    if (!response.ok) {
+      throw new Error(`Avatar fetch failed with status ${response.status}`)
+    }
+
+    const contentType = response.headers.get('content-type') || 'image/jpeg'
+    const avatarBuffer = Buffer.from(await response.arrayBuffer())
+
+    res.set({
+      'Content-Type': contentType,
+      'Cache-Control': 'private, max-age=3600',
+      'Cross-Origin-Resource-Policy': 'same-origin',
+      Vary: 'Cookie',
+    })
+
+    return res.send(avatarBuffer)
+  } catch (error) {
+    console.error('Failed to proxy Google avatar:', error)
+    return res.redirect(DEFAULT_AVATAR_PATH)
+  }
 })
 
 router.get('/google/login', (req, res) => {

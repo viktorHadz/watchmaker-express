@@ -11,6 +11,7 @@
     /* Firefox */
     input[type='number'] {
       -moz-appearance: textfield;
+      appearance: textfield;
     }
   }
 }
@@ -105,39 +106,6 @@
   @apply text-acc;
 }
 
-@keyframes rotate-cw {
-  0% {
-    transform: rotate(0deg);
-  }
-  100% {
-    transform: rotate(360deg);
-  }
-}
-
-@keyframes rotate-ccw {
-  0% {
-    transform: rotate(0deg);
-  }
-  100% {
-    transform: rotate(-360deg);
-  }
-}
-
-#bottom-wheel {
-  animation: rotate-cw 2s linear infinite;
-  transform-origin: center;
-  transform-box: fill-box;
-}
-#middle-wheel {
-  animation: rotate-ccw 6s linear infinite;
-  transform-origin: center;
-  transform-box: fill-box;
-}
-#top-wheel {
-  animation: rotate-cw 2s linear infinite;
-  transform-origin: center;
-  transform-box: fill-box;
-}
 /* Diagonal transition for the admin menu */
 .diagonal-scale-enter-active {
   @apply transition-all duration-500 ease-out;
@@ -161,10 +129,10 @@
 
 @layer components {
   .input {
-    @apply dark:border-sec-light dark:bg-sec text-fg placeholder-fg/50 bg-sec-light border-brdr focus:ring-acc/80 focus:border-acc/90 flex min-h-12 w-full items-center rounded-lg border p-2 px-3 ring-0 transition duration-200 focus:ring-2 focus:outline-none;
+    @apply dark:border-sec-mute/90 dark:bg-sec/80 text-fg/92 dark:text-fg/96 placeholder-fg/50 bg-sec-light border-brdr focus:ring-acc/80 focus:border-acc/90 flex min-h-12 w-full items-center rounded-lg border p-2 px-3 ring-0 transition duration-200 focus:ring-2 focus:outline-none;
   }
   .input-lbl {
-    @apply font-sec text-fg font-medium;
+    @apply font-sec text-fg text-lg font-medium;
   }
 
   .btn {

@@ -3,6 +3,7 @@ import { computed, onMounted, onUnmounted } from 'vue'
 import { XMarkIcon, ClipboardIcon, EnvelopeIcon } from '@heroicons/vue/24/outline'
 import { useToastStore } from '@/stores/toast'
 import IconMessenger from '../icons/IconMessenger.vue'
+import { getPostExcerpt } from '@/utils/postContent'
 const props = defineProps({
   show: {
     type: Boolean,
@@ -29,8 +30,10 @@ const shareTitle = computed(() => {
 })
 
 const shareDescription = computed(() => {
-  const body = props.post?.postBody || 'The latest piece of craftsmanship from my workshop.'
-  return body.length > 100 ? body.substring(0, 100) + '...' : body
+  return (
+    getPostExcerpt(props.post?.postBody, 100) ||
+    'The latest piece of craftsmanship from my workshop.'
+  )
 })
 
 const twitterContent = computed(() => {

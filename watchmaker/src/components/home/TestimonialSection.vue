@@ -4,19 +4,23 @@ import TheDivider from '../TheDivider.vue'
 </script>
 
 <template>
-  <section class="mt-20 w-full py-16">
+  <section class="my-16 w-full sm:mt-16 sm:mb-36">
     <div class="relative mx-auto max-w-7xl px-6">
       <!-- Section Header -->
       <div class="mb-16 text-center">
-        <h2 class="font-sec text-fg mb-2 text-4xl font-normal tracking-wide">
+        <h2
+          class="font-sec text-fg dark:text-fg2 mb-4 text-center text-2xl font-light tracking-wide uppercase md:text-4xl">
           Client Testimonials
         </h2>
         <TheDivider variant="sm" />
-        <p class="text-fg/90 text-lg">Trusted by collectors and enthusiasts </p>
+        <p class="text-fg/90 mx-auto max-w-2xl text-lg leading-relaxed">
+          Trusted by collectors and enthusiasts
+        </p>
       </div>
 
+
       <!-- Testimonials Grid -->
-      <div class="grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-3">
+      <div class="grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-3 mt-20">
         <!-- Testimonial 1 -->
         <div class="group">
           <div
@@ -25,7 +29,6 @@ import TheDivider from '../TheDivider.vue'
             <div class="text-acc/40 absolute -top-2 -left-2 font-serif text-6xl leading-none">
               "
             </div>
-
 
             <!-- Stars -->
             <div class="mb-4 flex space-x-0.5">
@@ -107,6 +110,8 @@ import TheDivider from '../TheDivider.vue'
           </div>
         </div>
       </div>
+
+
     </div>
   </section>
 </template>

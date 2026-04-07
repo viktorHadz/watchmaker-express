@@ -1,6 +1,8 @@
 import { ref, computed, watch } from 'vue'
 import { useToastStore } from '@/stores/toast'
 
+const DEFAULT_AVATAR_PATH = '/pictures/avatars/vik_avatar_sm.png'
+
 const toast = (message, type) => useToastStore().showToast(message, type)
 
 // Singleton state — shared across all components
@@ -20,7 +22,7 @@ function mapSessionUser(authUser) {
     id: authUser.id,
     email: authUser.email,
     username: authUser.username || authUser.name || authUser.email,
-    avatar: authUser.avatar || '/default-avatar.png',
+    avatar: authUser.avatar || DEFAULT_AVATAR_PATH,
     provider: authUser.provider || 'google',
   }
 }
