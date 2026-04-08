@@ -156,4 +156,12 @@ export const formSchema = z.object({
 export const editPostSchema = z.object({
   postTitle: z.string().min(1, 'Title required').max(200),
   postBody: z.string().min(0),
+  slug: z.string().trim().max(200).optional().or(z.literal('')),
+  seoTitle: z.string().trim().max(200).optional().or(z.literal('')),
+  seoDescription: z.string().trim().max(320).optional().or(z.literal('')),
+  brand: z.string().trim().max(100).optional().or(z.literal('')),
+  model: z.string().trim().max(120).optional().or(z.literal('')),
+  serviceType: z.string().trim().max(120).optional().or(z.literal('')),
+  issueSummary: z.string().trim().max(260).optional().or(z.literal('')),
+  locationFocus: z.string().trim().max(100).optional().or(z.literal('')),
 })

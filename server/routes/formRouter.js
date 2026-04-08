@@ -1,3 +1,4 @@
+import '../env.js'
 import express from 'express'
 import { limiter } from '../middleware/rateLimiter.js'
 import { validateAndSanitize, formSchema } from '../middleware/validationMiddleware.js'
@@ -5,9 +6,19 @@ import { Resend } from 'resend'
 import multer from 'multer'
 import { generateEmailTemplate } from '../utils/generateEmailTemplate.js'
 
-
 const router = express.Router()
-const resend = new Resend(process.env.RESEND_KEY_TOKEN)
+function getRequiredEnv(name) {
+  const value = process.env[name]
+
+  if (!value) {
+    throw new Error(`${name} is not configured`)
+  }
+
+  return value
+}
+
+const resend = new Resend(getRequiredEnv('RESEND_KEY_TOKEN'))
+const sendToMail = getRequiredEnv('WATCHMAKER_EMAIL')
 
 // Multer configuration with memory storage
 const storage = multer.memoryStorage()
@@ -38,9 +49,6 @@ function getExtensionFromMimetype(mimetype) {
       return '.jpg'
   }
 }
-const sendToMail = process.env.WATCHMAKER_EMAIL
-
-
 // POST form submission with rate limiting
 router.post(
   '/data',

@@ -7,6 +7,8 @@ import { db } from '../database.js'
 import { verifyUserIdentity } from '../middleware/requireAuth.js'
 import { editPostSchema } from '../middleware/validationMiddleware.js'
 import { sanitizePlainTextContent, sanitizeRichTextContent } from '../utils/contentSanitizer.js'
+import { publicUploadsDir } from '../paths.js'
+import { buildPostSlug, DEFAULT_POST_LOCATION } from '../../watchmaker/src/seo/utils.js'
 
 const router = express.Router()
 const INLINE_MEDIA_TOKEN_PATTERN = /__WATCHMAKER_MEDIA__:([a-zA-Z0-9_-]+)/g
@@ -46,6 +48,10 @@ const normaliseFieldArray = (value) => {
 }
 
 const sanitiseMediaId = (value = '') => `${value}`.replace(/[^a-zA-Z0-9_-]/g, '').slice(0, 64)
+const emptyToNull = (value = '') => {
+  const trimmed = `${value}`.trim()
+  return trimmed ? trimmed : null
+}
 
 const replaceInlineMediaTokens = (content, imagePathLookup) =>
   typeof content === 'string'
@@ -125,7 +131,7 @@ router.patch('/edit/:postid', verifyUserIdentity, (req, res) => {
       }
 
       const extraImageIds = normaliseFieldArray(req.body.extraImageIds).map(sanitiseMediaId)
-      const uploadsDir = path.join('public', 'uploads', folderRow.folder_url)
+      const uploadsDir = path.join(publicUploadsDir, folderRow.folder_url)
       const inlineImagePathLookup = new Map()
       const imagesToInsert = []
 
@@ -193,16 +199,35 @@ router.patch('/edit/:postid', verifyUserIdentity, (req, res) => {
       const safeBody = sanitizeRichTextContent(
         replaceInlineMediaTokens(req.body?.postBody ?? '', inlineImagePathLookup),
       )
+      const safeBrand = sanitizePlainTextContent(req.body?.brand ?? '')
+      const safeModel = sanitizePlainTextContent(req.body?.model ?? '')
+      const safeLocationFocus = DEFAULT_POST_LOCATION
 
       const postEdit = editPostSchema.parse({
         postTitle: safeTitle,
         postBody: safeBody,
+        brand: safeBrand,
+        model: safeModel,
+        locationFocus: safeLocationFocus,
       })
+      const canonicalSlug = buildPostSlug({ postTitle: postEdit.postTitle })
+      const updatedAt = new Date().toISOString()
 
       const updatePost = db.prepare(
         `
           UPDATE posts
-          SET post_title = ?, post_body = ?
+          SET
+            post_title = ?,
+            post_body = ?,
+            slug = ?,
+            seo_title = ?,
+            seo_description = ?,
+            brand = ?,
+            model = ?,
+            service_type = ?,
+            issue_summary = ?,
+            location_focus = ?,
+            updated_at = ?
           WHERE id = ?
         `,
       )
@@ -214,7 +239,20 @@ router.patch('/edit/:postid', verifyUserIdentity, (req, res) => {
       )
 
       const saveChanges = db.transaction(() => {
-        const result = updatePost.run(postEdit.postTitle, postEdit.postBody, id)
+        const result = updatePost.run(
+          postEdit.postTitle,
+          postEdit.postBody,
+          canonicalSlug,
+          null,
+          null,
+          emptyToNull(postEdit.brand),
+          emptyToNull(postEdit.model),
+          null,
+          null,
+          emptyToNull(postEdit.locationFocus),
+          updatedAt,
+          id,
+        )
 
         if (result.changes === 0) {
           throw new ValidationError('Post not found or no changes made')
@@ -235,6 +273,15 @@ router.patch('/edit/:postid', verifyUserIdentity, (req, res) => {
           postId: Number(id),
           postTitle: postEdit.postTitle,
           postBody: postEdit.postBody,
+          slug: canonicalSlug,
+          seoTitle: null,
+          seoDescription: null,
+          brand: emptyToNull(postEdit.brand),
+          model: emptyToNull(postEdit.model),
+          serviceType: null,
+          issueSummary: null,
+          locationFocus: emptyToNull(postEdit.locationFocus),
+          updatedAt,
         },
       })
     } catch (error) {

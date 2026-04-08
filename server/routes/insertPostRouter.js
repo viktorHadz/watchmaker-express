@@ -9,6 +9,8 @@ import fs from 'fs'
 import { verifyUserIdentity } from '../middleware/requireAuth.js'
 import { getNormalDate } from '../utils/security.js'
 import { sanitizePlainTextContent, sanitizeRichTextContent } from '../utils/contentSanitizer.js'
+import { publicUploadsDir, tempUploadsDir } from '../paths.js'
+import { buildPostSlug, DEFAULT_POST_LOCATION } from '../../watchmaker/src/seo/utils.js'
 
 const database = db
 const router = express.Router()
@@ -16,8 +18,8 @@ const ALLOWED_POST_TYPES = new Set(['empty', 'blog', 'gallery', 'mixed'])
 const INLINE_MEDIA_TOKEN_PATTERN = /__WATCHMAKER_MEDIA__:([a-zA-Z0-9_-]+)/g
 
 // Base upload directory - use temp directory first
-const tempUploadDir = './temp/uploads'
-const finalUploadDir = './public/uploads'
+const tempUploadDir = tempUploadsDir
+const finalUploadDir = publicUploadsDir
 
 // Ensure directories exist
 ;[tempUploadDir, finalUploadDir].forEach((dir) => {
@@ -42,6 +44,10 @@ const normaliseFieldArray = (value) => {
 }
 
 const sanitiseMediaId = (value = '') => `${value}`.replace(/[^a-zA-Z0-9_-]/g, '').slice(0, 64)
+const emptyToNull = (value = '') => {
+  const trimmed = `${value}`.trim()
+  return trimmed ? trimmed : null
+}
 
 const replaceInlineMediaTokens = (content, imagePathLookup) =>
   typeof content === 'string'
@@ -232,6 +238,9 @@ router.post('/new-post', verifyUserIdentity, (req, res) => {
       const safeTitle = sanitizePlainTextContent(title ?? '')
       const safeDate = sanitizePlainTextContent(date ?? '')
       const safeType = sanitizePlainTextContent(type ?? '')
+      const safeBrand = sanitizePlainTextContent(req.body.brand ?? '')
+      const safeModel = sanitizePlainTextContent(req.body.model ?? '')
+      const safeLocationFocus = DEFAULT_POST_LOCATION
 
       // Validate required fields
       if (!safeTitle || !files.titleImage) {
@@ -293,7 +302,24 @@ router.post('/new-post', verifyUserIdentity, (req, res) => {
       }
       // Database transaction - only if this succeeds do we move files
       const insertPost = database.prepare(
-        `INSERT INTO posts (post_title, post_body, date, post_type) VALUES (?, ?, ?, ?)`,
+        `
+          INSERT INTO posts (
+            post_title,
+            post_body,
+            date,
+            post_type,
+            slug,
+            seo_title,
+            seo_description,
+            brand,
+            model,
+            service_type,
+            issue_summary,
+            location_focus,
+            published_at,
+            updated_at
+          ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+        `,
       )
       const insertImage = database.prepare(
         `INSERT INTO images (post_id, image_path, image_type, folder_url, order_index) VALUES (?, ?, ?, ?, ?)`,
@@ -304,10 +330,27 @@ router.post('/new-post', verifyUserIdentity, (req, res) => {
       const safeBodyText = sanitizeRichTextContent(
         replaceInlineMediaTokens(rawBodyText, inlineImagePathLookup),
       )
+      const canonicalSlug = buildPostSlug({ postTitle: safeTitle })
+      const publishedAt = new Date().toISOString()
 
       const savePost = database.transaction(() => {
         // Insert post
-        const result = insertPost.run(safeTitle, safeBodyText, safeDate, safeType)
+        const result = insertPost.run(
+          safeTitle,
+          safeBodyText,
+          safeDate,
+          safeType,
+          canonicalSlug,
+          null,
+          null,
+          emptyToNull(safeBrand),
+          emptyToNull(safeModel),
+          null,
+          null,
+          emptyToNull(safeLocationFocus),
+          publishedAt,
+          publishedAt,
+        )
         const postId = result.lastInsertRowid
 
         // Insert title image
@@ -347,6 +390,16 @@ router.post('/new-post', verifyUserIdentity, (req, res) => {
           date: safeDate,
           type: safeType,
           folder: postFolder,
+          slug: canonicalSlug,
+          seoTitle: null,
+          seoDescription: null,
+          brand: emptyToNull(safeBrand),
+          model: emptyToNull(safeModel),
+          serviceType: null,
+          issueSummary: null,
+          locationFocus: emptyToNull(safeLocationFocus),
+          publishedAt,
+          updatedAt: publishedAt,
         },
       })
     } catch (error) {

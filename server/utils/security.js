@@ -1,6 +1,7 @@
 import fs from 'fs'
 import path from 'path'
 import { formatFileSize } from './formatFileSize.js'
+import { securityLogPath } from '../paths.js'
 
 export const getNormalDate = (includeTime = false) => {
   const date = new Date()
@@ -20,8 +21,7 @@ export const getNormalDate = (includeTime = false) => {
 
 const writeToLog = (content) => {
   try {
-    const logPath = path.join(process.cwd(), '..', 'server', 'logs', 'SecurityLog.txt')
-    const logDir = path.dirname(logPath)
+    const logDir = path.dirname(securityLogPath)
 
     if (!fs.existsSync(logDir)) {
       fs.mkdirSync(logDir, { recursive: true })
@@ -37,7 +37,7 @@ ${'='.repeat(100)}
 
 `
 
-    fs.writeFile(logPath, logEntry, { flag: 'a+' }, (err) => {
+    fs.writeFile(securityLogPath, logEntry, { flag: 'a+' }, (err) => {
       if (err) {
         console.error('SecLogger Write Error:', err.message)
       } else {

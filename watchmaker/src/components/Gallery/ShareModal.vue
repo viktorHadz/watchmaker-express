@@ -4,6 +4,7 @@ import { XMarkIcon, ClipboardIcon, EnvelopeIcon } from '@heroicons/vue/24/outlin
 import { useToastStore } from '@/stores/toast'
 import IconMessenger from '../icons/IconMessenger.vue'
 import { getPostExcerpt } from '@/utils/postContent'
+import { buildCanonicalPostPath } from '@/seo/utils'
 const props = defineProps({
   show: {
     type: Boolean,
@@ -22,40 +23,37 @@ const toast = useToastStore()
 
 const postUrl = computed(() => {
   if (!props.post?.postId) return ''
-  return `${window.location.origin}/my-work/${props.post.postId}`
+  return `${window.location.origin}${buildCanonicalPostPath(props.post)}`
 })
 
 const shareTitle = computed(() => {
-  return props.post?.postTitle || 'Check out this amazing workshop piece!'
+  return props.post?.postTitle || 'Recent work from The Watchmaker'
 })
 
 const shareDescription = computed(() => {
-  return (
-    getPostExcerpt(props.post?.postBody, 100) ||
-    'The latest piece of craftsmanship from my workshop.'
-  )
+  return getPostExcerpt(props.post?.postBody, 100) || 'Recent repair work from the workshop.'
 })
 
 const twitterContent = computed(() => {
   const title = shareTitle.value
-  const hashtags = '#Craftsmanship #Workshop #Handmade'
+  const hashtags = '#WatchRepair #VintageWatches #TheWatchmaker'
   return `${title} ${hashtags}`
 })
 
 const whatsappMessage = computed(() => {
-  return `Check out this amazing workshop piece: "${shareTitle.value}"`
+  return `Take a look at this recent repair from The Watchmaker: "${shareTitle.value}"`
 })
 
 const messengerMessage = computed(() => {
-  return `Check out my latest workshop piece: "${shareTitle.value}"`
+  return `Take a look at this recent repair from The Watchmaker: "${shareTitle.value}"`
 })
 
 const emailSubject = computed(() => {
-  return `Amazing Workshop Piece: ${shareTitle.value}`
+  return `The Watchmaker: ${shareTitle.value}`
 })
 
 const emailBody = computed(() => {
-  return `Hi!\n\nI wanted to share this beautiful piece with you:\n\n"${shareTitle.value}"\n\n${shareDescription.value}\n\nTake a look here:`
+  return `Hi!\n\nI wanted to share this recent repair story with you:\n\n"${shareTitle.value}"\n\n${shareDescription.value}\n\nTake a look here:`
 })
 
 const facebookUrl = computed(() => {
@@ -104,7 +102,7 @@ onUnmounted(() => {
 
 const copyLink = async () => {
   if (!postUrl.value) {
-    toast.showToast('No post to share', 'error')
+    toast.showToast('No story to share', 'error')
     return
   }
 
@@ -138,15 +136,15 @@ const copyLink = async () => {
         >
           <div class="border-brdr/30 dark:border-sec-mute/30 border-b px-6 py-4">
             <div class="flex items-center justify-between">
-              <h3 class="text-fg dark:text-fg2 text-lg font-semibold">Share Post</h3>
+              <h3 class="text-fg dark:text-fg2 text-lg font-semibold">Share Story</h3>
               <button
                 @click="$emit('close')"
-                class="text-fg/50 hover:text-fg hover:bg-brdr/20 cursor-pointer rounded p-1"
+                class="text-fg/80 hover:text-fg hover:bg-brdr/20 cursor-pointer rounded p-1"
               >
                 <XMarkIcon class="size-5" />
               </button>
             </div>
-            <p class="text-fg/60 mt-1">{{ post.postTitle || 'Untitled Post' }}</p>
+            <p class="text-fg/80 mt-1">{{ post.postTitle || 'Untitled Story' }}</p>
           </div>
 
           <div class="p-6">
@@ -232,7 +230,7 @@ const copyLink = async () => {
                 <span class="text-fg truncate text-sm">{{ postUrl }}</span>
                 <button
                   @click="copyLink"
-                  class="text-fg/50 hover:text-fg hover:bg-brdr/20 cursor-pointer rounded p-1"
+                  class="text-fg/80 hover:text-fg hover:bg-brdr/20 cursor-pointer rounded p-1"
                 >
                   <ClipboardIcon class="size-4" />
                 </button>

@@ -10,12 +10,15 @@ import {
 } from '@heroicons/vue/24/outline'
 import AdminNewPost from '@/components/Gallery/AdminNewPost.vue'
 import PostBlockBuilder from '@/components/posts/PostBlockBuilder.vue'
+import PostSeoFields from '@/components/posts/PostSeoFields.vue'
 import { usePostsStore } from '@/stores/usePostsStore'
 import {
   buildPostHtmlFromBlocks,
   getReferencedAssetIds,
   parsePostHtmlToBlocks,
 } from '@/utils/postBlocks'
+import { buildCanonicalPostPath } from '@/seo/utils'
+import { siteProfile } from '@/seo/siteProfile'
 
 const route = useRoute()
 const router = useRouter()
@@ -31,12 +34,21 @@ const loadError = ref('')
 const postTitle = ref('')
 const postBlocks = ref([])
 const postAssets = ref([])
+const seoFields = ref({
+  brand: '',
+  model: '',
+})
 
 const isEditMode = computed(() => Boolean(route.params.postId))
 
 const referencedAssetIds = computed(() => getReferencedAssetIds(postBlocks.value))
 const referencedAssets = computed(() =>
   postAssets.value.filter((asset) => referencedAssetIds.value.has(`${asset.id}`)),
+)
+const postBodyHtml = computed(() =>
+  buildPostHtmlFromBlocks(postBlocks.value, referencedAssets.value, {
+    useTokens: true,
+  }),
 )
 
 useHead(
@@ -76,6 +88,10 @@ const loadPost = async (postId) => {
     loadError.value = ''
     postBlocks.value = []
     postAssets.value = []
+    seoFields.value = {
+      brand: '',
+      model: '',
+    }
     cancelEdit()
     return
   }
@@ -94,6 +110,10 @@ const loadPost = async (postId) => {
 
     postAssets.value = attachedAssets
     postBlocks.value = parsePostHtmlToBlocks(response.postBody || '', attachedAssets)
+    seoFields.value = {
+      brand: response.brand || '',
+      model: response.model || '',
+    }
     prepareEdit(response)
   } catch (error) {
     post.value = null
@@ -108,12 +128,12 @@ const loadPost = async (postId) => {
 
 const buildEditFormData = () => {
   const formData = new FormData()
-  const bodyHtml = buildPostHtmlFromBlocks(postBlocks.value, referencedAssets.value, {
-    useTokens: true,
-  })
 
   formData.append('postTitle', postTitle.value.trim())
-  formData.append('postBody', bodyHtml)
+  formData.append('postBody', postBodyHtml.value)
+  formData.append('brand', seoFields.value.brand.trim())
+  formData.append('model', seoFields.value.model.trim())
+  formData.append('locationFocus', siteProfile.locationLabel)
 
   referencedAssets.value
     .filter((asset) => asset.file && asset.thumbnailFile)
@@ -172,6 +192,10 @@ const openCreateView = () => {
   router.push('/admin/editor')
 }
 
+const updateSeoFields = (value) => {
+  seoFields.value = value
+}
+
 watch(
   () => route.params.postId,
   (postId) => {
@@ -185,11 +209,11 @@ watch(
   <section class="relative mx-auto my-4 max-w-6xl px-4 py-12 sm:my-22 sm:px-6 lg:px-8">
     <div class="mb-10 flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
       <div class="space-y-4">
-        <p class="text-acc text-sm tracking-[0.3em] uppercase">Admin Editor</p>
-        <h1 class="font-sec text-fg text-3xl font-light tracking-[0.2em] uppercase md:text-4xl">
+        <p class="text-acc text-sm tracking-widest uppercase">Admin Editor</p>
+        <h1 class="font-sec text-fg text-3xl font-light tracking-wider uppercase md:text-4xl">
           {{ isEditMode ? 'Edit Workshop Post' : 'Create Workshop Post' }}
         </h1>
-        <p class="text-fg/72 dark:text-fg/82 max-w-3xl leading-relaxed">
+        <p class="text-fg/80 dark:text-fg/82 max-w-3xl leading-relaxed">
           {{
             isEditMode
               ? 'Adjust the featured image, title, and story blocks in the same order visitors will read the post.'
@@ -201,10 +225,10 @@ watch(
       <div class="flex flex-wrap gap-3">
         <a
           v-if="isEditMode && post"
-          :href="`/my-work/${post.postId}`"
+          :href="post.canonicalPath || buildCanonicalPostPath(post)"
           target="_blank"
           rel="noopener noreferrer"
-          class="border-brdr dark:border-sec-mute text-fg hover:text-acc hover:border-acc inline-flex items-center gap-2 rounded-lg border px-4 py-2 text-sm tracking-[0.15em] uppercase transition-colors"
+          class="border-brdr dark:border-sec-mute text-fg hover:text-acc hover:border-acc inline-flex items-center gap-2 rounded-lg border px-4 py-2 text-sm tracking-wider uppercase transition-colors"
         >
           <ArrowTopRightOnSquareIcon class="size-4" />
           View Public Page
@@ -215,7 +239,7 @@ watch(
     <AdminNewPost v-if="!isEditMode" embedded />
 
     <div v-else-if="isLoading" class="space-y-8">
-      <div class="bg-fg/8 aspect-[16/9] animate-pulse rounded-lg dark:bg-white/6"></div>
+      <div class="bg-fg/8 aspect-video animate-pulse rounded-lg dark:bg-white/6"></div>
       <div class="bg-fg/10 h-12 w-full rounded-lg dark:bg-white/10"></div>
       <div class="space-y-4">
         <div class="bg-fg/10 h-40 rounded-lg dark:bg-white/10"></div>
@@ -228,7 +252,7 @@ watch(
       class="bg-primary dark:bg-sec/80 border-brdr dark:border-sec-mute rounded-lg border p-8 text-center shadow-lg"
     >
       <h2 class="font-sec text-fg text-2xl">Post unavailable</h2>
-      <p class="text-fg/70 mx-auto mt-3 max-w-2xl leading-relaxed">
+      <p class="text-fg/80 mx-auto mt-3 max-w-2xl leading-relaxed">
         {{ loadError || 'The requested post could not be loaded.' }}
       </p>
       <button
@@ -250,9 +274,9 @@ watch(
             v-if="featuredImageUrl"
             :src="featuredImageUrl"
             :alt="post.postTitle || 'Featured image'"
-            class="aspect-[16/9] h-full w-full object-cover"
+            class="aspect-video h-full w-full object-cover"
           />
-          <div v-else class="bg-fg/5 flex aspect-[16/9] items-center justify-center">
+          <div v-else class="bg-fg/5 flex aspect-video items-center justify-center">
             <PhotoIcon class="text-fg/30 size-16" />
           </div>
         </div>
@@ -271,6 +295,12 @@ watch(
         />
       </div>
 
+      <PostSeoFields
+        :fields="seoFields"
+        :disabled="isSaving || isDeleting"
+        @update:fields="updateSeoFields"
+      />
+
       <div class="space-y-3">
         <p class="input-lbl">Post Body</p>
         <PostBlockBuilder
@@ -283,7 +313,7 @@ watch(
       <div class="flex flex-wrap items-center gap-3 pt-4">
         <button
           type="button"
-          class="bg-acc hover:bg-acc/90 inline-flex items-center gap-2 rounded-lg px-6 py-3 text-sm font-medium tracking-[0.15em] text-white uppercase transition-colors disabled:cursor-not-allowed disabled:opacity-60"
+          class="bg-acc hover:bg-acc/90 inline-flex items-center gap-2 rounded-lg px-6 py-3 text-sm font-medium tracking-wider text-white uppercase transition-colors disabled:cursor-not-allowed disabled:opacity-60"
           :disabled="isSaving"
           @click="savePostChanges"
         >
@@ -293,7 +323,7 @@ watch(
 
         <button
           type="button"
-          class="border-danger/40 text-danger hover:bg-danger/10 inline-flex items-center gap-2 rounded-lg border px-6 py-3 text-sm font-medium tracking-[0.15em] uppercase transition-colors disabled:cursor-not-allowed disabled:opacity-60"
+          class="border-danger/40 text-danger hover:bg-danger/10 inline-flex items-center gap-2 rounded-lg border px-6 py-3 text-sm font-medium tracking-wider uppercase transition-colors disabled:cursor-not-allowed disabled:opacity-60"
           :disabled="isDeleting"
           @click="removePost"
         >

@@ -682,7 +682,7 @@ const clearForm = () => {
               >
                 <PlusIcon class="text-acc mb-1 size-6" />
                 <span class="text-acc text-xs font-medium">Add More</span>
-                <span class="text-fg-subtle text-xs"
+                <span class="text-fg/80 text-xs"
                   >{{ 5 - uploadedImages.length - processingFiles.length }} left</span
                 >
               </div>
@@ -702,14 +702,14 @@ const clearForm = () => {
             <div v-else class="flex flex-col items-center">
               <IconGallery class="text-acc mb-3 size-12" />
               <p class="text-fg mb-2 font-medium">Drag & drop images here</p>
-              <p class="text-fg-subtle mb-3 text-sm">
+              <p class="text-fg/80 mb-3 text-sm">
                 or <span class="hidden md:inline">click</span>
                 <span class="inline md:hidden">touch</span> to browse
               </p>
               <div class="bg-acc/10 text-acc rounded-lg px-4 py-2 text-sm font-medium">
                 Choose up to 5 images
               </div>
-              <p class="text-fg-subtle mt-2 text-xs">JPEG, PNG, WebP • Max 7MB each</p>
+              <p class="text-fg/80 mt-2 text-xs">JPEG, PNG, WebP • Max 7MB each</p>
             </div>
           </div>
         </div>
@@ -737,7 +737,7 @@ const clearForm = () => {
               <span
                 :class="[
                   'font-medium',
-                  uploadedImages.length === 5 ? 'text-success' : 'text-fg-subtle',
+                  uploadedImages.length === 5 ? 'text-success' : 'text-fg/80',
                 ]"
               >
                 {{ uploadedImages.length }}/5

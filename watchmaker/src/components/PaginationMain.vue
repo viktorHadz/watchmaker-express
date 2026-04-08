@@ -7,7 +7,7 @@
     <div class="flex flex-col items-center gap-6">
       <!-- Summary Info -->
       <div class="text-center">
-        <p class="text-fg-mute text-sm font-light tracking-wide">
+        <p class="text-fg/80 text-sm font-light tracking-wide">
           Displaying
           <span class="text-fg font-medium">{{ startItem }}</span>
           –
@@ -28,7 +28,7 @@
           aria-label="Previous page"
         >
           <ChevronLeftIcon
-            class="text-fg-mute group-hover:text-acc group-disabled:group-hover:text-fg-mute h-3.5 w-3.5 transition-colors duration-200 sm:h-5 sm:w-5"
+            class="text-fg/80 group-hover:text-acc group-disabled:group-hover:text-fg/80 h-3.5 w-3.5 transition-colors duration-200 sm:h-5 sm:w-5"
           />
           <span
             class="text-acc pointer-events-none absolute -bottom-6 text-xs whitespace-nowrap opacity-0 transition-opacity duration-200 group-hover:opacity-100 group-disabled:group-hover:opacity-0 max-sm:hidden"
@@ -43,7 +43,7 @@
             <!-- Ellipsis -->
             <span
               v-if="page === 'ellipsis-start' || page === 'ellipsis-end'"
-              class="text-fg-subtle px-0.5 text-xs sm:px-1 sm:text-sm"
+              class="text-fg/80 px-0.5 text-xs sm:px-1 sm:text-sm"
             >
               ···
             </span>
@@ -57,7 +57,7 @@
                 'relative flex h-7 w-7 cursor-pointer items-center justify-center rounded-lg text-xs font-medium transition-all duration-200 ease-out disabled:cursor-not-allowed sm:h-10 sm:w-10 sm:text-sm',
                 page === currentPage
                   ? 'bg-acc text-fg2 shadow-acc/25 shadow-md'
-                  : 'text-fg-mute hover:bg-sec-mute/50 hover:text-acc dark:hover:bg-sec-light/30',
+                  : 'text-fg/80 hover:bg-sec-mute/50 hover:text-acc dark:hover:bg-sec-light/30',
               ]"
               :aria-label="`Go to page ${page}`"
               :aria-current="page === currentPage ? 'page' : undefined"
@@ -75,7 +75,7 @@
           aria-label="Next page"
         >
           <ChevronRightIcon
-            class="text-fg-mute group-hover:text-acc group-disabled:group-hover:text-fg-mute h-3.5 w-3.5 transition-colors duration-200 sm:h-5 sm:w-5"
+            class="text-fg/80 group-hover:text-acc group-disabled:group-hover:text-fg/80 h-3.5 w-3.5 transition-colors duration-200 sm:h-5 sm:w-5"
           />
           <span
             class="text-acc pointer-events-none absolute -bottom-6 text-xs whitespace-nowrap opacity-0 transition-opacity duration-200 group-hover:opacity-100 group-disabled:group-hover:opacity-0 max-sm:hidden"
@@ -90,7 +90,7 @@
         v-if="paginationData.totalPages > 5"
         class="flex flex-col items-center gap-3 sm:flex-row"
       >
-        <label for="page-jump" class="text-fg-mute text-sm font-light"> Jump to page: </label>
+        <label for="page-jump" class="text-fg/80 text-sm font-light"> Jump to page: </label>
         <div class="flex items-center gap-2">
           <input
             id="page-jump"
@@ -99,7 +99,7 @@
             :max="paginationData.totalPages"
             v-model.number="jumpToPage"
             @keyup.enter="handleJump"
-            class="border-brdr bg-primary text-fg placeholder:text-fg-subtle focus:border-acc focus:ring-acc/20 h-9 w-16 rounded-lg border px-2 text-center text-sm transition-all focus:ring-2 focus:outline-none"
+            class="border-brdr bg-primary text-fg placeholder:text-fg/80 focus:border-acc focus:ring-acc/20 h-9 w-16 rounded-lg border px-2 text-center text-sm transition-all focus:ring-2 focus:outline-none"
             :placeholder="currentPage.toString()"
           />
           <button

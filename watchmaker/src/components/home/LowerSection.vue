@@ -148,19 +148,19 @@ import { ChatBubbleLeftEllipsisIcon, CameraIcon } from '@heroicons/vue/24/outlin
           <p class="font-sec text-acc text-3xl font-light">
             {{ new Date().getFullYear() - 2016 }}+
           </p>
-          <p class="text-fg-subtle text-sm tracking-wider uppercase">Years Experience</p>
+          <p class="text-fg/80 text-sm tracking-wider uppercase">Years Experience</p>
         </div>
         <div>
           <p class="font-sec text-acc text-3xl font-light">200+</p>
-          <p class="text-fg-subtle text-sm tracking-wider uppercase">Watches Restored</p>
+          <p class="text-fg/80 text-sm tracking-wider uppercase">Watches Restored</p>
         </div>
         <div>
           <p class="font-sec text-acc text-3xl font-light">20+</p>
-          <p class="text-fg-subtle text-sm tracking-wider uppercase">Brands Serviced</p>
+          <p class="text-fg/80 text-sm tracking-wider uppercase">Brands Serviced</p>
         </div>
         <div>
           <p class="font-sec text-acc text-3xl font-light">24/7</p>
-          <p class="text-fg-subtle text-sm tracking-wider uppercase">Precision Care</p>
+          <p class="text-fg/80 text-sm tracking-wider uppercase">Precision Care</p>
         </div>
       </div>
     </div>

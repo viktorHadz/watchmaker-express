@@ -9,7 +9,8 @@ import TheDivider from '../TheDivider.vue'
       <!-- Section Header -->
       <div class="mb-16 text-center">
         <h2
-          class="font-sec text-fg dark:text-fg2 mb-4 text-center text-2xl font-light tracking-wide uppercase md:text-4xl">
+          class="font-sec text-fg dark:text-fg2 mb-4 text-center text-2xl font-light tracking-wide uppercase md:text-4xl"
+        >
           Client Testimonials
         </h2>
         <TheDivider variant="sm" />
@@ -18,13 +19,13 @@ import TheDivider from '../TheDivider.vue'
         </p>
       </div>
 
-
       <!-- Testimonials Grid -->
-      <div class="grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-3 mt-20">
+      <div class="mt-20 grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-3">
         <!-- Testimonial 1 -->
         <div class="group">
           <div
-            class="bg-primary/80 border-brdr/30 hover:border-acc/20 relative h-full rounded-lg border p-8 transition-all duration-500 hover:shadow-xl">
+            class="bg-primary/80 border-brdr/30 hover:border-acc/20 relative h-full rounded-lg border p-8 transition-all duration-500 hover:shadow-xl"
+          >
             <!-- Decorative quote mark -->
             <div class="text-acc/40 absolute -top-2 -left-2 font-serif text-6xl leading-none">
               "
@@ -49,7 +50,7 @@ import TheDivider from '../TheDivider.vue'
             <!-- Author -->
             <div class="border-brdr/20 border-t pt-4">
               <p class="text-fg font-medium">Mihail R.</p>
-              <p class="text-fg-subtle text-sm">Collector</p>
+              <p class="text-fg/80 text-sm">Collector</p>
             </div>
           </div>
         </div>
@@ -57,7 +58,8 @@ import TheDivider from '../TheDivider.vue'
         <!-- Testimonial 2 -->
         <div class="group">
           <div
-            class="bg-primary/80 border-brdr/30 hover:border-acc/20 relative h-full rounded-lg border p-8 transition-all duration-500 hover:shadow-xl">
+            class="bg-primary/80 border-brdr/30 hover:border-acc/20 relative h-full rounded-lg border p-8 transition-all duration-500 hover:shadow-xl"
+          >
             <div class="text-acc/10 absolute -top-2 -left-2 font-serif text-6xl leading-none">
               "
             </div>
@@ -77,7 +79,7 @@ import TheDivider from '../TheDivider.vue'
 
             <div class="border-brdr/20 border-t pt-4">
               <p class="text-fg font-medium">Grigor I.</p>
-              <p class="text-fg-subtle text-sm">Watch Enthusiast</p>
+              <p class="text-fg/80 text-sm">Watch Enthusiast</p>
             </div>
           </div>
         </div>
@@ -85,7 +87,8 @@ import TheDivider from '../TheDivider.vue'
         <!-- Testimonial 3 -->
         <div class="group">
           <div
-            class="bg-primary/80 border-brdr/30 hover:border-acc/20 relative h-full rounded-lg border p-8 transition-all duration-500 hover:shadow-xl">
+            class="bg-primary/80 border-brdr/30 hover:border-acc/20 relative h-full rounded-lg border p-8 transition-all duration-500 hover:shadow-xl"
+          >
             <div class="text-acc/10 absolute -top-2 -left-2 font-serif text-6xl leading-none">
               "
             </div>
@@ -105,13 +108,11 @@ import TheDivider from '../TheDivider.vue'
 
             <div class="border-brdr/20 border-t pt-4">
               <p class="text-fg font-medium">David J.</p>
-              <p class="text-fg-subtle text-sm">Collector</p>
+              <p class="text-fg/80 text-sm">Collector</p>
             </div>
           </div>
         </div>
       </div>
-
-
     </div>
   </section>
 </template>

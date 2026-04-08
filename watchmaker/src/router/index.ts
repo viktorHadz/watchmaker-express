@@ -4,6 +4,7 @@ import HomeView from '../views/HomeView.vue'
 import RepairsView from '@/views/RepairsView.vue'
 import MyWorkView from '@/views/MyWorkView.vue'
 import PostDetailView from '@/views/PostDetailView.vue'
+import ServiceLandingView from '@/views/ServiceLandingView.vue'
 import LoginPanel from '@/views/Admin/LoginPanel.vue'
 import EditorView from '@/views/Admin/EditorView.vue'
 import NotFoundView from '@/views/NotFoundView.vue'
@@ -40,15 +41,75 @@ const router = createRouter({
       component: RepairsView,
     },
     {
+      path: '/watch-repair-london',
+      name: 'watchRepairLondon',
+      component: ServiceLandingView,
+      meta: {
+        pageKey: 'watchRepairLondon',
+      },
+    },
+    {
+      path: '/vintage-watch-repair-london',
+      name: 'vintageWatchRepairLondon',
+      component: ServiceLandingView,
+      meta: {
+        pageKey: 'vintageWatchRepairLondon',
+      },
+    },
+    {
+      path: '/watch-restoration-london',
+      name: 'watchRestorationLondon',
+      component: ServiceLandingView,
+      meta: {
+        pageKey: 'watchRestorationLondon',
+      },
+    },
+    {
+      path: '/mechanical-watch-service-london',
+      name: 'mechanicalWatchServiceLondon',
+      component: ServiceLandingView,
+      meta: {
+        pageKey: 'mechanicalWatchServiceLondon',
+      },
+    },
+    {
+      path: '/pocket-watch-repair-london',
+      name: 'pocketWatchRepairLondon',
+      component: ServiceLandingView,
+      meta: {
+        pageKey: 'pocketWatchRepairLondon',
+      },
+    },
+    {
+      path: '/watch-repair-by-post',
+      name: 'watchRepairByPost',
+      component: ServiceLandingView,
+      meta: {
+        pageKey: 'watchRepairByPost',
+      },
+    },
+    {
       path: '/my-work',
       name: 'myWork',
       component: MyWorkView,
     },
     {
-      path: '/my-work/:postId',
+      path: '/my-work/:slug-:postId(\\d+)',
       name: 'postDetail',
       component: PostDetailView,
-      props: true,
+      props: (route) => ({
+        postId: route.params.postId,
+        slug: route.params.slug,
+      }),
+    },
+    {
+      path: '/my-work/:postId(\\d+)',
+      name: 'postDetailLegacy',
+      component: PostDetailView,
+      props: (route) => ({
+        postId: route.params.postId,
+        slug: '',
+      }),
     },
     {
       path: '/admin',

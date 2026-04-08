@@ -183,7 +183,7 @@ watch(
                   <h2
                     class="text-fg/90 dark:text-fg2 font-sec truncate text-lg font-medium tracking-wide"
                   >
-                    {{ post.postTitle || 'Untitled Post' }}
+                    {{ post.postTitle || 'Untitled Story' }}
                   </h2>
                 </div>
               </div>
@@ -194,7 +194,7 @@ watch(
                 <button
                   v-if="allImages.length > 0"
                   @click="toggleImageGallery"
-                  class="text-fg/60 hover:text-fg hover:bg-sec-mute/30 dark:hover:bg-sec-light/20 flex size-9 cursor-pointer items-center justify-center rounded-lg transition-all sm:size-10"
+                  class="text-fg/80 hover:text-fg hover:bg-sec-mute/30 dark:hover:bg-sec-light/20 flex size-9 cursor-pointer items-center justify-center rounded-lg transition-all sm:size-10"
                   :title="showImageGallery ? 'Hide images' : 'Show images'"
                 >
                   <EyeIcon v-if="showImageGallery" class="text-acc size-4 sm:size-5" />
@@ -204,7 +204,7 @@ watch(
                 <!-- Save/Share -->
                 <button
                   v-if="isAuthenticated && isEditing"
-                  class="text-fg/60 hover:text-success hover:bg-sec-mute/30 dark:hover:bg-sec-light/20 flex size-9 cursor-pointer items-center justify-center rounded-lg transition-all sm:size-10"
+                  class="text-fg/80 hover:text-success hover:bg-sec-mute/30 dark:hover:bg-sec-light/20 flex size-9 cursor-pointer items-center justify-center rounded-lg transition-all sm:size-10"
                   title="Save edit"
                   @click="saveEdit(post.postId)"
                 >
@@ -213,7 +213,7 @@ watch(
                 <button
                   v-else
                   @click="handleShare"
-                  class="text-fg/60 hover:text-acc hover:bg-sec-mute/30 dark:hover:bg-sec-light/20 flex size-9 cursor-pointer items-center justify-center rounded-lg transition-all sm:size-10"
+                  class="text-fg/80 hover:text-acc hover:bg-sec-mute/30 dark:hover:bg-sec-light/20 flex size-9 cursor-pointer items-center justify-center rounded-lg transition-all sm:size-10"
                 >
                   <ShareIcon class="text-acc size-4 sm:size-5" />
                 </button>
@@ -221,7 +221,7 @@ watch(
                 <!-- Close -->
                 <button
                   @click="closeModal"
-                  class="text-fg/40 hover:text-fg/80 hover:bg-sec-mute/30 dark:hover:bg-sec-light/20 flex size-9 cursor-pointer items-center justify-center rounded-lg transition-all sm:size-10"
+                  class="text-fg/80 hover:text-fg hover:bg-sec-mute/30 dark:hover:bg-sec-light/20 flex size-9 cursor-pointer items-center justify-center rounded-lg transition-all sm:size-10"
                 >
                   <XMarkIcon class="size-4 sm:size-5" />
                 </button>
@@ -391,7 +391,7 @@ watch(
                       <PencilIcon class="size-8" />
                     </div>
                     <h3 class="text-fg text-lg font-medium">No content available</h3>
-                    <p class="text-fg/60 mt-2 text-sm">This post hasn't been given content yet</p>
+                    <p class="text-fg/80 mt-2 text-sm">This post hasn't been given content yet</p>
                   </div>
                 </div>
               </div>
@@ -404,7 +404,7 @@ watch(
               <div class="flex items-center gap-4">
                 <span
                   v-if="allImages.length > 0"
-                  class="text-fg-mute flex items-center gap-2 text-sm"
+                  class="text-fg/80 flex items-center gap-2 text-sm"
                 >
                   <PhotoIcon class="size-4" />
                   <span
@@ -412,7 +412,7 @@ watch(
                   >
                 </span>
               </div>
-              <span v-if="post.date" class="text-fg-mute flex items-center gap-2 text-sm">
+              <span v-if="post.date" class="text-fg/80 flex items-center gap-2 text-sm">
                 <CalendarIcon class="size-4" />
                 <span>{{ post.date }}</span>
               </span>

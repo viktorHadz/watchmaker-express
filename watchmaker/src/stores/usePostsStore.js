@@ -1,6 +1,7 @@
 import { defineStore } from 'pinia'
 import { ref, computed } from 'vue'
 import { useToastStore } from './toast'
+import { buildCanonicalPostPath } from '@/seo/utils'
 
 export const usePostsStore = defineStore('posts', () => {
   const posts = ref([])
@@ -56,7 +57,8 @@ export const usePostsStore = defineStore('posts', () => {
 
   // SHARING FUNCTIONS
   function generatePostUrl(postId) {
-    return `${window.location.origin}/my-work/${postId}`
+    const post = posts.value.find((entry) => `${entry.postId}` === `${postId}`) || { postId }
+    return `${window.location.origin}${buildCanonicalPostPath(post)}`
   }
 
   function openShareModal(post) {
@@ -275,11 +277,25 @@ export const usePostsStore = defineStore('posts', () => {
       if (postIndex > -1) {
         posts.value[postIndex].postTitle = savedPost.postTitle
         posts.value[postIndex].postBody = savedPost.postBody
+        posts.value[postIndex].slug = savedPost.slug || posts.value[postIndex].slug
+        posts.value[postIndex].seoTitle = savedPost.seoTitle || ''
+        posts.value[postIndex].seoDescription = savedPost.seoDescription || ''
+        posts.value[postIndex].brand = savedPost.brand || ''
+        posts.value[postIndex].model = savedPost.model || ''
+        posts.value[postIndex].locationFocus = savedPost.locationFocus || ''
+        posts.value[postIndex].updatedAt = savedPost.updatedAt || posts.value[postIndex].updatedAt
       }
 
       if (selectedPost.value?.postId == postId) {
         selectedPost.value.postTitle = savedPost.postTitle
         selectedPost.value.postBody = savedPost.postBody
+        selectedPost.value.slug = savedPost.slug || selectedPost.value.slug
+        selectedPost.value.seoTitle = savedPost.seoTitle || ''
+        selectedPost.value.seoDescription = savedPost.seoDescription || ''
+        selectedPost.value.brand = savedPost.brand || ''
+        selectedPost.value.model = savedPost.model || ''
+        selectedPost.value.locationFocus = savedPost.locationFocus || ''
+        selectedPost.value.updatedAt = savedPost.updatedAt || selectedPost.value.updatedAt
       }
 
       editForm.value.postTitle = savedPost.postTitle

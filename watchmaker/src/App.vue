@@ -1,5 +1,4 @@
 <script setup>
-import { useHead } from '@unhead/vue'
 import { RouterView } from 'vue-router'
 import ToastElement from './components/ToastElement.vue'
 import { useToastStore } from '@/stores/toast'
@@ -7,28 +6,6 @@ import NavHorizontal from './components/NavHorizontal.vue'
 import SiteFooter from './components/SiteFooter.vue'
 
 const toast = useToastStore()
-
-useHead({
-  script: [
-    {
-      type: 'application/ld+json',
-      children: JSON.stringify({
-        '@context': 'https://schema.org',
-        '@type': 'LocalBusiness',
-        name: 'The Watchmaker',
-        description: 'Expert watch repair and restoration services',
-        url: 'https://thewatchmaker.uk',
-        areaServed: 'UK',
-        serviceType: 'Watch Repair',
-        contactPoint: {
-          '@type': 'ContactPoint',
-          contactType: 'customer service',
-          url: 'https://thewatchmaker.uk/repairs',
-        },
-      }),
-    },
-  ],
-})
 </script>
 
 <template>

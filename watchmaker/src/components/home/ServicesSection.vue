@@ -1,6 +1,7 @@
 <script setup>
 import { WrenchIcon, Cog6ToothIcon, SparklesIcon } from '@heroicons/vue/24/outline'
 import TheDivider from '@/components/TheDivider.vue'
+import TheMaker from '@/components/svgDecor/TheMaker.vue'
 </script>
 
 <template>
@@ -17,6 +18,7 @@ import TheDivider from '@/components/TheDivider.vue'
         servicing
       </p>
     </div>
+
     <!-- Services Grid -->
     <div class="grid grid-cols-1 gap-8 md:grid-cols-2 lg:grid-cols-3">
       <!-- Service 1: Movement Restoration -->
@@ -42,7 +44,7 @@ import TheDivider from '@/components/TheDivider.vue'
           <h3 class="font-sec text-fg mb-4 text-xl font-normal tracking-wide">
             Movement Restoration
           </h3>
-          <p class="text-fg/70 leading-relaxed">
+          <p class="text-fg/80 leading-relaxed">
             Complete overhaul of mechanical movements including disassembly, ultrasonic cleaning,
             lubrication, and precision timing adjustment to restore factory specifications.
           </p>
@@ -70,7 +72,7 @@ import TheDivider from '@/components/TheDivider.vue'
           <h3 class="font-sec text-fg mb-4 text-xl font-normal tracking-wide">
             Dial & Hand Refinishing
           </h3>
-          <p class="text-fg/70 leading-relaxed">
+          <p class="text-fg/80 leading-relaxed">
             Expert restoration of vintage dials, careful hand relumeing, and index marker
             refinishing while preserving the original character and patina of your timepiece.
           </p>
@@ -98,16 +100,18 @@ import TheDivider from '@/components/TheDivider.vue'
           <h3 class="font-sec text-fg mb-4 text-xl font-normal tracking-wide">
             Case & Bracelet Restoration
           </h3>
-          <p class="text-fg/70 leading-relaxed">
+          <p class="text-fg/80 leading-relaxed">
             Professional refinishing of watch cases and bracelets using traditional techniques to
             restore original finishing while maintaining crisp edges and factory specifications.
           </p>
         </div>
       </div>
     </div>
-
+    <div class="flex justify-center dark:text-zinc-400 mt-24 mb-6 ">
+      <TheMaker class="w-64" />
+    </div>
     <!-- Additional Service Note -->
-    <div class="mt-12 text-center">
+    <div class=" text-center">
       <p class="text-fg/90 text-sm">
         All services include a comprehensive 12-month warranty · Free estimates available
       </p>

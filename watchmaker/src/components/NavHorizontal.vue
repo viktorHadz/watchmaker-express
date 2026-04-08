@@ -250,7 +250,7 @@ onUnmounted(() => {
         >
           <ChevronUpIcon
             class="size-5 transition-transform duration-300 ease-out"
-            :class="isOpenMobile ? 'text-acc rotate-180' : 'text-fg-mute'"
+            :class="isOpenMobile ? 'text-acc rotate-180' : 'text-fg/80'"
           />
           <div
             class="font-sec text-xs font-medium tracking-wide transition-colors duration-150"

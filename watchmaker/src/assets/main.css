@@ -1,18 +1,20 @@
 @import 'tailwindcss';
 @layer base {
-  :root {
-    /* Chrome, Safari, Edge, Opera */
-    input::-webkit-outer-spin-button,
-    input::-webkit-inner-spin-button {
-      -webkit-appearance: none;
-      margin: 0;
-    }
+  /* :root {
 
-    /* Firefox */
-    input[type='number'] {
-      -moz-appearance: textfield;
-      appearance: textfield;
-    }
+
+    } */
+  /* Chrome, Safari, Edge, Opera */
+  input::-webkit-outer-spin-button,
+  input::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+  }
+
+  /* Firefox */
+  input[type='number'] {
+    -moz-appearance: textfield;
+    appearance: textfield;
   }
 }
 @custom-variant dark (&:where([data-theme=dark], [data-theme=dark] *));
@@ -43,26 +45,28 @@
   --color-danger: oklch(0.64 0.23 29); /* Deep burgundy */
   --color-warning: oklch(68% 0.14 65); /* Amber bronze */
   --color-success: oklch(48% 0.07 145); /* Forest green */
+
+  --color-decor: oklch(18% 0.01 30);
 }
 
 [data-theme='dark'] {
   /* Backgrounds - Deep midnight blues with subtle warmth */
-  --color-primary: oklch(13% 0.015 250); /* Deep midnight blue */
-  --color-sec: oklch(16% 0.018 245); /* Rich navy - cards/sections */
-  --color-sec-mute: oklch(21% 0.015 240); /* Lighter navy - hover states */
-  --color-sec-light: oklch(26% 0.012 235); /* Light midnight */
+  --color-primary: hsl(225, 36%, 11%); /* Deep midnight blue */
+  --color-sec: hsl(227, 39%, 9%); /* Darker */
+  --color-sec-mute: hsl(227, 30%, 15%); /* Lighter navy - hover states */
+  --color-sec-light: hsl(227, 38%, 21%); /* Light midnight */
 
   /* Accents - Warm brass and copper */
-  --color-acc: oklch(72% 0.13 55); /* Warm brass/copper */
-  --color-acc-mute: oklch(62% 0.11 52); /* Muted copper */
+  --color-acc: hsl(26, 72%, 60%); /* Warm brass/copper */
+  --color-acc-mute: hsl(23, 46%, 50%); /* Muted copper */
 
   /* Borders & Dividers */
-  --color-brdr: oklch(28% 0.01 240); /* Subtle blue borders */
+  --color-brdr: hsl(225, 36%, 30%); /* Subtle blue borders */
   --color-brdr-mute: oklch(38% 0.015 235); /* Stronger borders */
 
   /* Text */
   --color-fg: oklch(88% 0.006 230); /* Warm silver text */
-  --color-fg2: oklch(95% 0.004 225); /* Bright silver (for dark backgrounds) */
+  --color-: oklch(95% 0.004 225); /* Bright silver (for dark backgrounds) */
   --color-fg-mute: oklch(75% 0.01 235); /* Muted blue-gray */
   --color-fg-subtle: oklch(65% 0.01 235); /* Subtle blue-gray */
 
@@ -70,6 +74,8 @@
   --color-danger: oklch(58% 0.18 25); /* Warm red */
   --color-warning: oklch(72% 0.12 62); /* Golden amber */
   --color-success: oklch(65% 0.15 151); /* Jade green */
+
+  --color-decor: hsl(26, 72%, 60%);
 }
 
 /* Keep the existing theme configuration */
@@ -98,6 +104,9 @@
   --color-success: var(--color-success);
   --color-danger: var(--color-danger);
   --color-warn: var(--color-warning);
+
+  /* light on light and dark on dark */
+  --color-decor: var(--color-decor);
 }
 .router-link-active {
   @apply text-acc;

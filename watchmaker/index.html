@@ -2,20 +2,25 @@
 <html lang="en-GB">
   <head>
     <meta charset="UTF-8" />
-    <meta property="og:title" content="Workshop Gallery" />
-    <meta property="og:description" content="Precision craftsmanship showcase" />
-    <meta property="og:image" content="/assets/pictures/hoz-pocket-watch.webp" />
-    <meta property="og:url" content="" />
-    <meta property="og:type" content="website" />
-    <meta name="twitter:card" content="summary_large_image" />
     <meta name="google-site-verification" content="bS9d4I1v_Bt1aSbnUnk8FIyQYdQ1SS-G2yU1mpCv_88" />
-    
     <link rel="icon" href="/favicon.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Watchmaker - Ves</title>
+    <style>
+      html.watchmaker-app-pending [data-seo-static='true'] {
+        display: none !important;
+      }
+    </style>
+    <script nonce="__CSP_NONCE__">
+      document.documentElement.classList.add('watchmaker-app-pending')
+      window.__watchmakerSeoSnapshotTimer = window.setTimeout(function () {
+        document.documentElement.classList.remove('watchmaker-app-pending')
+      }, 4000)
+    </script>
+    <!-- SEO_HEAD -->
+    <meta name="csp-nonce" content="__CSP_NONCE__" />
   </head>
   <body>
-    <div id="app"></div>
-    <script type="module" src="/src/main.js"></script>
+    <div id="app"><!-- SEO_APP_HTML --></div>
+    <script type="module" src="/src/main.ts"></script>
   </body>
 </html>

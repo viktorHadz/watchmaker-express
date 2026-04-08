@@ -10,6 +10,9 @@ import { storeToRefs } from 'pinia'
 import { useRouter } from 'vue-router'
 import TheDivider from '../TheDivider.vue'
 import { getPostExcerpt } from '@/utils/postContent'
+import { buildCanonicalPostPath } from '@/seo/utils'
+import QuickLinksGrid from '@/components/seo/QuickLinksGrid.vue'
+import { getServicePageLinks } from '@/seo/content'
 
 const { isAuthenticated } = useAuth()
 const postsRef = useTemplateRef('postsRef')
@@ -50,7 +53,7 @@ const handlePageChangeWithScroll = async (page) => {
 }
 
 const handleOpenPost = (post) => {
-  router.push(`/my-work/${post.postId}`)
+  router.push(buildCanonicalPostPath(post))
 }
 
 const handleEditPost = (post) => {
@@ -89,14 +92,15 @@ const getPostPreview = (post, maxLength = 120) =>
     <!-- Gallery Header -->
     <div class="my-4 text-center sm:my-22">
       <div class="mb-2 text-center">
-        <h2
+        <h1
           class="font-sec text-fg mb-4 text-center text-2xl font-light tracking-[0.3em] uppercase md:text-4xl"
         >
           Workshop Gallery
-        </h2>
+        </h1>
         <TheDivider />
         <p class="text-fg/90 mx-auto mt-6 max-w-2xl text-lg leading-relaxed">
-          A showcase of precision craftsmanship and horological excellence
+          Recent repairs, restoration work, and workshop stories from vintage and mechanical
+          projects.
         </p>
       </div>
     </div>
@@ -156,7 +160,7 @@ const getPostPreview = (post, maxLength = 120) =>
         <IconGallery class="text-acc size-12"></IconGallery>
       </div>
       <h3 class="font-sec text-fg mb-2 text-xl font-semibold">No posts yet</h3>
-      <p class="text-fg/60">Create your first post to showcase your work</p>
+      <p class="text-fg/80">Create your first post to showcase your work</p>
     </div>
 
     <!-- Gallery Grid -->
@@ -205,7 +209,7 @@ const getPostPreview = (post, maxLength = 120) =>
               {{ post.postTitle }}
             </h3>
 
-            <p class="text-fg/70 line-clamp-1 text-sm leading-relaxed sm:line-clamp-2">
+            <p class="text-fg/80 line-clamp-1 text-sm leading-relaxed sm:line-clamp-2">
               {{ getPostPreview(post, 110) }}
             </p>
           </div>
@@ -227,7 +231,7 @@ const getPostPreview = (post, maxLength = 120) =>
               ></div>
             </div>
 
-            <p class="text-fg/70 line-clamp-3 text-sm leading-relaxed">
+            <p class="text-fg/80 line-clamp-3 text-sm leading-relaxed">
               {{ getPostPreview(post, 140) }}
             </p>
           </div>
@@ -238,7 +242,7 @@ const getPostPreview = (post, maxLength = 120) =>
             class="border-brdr dark:border-sec-mute mt-3 border-t pt-2 sm:mt-4 sm:pt-3"
           >
             <div class="flex items-center justify-between">
-              <span class="text-fg/60 text-sm">Additional photos</span>
+              <span class="text-fg/80 text-sm">Additional photos</span>
               <div class="flex -space-x-2">
                 <div
                   v-for="(img, idx) in post.thumbImages.slice(0, 3)"
@@ -305,5 +309,7 @@ const getPostPreview = (post, maxLength = 120) =>
 
     <!-- Share Modal -->
     <ShareModal :show="showShareModal" :post="postToShare || {}" @close="handleCloseShareModal" />
+
+    <QuickLinksGrid title="Related Repair Services" :items="getServicePageLinks()" />
   </section>
 </template>

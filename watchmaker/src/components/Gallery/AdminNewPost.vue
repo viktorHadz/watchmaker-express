@@ -9,6 +9,8 @@ import { usePostsStore } from '@/stores/usePostsStore.js'
 import { useToastStore } from '@/stores/toast'
 import { storeToRefs } from 'pinia'
 import { buildPostHtmlFromBlocks, getReferencedAssetIds } from '@/utils/postBlocks'
+import PostSeoFields from '@/components/posts/PostSeoFields.vue'
+import { siteProfile } from '@/seo/siteProfile'
 
 const MAX_FILE_SIZE = 15 * 1024 * 1024
 const MAX_COMPRESSED_SIZE_KB = 800
@@ -31,6 +33,10 @@ const newPost = ref({
   title: '',
   titleImage: [],
 })
+const seoFields = ref({
+  brand: '',
+  model: '',
+})
 
 const titleFile = ref(null)
 const postBlocks = ref([])
@@ -43,10 +49,13 @@ const referencedAssetIds = computed(() => getReferencedAssetIds(postBlocks.value
 const referencedAssets = computed(() =>
   postAssets.value.filter((asset) => referencedAssetIds.value.has(`${asset.id}`)),
 )
+const postBodyHtml = computed(() =>
+  buildPostHtmlFromBlocks(postBlocks.value, referencedAssets.value, { useTokens: true }),
+)
 
 const postTypeState = computed(() => ({
   title: newPost.value.title,
-  bodyText: buildPostHtmlFromBlocks(postBlocks.value, referencedAssets.value, { useTokens: true }),
+  bodyText: postBodyHtml.value,
   titleImage: newPost.value.titleImage,
   extraImages: referencedAssets.value,
 }))
@@ -58,6 +67,10 @@ const computedButtonState = computed(() => {
   if (isUploading.value) return { text: 'Creating Post...', disabled: true }
   return { text: 'Publish Post', disabled: false }
 })
+
+const updateSeoFields = (value) => {
+  seoFields.value = value
+}
 
 const createPreview = (file) =>
   new Promise((resolve, reject) => {
@@ -163,6 +176,10 @@ const resetForm = () => {
     title: '',
     titleImage: [],
   })
+  seoFields.value = {
+    brand: '',
+    model: '',
+  }
 
   titleFile.value = null
   postBlocks.value = []
@@ -185,15 +202,15 @@ async function saveNewPost(event) {
   try {
     const formData = new FormData()
     const date = useDateFormat(useNow(), 'DD-MM-YYYY').value
-    const bodyText = buildPostHtmlFromBlocks(postBlocks.value, referencedAssets.value, {
-      useTokens: true,
-    })
 
     formData.append('title', newPost.value.title.trim())
-    formData.append('bodyText', bodyText.trim())
+    formData.append('bodyText', postBodyHtml.value.trim())
     formData.append('date', date)
     formData.append('type', postType.value)
     formData.append('titleImage', titleFile.value)
+    formData.append('brand', seoFields.value.brand.trim())
+    formData.append('model', seoFields.value.model.trim())
+    formData.append('locationFocus', siteProfile.locationLabel)
 
     referencedAssets.value
       .filter((asset) => asset.file && asset.thumbnailFile)
@@ -219,10 +236,10 @@ async function saveNewPost(event) {
 <template>
   <section class="space-y-10">
     <div v-if="!props.embedded" class="space-y-3">
-      <h1 class="font-sec text-fg text-3xl font-light tracking-[0.18em] uppercase md:text-4xl">
+      <h1 class="font-sec text-fg text-3xl font-light tracking-wider uppercase md:text-4xl">
         Create Workshop Post
       </h1>
-      <p class="text-fg/72 dark:text-fg/82 max-w-3xl leading-relaxed">
+      <p class="text-fg/80 dark:text-fg/82 max-w-3xl leading-relaxed">
         Start with the featured image and title, then build the story one block at a time.
       </p>
     </div>
@@ -235,8 +252,8 @@ async function saveNewPost(event) {
         </div>
 
         <div
-          class="border-brdr dark:border-sec-mute bg-sec-light/35 dark:bg-sec/35 overflow-hidden rounded-lg border transition-colors"
-          :class="{ 'border-acc bg-acc/5': isDraggingFeaturedImage }"
+          class="border-brdr dark:border-brdr text-fg/90 dark:text-fg/90 hover:border-acc hover:text-acc bg-sec-light/20 dark:bg-sec/80 flex min-h-44 w-full items-center justify-center rounded-lg border-2 border-dashed transition-colors"
+          :class="{ 'border-acc bg-acc/10': isDraggingFeaturedImage }"
           @dragover.prevent
           @dragenter.prevent="isDraggingFeaturedImage = true"
           @dragleave.prevent="isDraggingFeaturedImage = false"
@@ -244,7 +261,7 @@ async function saveNewPost(event) {
         >
           <div
             v-if="newPost.titleImage.length === 0"
-            class="flex min-h-[320px] cursor-pointer flex-col items-center justify-center gap-4 px-6 text-center"
+            class="flex min-h-80 cursor-pointer flex-col items-center justify-center gap-4 px-6 text-center"
             @click="triggerFeaturedImageUpload"
           >
             <div class="bg-acc/10 text-acc flex size-16 items-center justify-center rounded-lg">
@@ -254,11 +271,11 @@ async function saveNewPost(event) {
               <p class="text-fg/92 dark:text-fg/96 text-lg font-medium">
                 Click or drop the featured image here
               </p>
-              <p class="text-fg/60 dark:text-fg/72 text-sm">JPEG, PNG, or WebP up to 15MB.</p>
+              <p class="text-fg/80 dark:text-fg/72 text-sm">JPEG, PNG, or WebP up to 15MB.</p>
             </div>
           </div>
 
-          <div v-else class="relative aspect-[16/9] overflow-hidden bg-black/5">
+          <div v-else class="relative aspect-video overflow-hidden bg-black/5">
             <img
               :src="newPost.titleImage[0]"
               alt="Featured image preview"
@@ -310,6 +327,12 @@ async function saveNewPost(event) {
         />
       </div>
 
+      <PostSeoFields
+        :fields="seoFields"
+        :disabled="computedButtonState.disabled"
+        @update:fields="updateSeoFields"
+      />
+
       <div class="space-y-3">
         <p class="input-lbl">Post Body</p>
 
@@ -323,7 +346,7 @@ async function saveNewPost(event) {
       <div class="flex flex-wrap items-center gap-4 pt-4">
         <button
           type="button"
-          class="bg-acc hover:bg-acc/90 inline-flex items-center gap-2 rounded-lg px-6 py-3 text-sm font-medium tracking-[0.15em] text-white uppercase transition-colors disabled:cursor-not-allowed disabled:opacity-60"
+          class="bg-acc hover:bg-acc/90 inline-flex items-center gap-2 rounded-lg px-6 py-3 text-sm font-medium tracking-wider text-white uppercase transition-colors disabled:cursor-not-allowed disabled:opacity-60"
           :disabled="computedButtonState.disabled"
           @click="saveNewPost($event)"
         >
@@ -335,7 +358,7 @@ async function saveNewPost(event) {
           {{ computedButtonState.text }}
         </button>
 
-        <p class="text-fg/60 dark:text-fg/72 text-sm">
+        <p class="text-fg/80 dark:text-fg/72 text-sm">
           {{ referencedAssets.length }} block image{{ referencedAssets.length === 1 ? '' : 's' }}
           ready to save with this post.
         </p>

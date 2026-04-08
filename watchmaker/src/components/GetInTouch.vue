@@ -32,7 +32,7 @@ import { ClockIcon } from '@heroicons/vue/24/outline'
       <div class="flex items-start space-x-3 sm:space-x-4">
         <div class="bg-acc mt-2 h-2 w-2 flex-shrink-0 rounded-lg sm:mt-3"></div>
         <div class="min-w-0 flex-1">
-          <h4 class="dark:text-fg/90 text-fg-mute mb-1 text-base font-semibold sm:mb-2">
+          <h4 class="text-fg/80 dark:text-fg/90 mb-1 text-base font-semibold sm:mb-2">
             All Types of Repairs
           </h4>
           <p class="text-fg/90 text-sm leading-relaxed">
@@ -45,7 +45,7 @@ import { ClockIcon } from '@heroicons/vue/24/outline'
       <div class="flex items-start space-x-3 sm:space-x-4">
         <div class="bg-acc mt-2 h-2 w-2 flex-shrink-0 rounded-lg sm:mt-3"></div>
         <div class="min-w-0 flex-1">
-          <h4 class="dark:text-fg/90 text-fg-mute mb-1 text-base font-semibold sm:mb-2">
+          <h4 class="text-fg/80 dark:text-fg/90 mb-1 text-base font-semibold sm:mb-2">
             Fellow Watchmakers
           </h4>
           <p class="text-fg/80 text-sm leading-relaxed">
@@ -58,7 +58,7 @@ import { ClockIcon } from '@heroicons/vue/24/outline'
       <div class="flex items-start space-x-3 sm:space-x-4">
         <div class="bg-acc mt-2 h-2 w-2 flex-shrink-0 rounded-lg sm:mt-3"></div>
         <div class="min-w-0 flex-1">
-          <h4 class="dark:text-fg/90 text-fg-mute mb-1 text-base font-semibold sm:mb-2">
+          <h4 class="text-fg/80 dark:text-fg/90 mb-1 text-base font-semibold sm:mb-2">
             Watch Enthusiasts
           </h4>
           <p class="text-fg text-sm leading-relaxed">

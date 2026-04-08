@@ -1,6 +1,15 @@
 <script setup>
 import { computed, nextTick, ref } from 'vue'
-import { CloudArrowUpIcon, PlusIcon } from '@heroicons/vue/24/outline'
+import {
+  Bars3BottomLeftIcon,
+  ChatBubbleBottomCenterTextIcon,
+  CloudArrowUpIcon,
+  DocumentTextIcon,
+  PhotoIcon,
+  PlusIcon,
+  QueueListIcon,
+  ViewColumnsIcon,
+} from '@heroicons/vue/24/outline'
 import { onClickOutside } from '@vueuse/core'
 import ParagraphBlockEditor from '@/components/posts/ParagraphBlockEditor.vue'
 import { useImageCompression } from '@/composables/useImageCompression'
@@ -233,12 +242,32 @@ const getImageHelperText = (layout) => {
 }
 
 const getBlockMenuOptions = () => [
-  { id: 'title', label: 'Title', create: () => createHeadingBlock(2) },
-  { id: 'paragraph', label: 'Paragraph', create: () => createParagraphBlock() },
-  { id: 'full', label: 'Full Image', create: () => createImageBlock('full') },
-  { id: 'pair', label: 'Two Images', create: () => createImageBlock('pair') },
-  { id: 'caption', label: 'Image + Caption', create: () => createImageBlock('caption') },
-  { id: 'gallery', label: 'Gallery Row', create: () => createImageBlock('gallery') },
+  { id: 'title', label: 'Title', icon: Bars3BottomLeftIcon, create: () => createHeadingBlock(2) },
+  {
+    id: 'paragraph',
+    label: 'Paragraph',
+    icon: DocumentTextIcon,
+    create: () => createParagraphBlock(),
+  },
+  { id: 'full', label: 'Full Image', icon: PhotoIcon, create: () => createImageBlock('full') },
+  {
+    id: 'pair',
+    label: 'Two Images',
+    icon: ViewColumnsIcon,
+    create: () => createImageBlock('pair'),
+  },
+  {
+    id: 'caption',
+    label: 'Image + Caption',
+    icon: ChatBubbleBottomCenterTextIcon,
+    create: () => createImageBlock('caption'),
+  },
+  {
+    id: 'gallery',
+    label: 'Gallery Row',
+    icon: QueueListIcon,
+    create: () => createImageBlock('gallery'),
+  },
 ]
 
 const setDragState = (targetKey, value) => {
@@ -442,7 +471,7 @@ onClickOutside(insertMenuRef, () => {
             <p class="text-fg/92 dark:text-fg/96 text-base font-medium">
               {{ getBlockLabel(block) }}
             </p>
-            <p class="text-fg/60 dark:text-fg/72 text-xs tracking-[0.14em] uppercase">
+            <p class="text-fg/80 dark:text-fg/72 text-xs tracking-[0.14em] uppercase">
               Block {{ index + 1 }}
             </p>
           </div>
@@ -538,7 +567,7 @@ onClickOutside(insertMenuRef, () => {
 
             <div v-if="block.layout === 'gallery'" class="flex flex-wrap gap-2">
               <label class="space-y-1">
-                <span class="text-fg/60 dark:text-fg/72 text-xs tracking-[0.14em] uppercase"
+                <span class="text-fg/80 dark:text-fg/72 text-xs tracking-[0.14em] uppercase"
                   >Gallery Size</span
                 >
                 <select
@@ -587,7 +616,7 @@ onClickOutside(insertMenuRef, () => {
             @dragleave.prevent="setDragState(createTargetKey(block.id, 'gallery'), false)"
             @drop.prevent="handleGalleryDrop(block, $event)"
           >
-            <p class="text-fg/60 dark:text-fg/72 text-center text-sm">
+            <p class="text-fg/80 dark:text-fg/72 text-center text-sm">
               Drop multiple images here to fill the gallery in order.
             </p>
           </div>
@@ -621,7 +650,7 @@ onClickOutside(insertMenuRef, () => {
                 <button
                   v-if="imageRef"
                   type="button"
-                  class="border-brdr text-fg/72 dark:text-fg/82 hover:border-acc hover:text-acc rounded-lg border px-3 py-1.5 text-xs font-medium transition-colors"
+                  class="border-brdr text-fg/80 dark:text-fg/82 hover:border-acc hover:text-acc rounded-lg border px-3 py-1.5 text-xs font-medium transition-colors"
                   :disabled="disabled"
                   @click="clearImageRef(block.id, slotIndex)"
                 >
@@ -689,7 +718,7 @@ onClickOutside(insertMenuRef, () => {
                             : 'Click or drop an image here'
                         }}
                       </p>
-                      <p class="text-fg/60 dark:text-fg/72 text-sm">
+                      <p class="text-fg/80 dark:text-fg/72 text-sm">
                         JPEG, PNG, or WebP up to 15MB.
                       </p>
                     </div>
@@ -708,7 +737,7 @@ onClickOutside(insertMenuRef, () => {
           v-if="!insertMenuOpen"
           key="insert-button"
           type="button"
-          class="border-brdr dark:border-brdr text-fg/90 dark:text-fg/90 hover:border-acc hover:text-acc bg-sec-light/20 dark:bg-sec/80 flex min-h-44 w-full items-center justify-center rounded-lg border-2 border-dashed transition-colors"
+          class="border-brdr dark:border-brdr text-fg/90 dark:text-fg/90 hover:border-acc hover:text-acc bg-sec-light/20 dark:bg-sec/80 flex min-h-44 w-full cursor-pointer items-center justify-center rounded-lg border-2 border-dashed transition-colors"
           :disabled="disabled"
           @click="openInsertMenu"
         >
@@ -724,22 +753,27 @@ onClickOutside(insertMenuRef, () => {
 
         <div v-else key="insert-menu" class="bg-sec-light/70 dark:bg-sec/80 rounded-lg p-5">
           <div class="mb-4 space-y-1">
-            <p class="text-acc tracking-[0.2em] uppercase">Choose Block</p>
+            <p class="text-acc tracking-widest uppercase">Choose Block</p>
             <p class="text-fg">
               Add the next piece of the story, then continue building from there.
             </p>
           </div>
 
-          <div class="grid gap-2 md:grid-cols-2 xl:grid-cols-3">
+          <div class="grid grid-cols-2 gap-2 lg:grid-cols-3">
             <button
               v-for="option in getBlockMenuOptions()"
               :key="option.id"
               type="button"
-              class="border-brdr text-fg hover:border-acc hover:text-acc hover:bg-acc/5 dark:hover:bg-acc/8 rounded-lg border px-4 py-3 text-sm font-medium transition-colors"
+              class="border-brdr text-fg hover:border-acc hover:text-acc hover:bg-acc/5 dark:hover:bg-acc/8 flex items-center gap-3 rounded-lg border px-4 py-3 text-left text-sm font-medium transition-colors"
               :disabled="disabled"
               @click="addBlock(option.create)"
             >
-              {{ option.label }}
+              <span
+                class="bg-acc/10 text-acc flex size-9 shrink-0 items-center justify-center rounded-lg"
+              >
+                <component :is="option.icon" class="size-5" />
+              </span>
+              <span>{{ option.label }}</span>
             </button>
           </div>
         </div>

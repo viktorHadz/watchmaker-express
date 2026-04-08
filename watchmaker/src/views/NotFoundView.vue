@@ -1,21 +1,9 @@
 <script setup>
 import { useHead } from '@unhead/vue'
 import TheDivider from '@/components/TheDivider.vue'
+import { buildNotFoundHead } from '@/seo/head'
 
-useHead({
-  title: 'Page Not Found | The Watchmaker',
-  meta: [
-    {
-      name: 'description',
-      content:
-        'The requested page could not be found. Return to The Watchmaker homepage or browse our repair services.',
-    },
-    {
-      name: 'robots',
-      content: 'noindex, follow',
-    },
-  ],
-})
+useHead(buildNotFoundHead())
 </script>
 
 <template>
@@ -40,7 +28,7 @@ useHead({
           <TheDivider variant="sm" />
         </div>
 
-        <p class="text-fg-mute mx-auto mt-4 max-w-xl text-base leading-relaxed sm:text-lg">
+        <p class="text-fg/80 mx-auto mt-4 max-w-xl text-base leading-relaxed sm:text-lg">
           This page seems to have slipped between gears. Head back to the workshop or continue to
           the repairs page and we will get you back on track.
         </p>

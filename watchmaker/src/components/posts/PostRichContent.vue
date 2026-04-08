@@ -28,7 +28,7 @@ const renderedHtml = computed(() => addHeadingAnchorsToPostHtml(props.content))
     v-html="renderedHtml"
   ></div>
 
-  <p v-else class="text-fg/68 dark:text-fg/78 leading-relaxed">
+  <p v-else class="text-fg/80 dark:text-fg/78 leading-relaxed">
     {{ emptyMessage }}
   </p>
 </template>
