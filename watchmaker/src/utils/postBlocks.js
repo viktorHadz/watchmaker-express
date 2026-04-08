@@ -1,5 +1,7 @@
 const ASSET_TOKEN_PREFIX = '__WATCHMAKER_MEDIA__:'
-export const GALLERY_BLOCK_COUNTS = [2, 3, 6, 9]
+export const BULK_GALLERY_BLOCK_COUNT = 100
+export const GALLERY_BLOCK_COUNTS = [2, 3, 6, 9, BULK_GALLERY_BLOCK_COUNT]
+const MAX_GALLERY_BLOCK_IMAGES = Math.max(...GALLERY_BLOCK_COUNTS)
 
 const escapeHtml = (value = '') =>
   value
@@ -22,6 +24,22 @@ const normaliseLayout = (layout = 'full') =>
 const normaliseGalleryCount = (count = 3) => {
   const parsed = Number(count)
   return GALLERY_BLOCK_COUNTS.includes(parsed) ? parsed : 3
+}
+
+const getGalleryCountClass = (count = 3) =>
+  `post-block-row--gallery-${normaliseGalleryCount(count)}`
+
+const getGalleryCountFromClassList = (classList, fallbackCount) => {
+  const galleryClass = Array.from(classList || []).find((className) =>
+    className.startsWith('post-block-row--gallery-'),
+  )
+
+  if (!galleryClass) {
+    return fallbackCount
+  }
+
+  const parsed = Number(galleryClass.replace('post-block-row--gallery-', ''))
+  return GALLERY_BLOCK_COUNTS.includes(parsed) ? parsed : fallbackCount
 }
 
 const getDefaultImageRefs = (layout = 'full') => {
@@ -264,8 +282,9 @@ export const buildPostHtmlFromBlocks = (blocks = [], assets = [], options = {}) 
           return []
         }
 
+        const galleryCount = normaliseGalleryCount(imageRefs.length)
         const figures = selectedRefs
-          .slice(0, 9)
+          .slice(0, MAX_GALLERY_BLOCK_IMAGES)
           .map((imageRef) =>
             buildImageFigure(
               resolveImageSrc(imageRef, assets, options),
@@ -276,7 +295,7 @@ export const buildPostHtmlFromBlocks = (blocks = [], assets = [], options = {}) 
 
         return figures.length >= 2
           ? [
-              `<div class="post-block-row post-block-row--gallery post-block-row--gallery-${figures.length}">${figures.join('')}</div>`,
+              `<div class="post-block-row post-block-row--gallery ${getGalleryCountClass(galleryCount)}">${figures.join('')}</div>`,
             ]
           : []
       }
@@ -368,13 +387,17 @@ export const parsePostHtmlToBlocks = (html = '', assets = []) => {
     }
 
     if (tagName === 'div' && node.classList.contains('post-block-row--gallery')) {
-      const imageRefs = parseImageRefs(Array.from(node.querySelectorAll('img')).slice(0, 9), assets)
+      const imageRefs = parseImageRefs(
+        Array.from(node.querySelectorAll('img')).slice(0, MAX_GALLERY_BLOCK_IMAGES),
+        assets,
+      )
       if (imageRefs.length >= 2) {
+        const galleryCount = getGalleryCountFromClassList(node.classList, imageRefs.length)
         blocks.push({
           id: createBlockId(),
           type: 'image',
           layout: 'gallery',
-          imageRefs,
+          imageRefs: Array.from({ length: galleryCount }, (_, index) => imageRefs[index] || ''),
           caption: '',
         })
       }

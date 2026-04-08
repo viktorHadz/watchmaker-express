@@ -15,6 +15,7 @@ import ParagraphBlockEditor from '@/components/posts/ParagraphBlockEditor.vue'
 import { useImageCompression } from '@/composables/useImageCompression'
 import { useToastStore } from '@/stores/toast'
 import {
+  BULK_GALLERY_BLOCK_COUNT,
   createHeadingBlock,
   createImageBlock,
   createParagraphBlock,
@@ -195,6 +196,13 @@ const clearImageRef = (blockId, slotIndex) => {
   updateImageRef(blockId, slotIndex, '')
 }
 
+const clearAllGalleryImages = (blockId) => {
+  updateBlock(blockId, (block) => ({
+    ...block,
+    imageRefs: (block.imageRefs || []).map(() => ''),
+  }))
+}
+
 const updateImageCaption = (blockId, caption) => {
   updateBlock(blockId, (block) => ({
     ...block,
@@ -228,6 +236,18 @@ const getImageGridClass = (block) => {
   return 'grid gap-4'
 }
 
+const isBulkGalleryBlock = (block) =>
+  block?.layout === 'gallery' &&
+  Array.isArray(block.imageRefs) &&
+  block.imageRefs.length === BULK_GALLERY_BLOCK_COUNT
+
+const getFilledGallerySlots = (block) =>
+  (block?.imageRefs || [])
+    .map((imageRef, slotIndex) => ({ imageRef, slotIndex }))
+    .filter(({ imageRef }) => Boolean(`${imageRef || ''}`.trim()))
+
+const getFilledGalleryImageCount = (block) => getFilledGallerySlots(block).length
+
 const getImageHelperText = (layout) => {
   switch (layout) {
     case 'caption':
@@ -235,7 +255,7 @@ const getImageHelperText = (layout) => {
     case 'pair':
       return 'Upload two images for a balanced side-by-side composition.'
     case 'gallery':
-      return 'Upload images one by one or in a batch.'
+      return 'Upload images one by one or in a batch. The 100-image option switches to a single bulk uploader.'
     default:
       return 'Upload one full-width image to create a visual break in the story.'
   }
@@ -432,8 +452,15 @@ const getGalleryBatchTargetIndices = (block, fileCount) => {
 }
 
 const handleGalleryBatchUpload = async (block, files) => {
-  const targetIndices = getGalleryBatchTargetIndices(block, files.length)
-  await uploadFilesIntoSlots(block, targetIndices, files)
+  const galleryTargetKey = createTargetKey(block.id, 'gallery')
+  setProcessingState(galleryTargetKey, true)
+
+  try {
+    const targetIndices = getGalleryBatchTargetIndices(block, files.length)
+    await uploadFilesIntoSlots(block, targetIndices, files)
+  } finally {
+    setProcessingState(galleryTargetKey, false)
+  }
 }
 
 const handleGalleryBatchInputChange = async (block, event) => {
@@ -584,29 +611,41 @@ onClickOutside(insertMenuRef, () => {
                 </select>
               </label>
 
-              <div class="flex items-end">
+              <input
+                :id="createFieldId(block.id, 'gallery-upload')"
+                :name="createFieldName(block.id, 'gallery_upload')"
+                type="file"
+                accept="image/jpeg,image/png,image/webp"
+                multiple
+                class="hidden"
+                :disabled="disabled"
+                @change="handleGalleryBatchInputChange(block, $event)"
+              />
+
+              <div v-if="!isBulkGalleryBlock(block)" class="flex items-end">
                 <label
                   :for="createFieldId(block.id, 'gallery-upload')"
                   class="border-brdr text-fg/88 dark:text-fg/94 hover:border-acc hover:text-acc inline-flex cursor-pointer items-center rounded-lg border px-3 py-4 text-xs font-medium transition-colors"
                 >
                   Upload Multiple
                 </label>
-                <input
-                  :id="createFieldId(block.id, 'gallery-upload')"
-                  :name="createFieldName(block.id, 'gallery_upload')"
-                  type="file"
-                  accept="image/jpeg,image/png,image/webp"
-                  multiple
-                  class="hidden"
+              </div>
+
+              <div v-else-if="getFilledGalleryImageCount(block)" class="flex items-end">
+                <button
+                  type="button"
+                  class="border-brdr text-fg/88 dark:text-fg/94 hover:border-acc hover:text-acc inline-flex items-center rounded-lg border px-3 py-4 text-xs font-medium transition-colors"
                   :disabled="disabled"
-                  @change="handleGalleryBatchInputChange(block, $event)"
-                />
+                  @click="clearAllGalleryImages(block.id)"
+                >
+                  Clear All
+                </button>
               </div>
             </div>
           </div>
 
           <div
-            v-if="block.layout === 'gallery'"
+            v-if="block.layout === 'gallery' && !isBulkGalleryBlock(block)"
             class="border-brdr bg-sec-light/30 dark:bg-sec/80 rounded-lg border border-dashed px-4 py-3"
             :class="{
               'border-acc bg-acc/5': isDraggingTarget(createTargetKey(block.id, 'gallery')),
@@ -620,6 +659,41 @@ onClickOutside(insertMenuRef, () => {
               Drop multiple images here to fill the gallery in order.
             </p>
           </div>
+
+          <label
+            v-if="isBulkGalleryBlock(block)"
+            :for="createFieldId(block.id, 'gallery-upload')"
+            class="group border-brdr bg-sec-light/35 dark:bg-sec/70 block cursor-pointer rounded-lg border border-dashed p-6 transition-colors"
+            :class="{
+              'border-acc bg-acc/5': isDraggingTarget(createTargetKey(block.id, 'gallery')),
+            }"
+            @dragover.prevent
+            @dragenter.prevent="setDragState(createTargetKey(block.id, 'gallery'), true)"
+            @dragleave.prevent="setDragState(createTargetKey(block.id, 'gallery'), false)"
+            @drop.prevent="handleGalleryDrop(block, $event)"
+          >
+            <div class="flex flex-col items-center justify-center gap-3 text-center">
+              <div class="bg-acc/10 text-acc flex size-14 items-center justify-center rounded-lg">
+                <CloudArrowUpIcon class="size-7" />
+              </div>
+              <div class="space-y-1">
+                <p class="text-fg/92 dark:text-fg/96 font-medium">
+                  {{
+                    isProcessingTarget(createTargetKey(block.id, 'gallery'))
+                      ? 'Processing images...'
+                      : 'Click or drop images here'
+                  }}
+                </p>
+                <p class="text-fg/80 dark:text-fg/72 text-sm">
+                  Upload multiple images at once. {{ getFilledGalleryImageCount(block) }} of
+                  {{ block.imageRefs.length }} added.
+                </p>
+                <p class="text-fg/72 dark:text-fg/66 text-xs">
+                  JPEG, PNG, or WebP up to 15MB each.
+                </p>
+              </div>
+            </div>
+          </label>
 
           <div v-if="block.layout === 'caption'" class="space-y-2">
             <label class="space-y-2">
@@ -637,7 +711,39 @@ onClickOutside(insertMenuRef, () => {
             </label>
           </div>
 
-          <div :class="getImageGridClass(block)">
+          <div
+            v-if="isBulkGalleryBlock(block) && getFilledGalleryImageCount(block)"
+            class="grid gap-3 sm:grid-cols-2 xl:grid-cols-4"
+          >
+            <div
+              v-for="{ imageRef, slotIndex } in getFilledGallerySlots(block)"
+              :key="`${block.id}-gallery-preview-${slotIndex}`"
+              class="border-brdr bg-sec-light/35 dark:bg-sec/65 overflow-hidden rounded-lg border"
+            >
+              <div class="aspect-[4/3] overflow-hidden bg-black/5">
+                <img
+                  :src="getImagePreview(imageRef)"
+                  :alt="`Selected image ${slotIndex + 1}`"
+                  class="h-full w-full object-cover"
+                />
+              </div>
+              <div class="flex items-center justify-between gap-3 px-3 py-2">
+                <p class="text-fg/80 dark:text-fg/72 text-xs font-medium uppercase">
+                  Image {{ slotIndex + 1 }}
+                </p>
+                <button
+                  type="button"
+                  class="border-brdr text-fg/80 dark:text-fg/82 hover:border-acc hover:text-acc rounded-lg border px-3 py-1.5 text-xs font-medium transition-colors"
+                  :disabled="disabled"
+                  @click="clearImageRef(block.id, slotIndex)"
+                >
+                  Remove
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <div v-else-if="!isBulkGalleryBlock(block)" :class="getImageGridClass(block)">
             <div
               v-for="(imageRef, slotIndex) in block.imageRefs"
               :key="`${block.id}-${slotIndex}`"

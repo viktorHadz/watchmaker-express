@@ -6,8 +6,11 @@ import {
 } from './content.js'
 import { siteProfile } from './siteProfile.js'
 import {
+  DEFAULT_OG_IMAGE_HEIGHT,
   DEFAULT_OG_IMAGE_PATH,
+  DEFAULT_OG_IMAGE_WIDTH,
   buildCanonicalPostPath,
+  getImageMimeType,
   getPostOgImage,
   getPostSeoDescription,
   getPostSeoTitle,
@@ -36,6 +39,9 @@ function baseHead({
 }) {
   const canonicalUrl = toAbsoluteUrl(path)
   const ogImage = image || toAbsoluteUrl(DEFAULT_OG_IMAGE_PATH)
+  const defaultOgImage = toAbsoluteUrl(DEFAULT_OG_IMAGE_PATH)
+  const ogImageType = getImageMimeType(ogImage)
+  const usesDefaultOgImage = ogImage === defaultOgImage
   const resolvedNonce = nonce || getClientCspNonce()
   const resolvedImageAlt = imageAlt || `${siteProfile.businessName} social preview`
 
@@ -55,11 +61,20 @@ function baseHead({
       { property: 'og:site_name', content: siteProfile.businessName },
       { property: 'og:locale', content: 'en_GB' },
       { property: 'og:image', content: ogImage },
+      { property: 'og:image:url', content: ogImage },
       { property: 'og:image:secure_url', content: ogImage },
+      ogImageType ? { property: 'og:image:type', content: ogImageType } : null,
+      usesDefaultOgImage
+        ? { property: 'og:image:width', content: `${DEFAULT_OG_IMAGE_WIDTH}` }
+        : null,
+      usesDefaultOgImage
+        ? { property: 'og:image:height', content: `${DEFAULT_OG_IMAGE_HEIGHT}` }
+        : null,
       { property: 'og:image:alt', content: resolvedImageAlt },
       { name: 'twitter:card', content: 'summary_large_image' },
       { name: 'twitter:title', content: title },
       { name: 'twitter:description', content: description },
+      { name: 'twitter:url', content: canonicalUrl },
       { name: 'twitter:image', content: ogImage },
       { name: 'twitter:image:alt', content: resolvedImageAlt },
       ...extraMeta,

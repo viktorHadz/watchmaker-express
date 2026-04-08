@@ -2,6 +2,8 @@ import { getPostExcerpt } from '../utils/postContent.js'
 
 export const SITE_ORIGIN = 'https://thewatchmaker.uk'
 export const DEFAULT_OG_IMAGE_PATH = '/og-image-thewatchmaker.png'
+export const DEFAULT_OG_IMAGE_WIDTH = 1200
+export const DEFAULT_OG_IMAGE_HEIGHT = 630
 export const DEFAULT_POST_LOCATION = 'London, UK'
 
 export function slugify(value = '') {
@@ -48,6 +50,28 @@ export function toAbsoluteUrl(path = '/') {
   }
 
   return `${SITE_ORIGIN}${path.startsWith('/') ? path : `/${path}`}`
+}
+
+export function getImageMimeType(path = '') {
+  const normalisedPath = `${path}`.toLowerCase()
+
+  if (normalisedPath.endsWith('.png')) {
+    return 'image/png'
+  }
+
+  if (normalisedPath.endsWith('.jpg') || normalisedPath.endsWith('.jpeg')) {
+    return 'image/jpeg'
+  }
+
+  if (normalisedPath.endsWith('.webp')) {
+    return 'image/webp'
+  }
+
+  if (normalisedPath.endsWith('.gif')) {
+    return 'image/gif'
+  }
+
+  return ''
 }
 
 export function formatPostalHtml(value = '') {
