@@ -61,8 +61,7 @@ const resolveIcon = (index) => sectionIcons[index % sectionIcons.length]
         </div>
       </div>
 
-      <div
-        class="border-brdr/50 divide-brdr/50 dark:border-acc/20 dark:divide-acc/20 mx-auto w-full max-w-2xl divide-y border-y lg:mx-0 lg:max-w-none">
+      <div class="border-brdr/50 divide-brdr/50 mx-auto w-full max-w-2xl divide-y border-y lg:mx-0 lg:max-w-none">
         <article v-for="(section, index) in props.sections" :key="section.heading"
           class="flex gap-4 px-1 py-6 text-left sm:gap-6">
           <div class="text-acc flex size-11 shrink-0 items-center justify-center">

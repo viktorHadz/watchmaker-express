@@ -171,17 +171,18 @@
   transform-box: fill-box;
 }
 
-#inner-btm-sm {
-  animation: rotate-cw 6s linear infinite;
+#inner-top-md {
+  animation: rotate-cw 4s linear infinite;
   transform-origin: center;
   transform-box: fill-box;
 }
 
-#inner-top-md {
-  animation: rotate-cw 6s linear infinite;
+#inner-btm-sm {
+  animation: rotate-cw 2s linear infinite;
   transform-origin: center;
   transform-box: fill-box;
 }
+
 
 /* Dont Like the tick */
 /* #inner-cntrl-lg {
