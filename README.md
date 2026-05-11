@@ -1,6 +1,6 @@
 # The Watchmaker
 
-![WatchMaker Mascot](./watchmaker-express/watchmaker/watchmaker-readme-photo.webp)
+![WatchMaker Mascot](.//watchmaker/watchmaker-readme-photo.webp)
 
 The Watchmaker is a full-stack watch repair website built to present a craft-led business in a way that feels polished, trustworthy, and easy to manage. On the surface it works as a public-facing service site for repairs and enquiries, but underneath it also includes a custom workshop blog and gallery, a protected admin area, and a backend that handles content, uploads, authentication, and email-based contact flow. The project is designed to feel human first: clear storytelling, strong visual identity, and a content system that supports ongoing updates without bolting on a separate CMS.
 
