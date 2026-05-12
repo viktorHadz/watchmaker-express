@@ -2,11 +2,11 @@
 
 ![WatchMaker Mascot](.//watchmaker/watchmaker-readme-photo.webp)
 
-The Watchmaker is a full-stack watch repair website built to present a craft-led business in a way that feels polished, trustworthy, and easy to manage. On the surface it works as a public-facing service site for repairs and enquiries, but underneath it also includes a custom workshop blog and gallery, a protected admin area, and a backend that handles content, uploads, authentication, and email-based contact flow. The project is designed to feel human first: clear storytelling, strong visual identity, and a content system that supports ongoing updates without bolting on a separate CMS.
+The Watchmaker is a full-stack watch repair website built to present a craft-led business in a way that feels polished, trustworthy, and easy to manage. On the surface it works as a public-facing service site for repairs and enquiries, but underneath it also includes a custom workshop blog and gallery, a protected admin area, and a backend that handles content, uploads, authentication, and email-based contact flow. My idea was to get as close as possible to a clear story with this product. Strong visual identity, and a content system that supports ongoing updates without relying on external libraries. 
 
 ## Why This Project Stands Out
 
-**Polished UI with a clear visual identity.** The frontend is not just a generic brochure layout. It uses a warm, horology-inspired design language, responsive sections, light and dark themes, structured page layouts, and thoughtful motion to make the brand feel intentional.
+**Polished UI with a clear visual identity.** The frontend is not just a generic brochure layout. It uses a warm/calm, horology-inspired design language, responsive sections, light and dark themes, structured page layouts, and thoughtful motion to make the brand feel intentional.
 
 **A custom Vue-powered workshop blog and gallery.** One of the strongest parts of the project is the content system. Posts are created and managed inside the app, then surfaced as a workshop gallery and individual detail pages with rich text, images, previews, pagination, and sharing.
 
@@ -67,4 +67,4 @@ The frontend runs through Vite, and the backend runs as a separate Express proce
 
 ## Current State
 
-The project already has a strong core: a distinctive frontend, a custom blog and gallery workflow, Google-protected admin publishing, SQLite-backed content storage, upload handling, and live contact submission. It is far beyond a starter template, but it is still an active application rather than a finished platform. There is not currently an automated test suite, so most confidence today comes from the code structure, validation layers, and manual feature verification.
+The project already has a strong core: a distinctive frontend, a custom blog and gallery workflow, Google-protected admin publishing, SQLite-backed content storage, upload handling, and live contact submission. It is far beyond a starter template, but it is still an active application rather than a finished platform. There is not currently an automated test suite, so most confidence today comes from the code structure, validation layers, and manual feature verification as the project is still small. 
